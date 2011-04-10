@@ -1,0 +1,18 @@
+%%
+%% -*- erlang-indent-level: 4;indent-tabs-mode: nil -*-
+%%
+{variables, [{package_name, "riak"},
+             {package_install_name, "riak"},
+             {package_install_user, "riak"},
+             {package_install_group, "riak"}]}.
+{template, "Makefile", "Makefile"}.
+{template, "compat", "compat"}.
+{template, "control", "control"}.
+{template, "copyright", "copyright"}.
+{template, "dirs", "dirs"}.
+{template, "postinst", "postinst"}.
+{template, "postrm", "postrm"}.
+{template, "rules", "rules"}.
+{template, "vars.config", "vars.config"}.
+{template, "init.script", "init.script"}.
+

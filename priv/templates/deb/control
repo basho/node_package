@@ -1,0 +1,14 @@
+Source: {{package_name}}
+Section: net
+Priority: extra
+Maintainer: Basho <support@basho.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.3
+Homepage: http://basho.com/
+
+Package: {{package_name}}
+Architecture: any
+Depends: adduser, logrotate, ${shlibs:Depends}, ${misc:Depends}
+Description: {{package_shortdesc}}
+  {{package_desc}}
+

@@ -1,0 +1,12 @@
+
+##
+## Export all variables to sub-invocation
+##
+export
+
+default:
+	mkdir -p $(TAG)/debian
+	cd $(TAG)/debian && $(REBAR) -v create \
+                              template_dir=../deps/riak_package/priv/templates \
+                              template_vars=../pkg.vars.config template=deb
+	make -C $(TAG) -f debian/Makefile

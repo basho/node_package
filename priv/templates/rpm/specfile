@@ -1,0 +1,114 @@
+# _revision, _release, and _version should be defined on the rpmbuild command
+# line like so:
+#
+# --define "_version 0.9.1.19.abcdef" --define "_release 7" \
+# --define "_revision 0.9.1-19-abcdef"
+
+Name: {{package_name}}
+Version: %{_version}
+Release: %{_release}%{?dist}
+License: Proprietary
+Group: Development/Libraries
+Source: %{name}-%{_revision}.tar.gz
+URL: http://basho.com
+Vendor: Basho Technologies
+Packager: Basho Technologies <support@basho.com>
+BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
+Summary: {{package_shortdesc}}
+Obsoletes: {{package_name}}
+
+%description
+{{package_desc}}
+
+%define init_script %{_sysconfdir}/init.d/{{package_install_name}}
+
+%define __prelink_undo_cmd /bin/cat prelink library
+
+%prep
+%setup -q -n {{package_name}}-%{_revision}
+cat > rpm.vars.config <<EOF
+{data_dir,          "%{_localstatedir}/lib/{{package_install_name}}"}.
+{runner_script_dir, "/usr/sbin"}.
+{runner_bin_dir,    "%{_libdir}/{{package_install_name}}"}.
+{runner_run_dir,    "%{_localstatedir}/lib/{{package_install_name}}"}.
+{runner_etc_dir,    "%{_sysconfdir}/{{package_install_name}}"}.
+{runner_log_dir,    "%{_localstatedir}/log/{{package_install_name}}"}.
+{runner_user,       "{{package_install_user}}"}.
+{pipe_dir,          "%{_localstatedir}/run/{{package_install_name}}"}.
+EOF
+
+
+%build
+OVERLAY_VARS="overlay_vars=../rpm.vars.config" make rel
+
+%install
+%define relpath	      %{_builddir}/%{buildsubdir}/rel/{{package_install_name}}
+%define buildroot_lib %{buildroot}%{_libdir}/{{package_install_name}}
+%define buildroot_etc %{buildroot}%{_sysconfdir}/{{package_install_name}}
+
+mkdir -p %{buildroot_etc}
+mkdir -p %{buildroot_lib}
+mkdir -p %{buildroot}%{_localstatedir}/lib/{{package_install_name}}
+mkdir -p %{buildroot}%{_localstatedir}/log/{{package_install_name}}
+mkdir -p %{buildroot}%{_localstatedir}/run/{{package_install_name}}
+
+cp -R %{relpath}/lib       %{buildroot_lib}
+cp -R %{relpath}/erts-*    %{buildroot_lib}
+cp -R %{relpath}/releases  %{buildroot_lib}
+
+mkdir -p %{buildroot}%{_bindir}
+if [ -d %{relpath}/bin ]; then \
+   find %{relpath}/bin -type f \
+        -exec install -p -D -m 0755 {} %{buildroot}%{_bindir}/ \; ;fi
+
+mkdir -p %{buildroot}%{_sbindir}
+if [ -d %{relpath}/sbin ]; then \
+   find %{relpath}/sbin -type f \
+        -exec install -p -D -m 0755 {} %{buildroot}%{_sbindir}/ \; ;fi
+
+install -m644 %{relpath}/etc/app.config %{buildroot_etc}/app.config
+install -m644 %{relpath}/etc/vm.args    %{buildroot_etc}/vm.args
+
+mkdir -p %{buildroot}%{_sysconfdir}/init.d
+install -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
+
+
+# Needed to work around check-rpaths which seems to be hardcoded into recent
+# RPM releases
+export QA_RPATHS=3
+
+
+%pre
+if ! getent group {{package_install_group}} >/dev/null 2>&1; then
+   groupadd -r {{package_install_group}}
+fi
+
+if getent passwd {{package_install_user}} >/dev/null 2>&1; then
+   usermod -d %{_localstatedir}/lib/{{package_install_name}} {{package_install_user}}
+else
+   useradd -r -g {{package_install_group}} \
+           --home %{_localstatedir}/lib/{{package_install_name}} \
+           {{package_install_user}}
+fi
+
+%post
+# Fixup perms for SELinux
+find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
+
+
+%files
+%defattr(-,{{package_install_user}},{{package_install_group}})
+%{_libdir}/*
+%dir %{_sysconfdir}/{{package_install_name}}
+%config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
+%{_bindir}
+%{_sbindir}
+%{_localstatedir}/lib/{{package_install_name}}
+%{_localstatedir}/log/{{package_install_name}}
+%{_localstatedir}/run/{{package_install_name}}
+%{_sysconfdir}/init.d/{{package_install_name}}
+
+%clean
+rm -rf %{buildroot}
+
+

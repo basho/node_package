@@ -1,0 +1,11 @@
+
+##
+## Export all variables to sub-invocation
+##
+export
+
+default:
+	$(REBAR) -v create \
+                    template_dir=$(TAG)/deps/riak_package/priv/templates \
+                    template_vars=$(TAG)/pkg.vars.config template=rpm
+	make -f Makefile

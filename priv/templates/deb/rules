@@ -1,0 +1,76 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+build:
+	## Clear variables that may confound our build of erlang_js; also
+	## note that it is necessary to use overlay_vars relative to .. as
+	## the generate command EXECUTES in rel/
+	unset CC CFLAGS CPPFLAGS LDFLAGS CXX CXXFLAGS \
+		&& OVERLAY_VARS="overlay_vars=../debian/vars.config" make rel
+	touch build
+
+clean:
+	dh_clean
+	rm -f build
+	make clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	cp -R rel/{{package_install_name}}/lib \
+              debian/{{package_name}}/usr/lib/{{package_install_name}}
+
+	cp -R rel/{{package_install_name}}/erts* \
+              debian/{{package_name}}/usr/lib/{{package_install_name}}
+
+	cp -R rel/{{package_install_name}}/releases \
+              debian/{{package_name}}/usr/lib/{{package_install_name}}
+
+	if [ -d rel/{{package_install_name}}/bin ]; then \
+	    mkdir -p debian/{{package_name}}/usr/bin; \
+	    find rel/{{package_install_name}}/bin -type f \
+               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/bin/ \; ;fi
+
+	if [ -d rel/{{package_install_name}}/sbin ]; then \
+	   mkdir -p debin/{{package_name}}/usr/sbin; \
+	   find rel/{{package_install_name}}/sbin -type f \
+              -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
+
+	install -m644 rel/{{package_install_name}}/etc/app.config \
+	 	debian/{{package_name}}/etc/{{package_install_name}}/app.config
+	install -m644 rel/riak/etc/vm.args \
+	 	debian/{{package_name}}/etc/{{package_install_name}}/vm.args
+
+	install -m755 debian/init.script debian/{{package_name}}/etc/init.d/{{package_install_name}}
+
+	# install -p -D -m 0644 doc/man/man1/riak.1.gz \
+	# 	debian/{{package_name}}/usr/share/man/man1/riak.1.gz
+	# install -p -D -m 0644 doc/man/man1/riak-admin.1.gz \
+	# 	debian/{{package_name}}/usr/share/man/man1/riak-admin.1.gz
+	# install -m644 rel/riak/etc/snmp/agent/conf/* \
+	# 	debian/{{package_name}}/etc/riak/snmp/agent/conf
+	# chmod 555 debian/{{package_name}}/usr/lib/riak/lib/riak_jmx-*/priv/riak_jmx.sh
+
+binary-indep: install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: install
+	dh_strip -a
+	dh_compress -a
+	dh_installdeb
+	dh_gencontrol
+	dh_builddeb
+
+binary: binary-indep binary-arch

@@ -1,0 +1,3 @@
+* node_package
+** Overview
+node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for packaging embedded Erlang nodes. 
