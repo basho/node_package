@@ -1,5 +1,5 @@
 {application, node_package,
- [{description, "RPM/Debian/Solaris packaging templates for Erlang Nodes",
+ [{description, "RPM/Debian/Solaris packaging templates for Erlang Nodes"},
   {vsn, git},
   {modules, []},
   {registered, []},
