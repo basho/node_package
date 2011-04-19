@@ -6,6 +6,7 @@ export
 
 default:
 	$(REBAR) -v create \
-                    template_dir=$(TAG)/deps/node_package/priv/templates \
-                    template_vars=$(TAG)/pkg.vars.config template=rpm
+                    package_name=$(PKG_NAME) \
+                    template_dir=$(PKG_ID)/deps/node_package/priv/templates \
+                    template_vars=$(PKG_ID)/pkg.vars.config template=rpm
 	make -f Makefile
