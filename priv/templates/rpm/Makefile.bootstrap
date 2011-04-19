@@ -6,6 +6,6 @@ export
 
 default:
 	$(REBAR) -v create \
-                    template_dir=$(TAG)/deps/riak_package/priv/templates \
+                    template_dir=$(TAG)/deps/node_package/priv/templates \
                     template_vars=$(TAG)/pkg.vars.config template=rpm
 	make -f Makefile
