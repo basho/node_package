@@ -47,12 +47,11 @@ install: build
 	   find rel/{{package_install_name}}/sbin -type f \
               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
 
-	install -m644 rel/{{package_install_name}}/etc/app.config \
-	 	debian/{{package_name}}/etc/{{package_install_name}}/app.config
-	install -m644 rel/riak/etc/vm.args \
-	 	debian/{{package_name}}/etc/{{package_install_name}}/vm.args
+	cp -R rel/{{package_install_name}}/etc \
+              debian/{{package_name}}/etc/{{package_install_name}}
 
-	install -m755 debian/init.script debian/{{package_name}}/etc/init.d/{{package_install_name}}
+	install -m755 debian/init.script \
+              debian/{{package_name}}/etc/init.d/{{package_install_name}}
 
 	# install -p -D -m 0644 doc/man/man1/riak.1.gz \
 	# 	debian/{{package_name}}/usr/share/man/man1/riak.1.gz

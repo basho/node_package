@@ -66,8 +66,7 @@ if [ -d %{relpath}/sbin ]; then \
    find %{relpath}/sbin -type f \
         -exec install -p -D -m 0755 {} %{buildroot}%{_sbindir}/ \; ;fi
 
-install -m644 %{relpath}/etc/app.config %{buildroot_etc}/app.config
-install -m644 %{relpath}/etc/vm.args    %{buildroot_etc}/vm.args
+cp -R %{relpath}/etc %{buildroot_etc}
 
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
 install -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
