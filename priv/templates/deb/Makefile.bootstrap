@@ -5,6 +5,7 @@
 export
 
 default:
+	ln -sf $(TAG).tar.gz $(REVISION).orig.tar.gz
 	mkdir -p $(TAG)/debian
 	cd $(TAG)/debian && $(REBAR) -v create \
                               template_dir=../deps/node_package/priv/templates \
