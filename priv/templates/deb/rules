@@ -47,7 +47,7 @@ install: build
 	   find rel/{{package_install_name}}/sbin -type f \
               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
 
-	cp -R rel/{{package_install_name}}/etc \
+	cp -R rel/{{package_install_name}}/etc/* \
               debian/{{package_name}}/etc/{{package_install_name}}
 
 	install -m755 debian/init.script \
