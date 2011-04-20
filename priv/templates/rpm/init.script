@@ -1,39 +1,34 @@
 #!/bin/bash
 #
-# Riak Distributed Data Store
+# {{package_name}}
 #
 # chkconfig: 2345 80 30
-# description: Riak is a distrubuted data store.
+# description: {{package_shortdesc}}
 # processname: beam 
-# config: /etc/riak/app.config
-# config: /etc/riak/vm.args
+# config: /etc/{{package_install_name}}/app.config
+# config: /etc/{{package_install_name}}/vm.args
 #
 
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-#check for script,config, and data dirs
-[ -x /usr/sbin/riak ] || exit 0
-[ -d /etc/riak ] || exit 0
-[ -d /var/lib/riak ] || exit 0
-[ -d /var/run/riak ] || exit 0
-
 RETVAL=0
-
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="a distributed key value store"
-NAME=riak
+DESC="{{package_shortdesc}}"
+NAME={{package_install_name}}
 DAEMON=/usr/sbin/$NAME
+
+# Check for script, config and data dirs
+[ -x /usr/sbin/$NAME ] || exit 0
+[ -d /etc/$NAME ] || exit 0
+[ -d /var/lib/$NAME ] || exit 0
+[ -d /var/run/$NAME ] || exit 0
 
 
 start() {
-        #Check if Riak is running
-        RETVAL=`$DAEMON ping`
-        [ "$RETVAL" = "pong" ] && echo "Riak is already running" && return 1
-
 	# Start daemons.
-	echo -n $"Starting Riak: "
-	su - riak -c "$DAEMON start" && success || failure $"$NAME start"
+	echo -n $"Starting {{package_name}}: "
+	su - {{package_install_user}} -c "$DAEMON start" && success || failure $"$NAME start"
 	RETVAL=$?
 	[ $RETVAL -eq 0 ]
         echo
@@ -42,9 +37,8 @@ start() {
 
 stop() {
         # Stop daemon.
-	echo -n $"Stopping Riak: "
-  	RETVAL=`su - riak -c "$DAEMON ping"`
-  	[ "$RETVAL" = "pong" ] && su - riak -c "$DAEMON stop 2>/dev/null 1>&2" 
+	echo -n $"Stopping {{package_name}}: "
+  	$DAEMON stop 2>/dev/null 1>&2
         sleep 2
         RETVAL=`pidof beam.smp`
         [ "$RETVAL" = "" ] && success && echo && return 0 || failure $"$NAME stop"
@@ -54,16 +48,6 @@ stop() {
         echo
         return 1
 
-}
-
-reload() {
-        # Restart the VM without exiting the process
-	echo -n $"Reloading Riak: "
-  	RETVAL=`su - riak -c "$DAEMON ping"`
-  	[ "$RETVAL" = "pong" ] && su - riak -c "$DAEMON restart 2>/dev/null 1>&2" \
-        && success && echo && return 0 || failure $"$NAME restart" 
-        echo
-	return $RETVAL
 }
 
 
@@ -79,14 +63,11 @@ case "$1" in
  	stop
 	start
 	;;
-  reload)
-	reload
-	;;
   ping)
-	su - riak -c "$DAEMON ping" || exit $?
+	$DAEMON ping || exit $?
         ;;
   *)
-	echo $"Usage: $0 {start|stop|reload|restart|ping}"
+	echo $"Usage: $0 {start|stop|restart|ping}"
 	exit 1
 esac
 
