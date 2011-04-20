@@ -2,67 +2,19 @@
 # -*- tab-width:4;indent-tabs-mode:nil -*-
 # ex: ts=4 sw=4 et
 
-RUNNER_SCRIPT_DIR={{runner_script_dir}}
-RUNNER_SCRIPT=${0##*/}
+# Pull environment for this install
+source {{runner_bin_dir}}/lib/env.sh
 
-RUNNER_BIN_DIR={{runner_bin_dir}}
-RUNNER_RUN_DIR={{runner_run_dir}}
-RUNNER_ETC_DIR={{runner_etc_dir}}
-RUNNER_LOG_DIR={{runner_log_dir}}
-PIPE_DIR={{pipe_dir}}
-RUNNER_USER={{runner_user}}
-
-# Validate that the user running the script is the owner of the
-# RUN_DIR.
-if [ "$RUNNER_RUN_DIR" -a ! -O "$RUNNER_RUN_DIR" ]; then
-    if [ "$LOGNAME" == "root" ]; then
-        su - $RUNNER_USER $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT -- $@
-        exit $?
-    else
-        echo "You must be $RUNNER_USER or root to invoke this script!"
-        exit 1
-    fi
-fi
-
+# Make sure the user running this script is the owner and/or su to that user
+check_user $@
 
 # Make sure CWD is set to runner run dir
 cd $RUNNER_RUN_DIR
 
-# Extract the target node name from node.args
-NAME_ARG=`grep '\-[s]*name' $RUNNER_ETC_DIR/vm.args`
-if [ -z "$NAME_ARG" ]; then
-    echo "vm.args needs to have either -name or -sname parameter."
-    exit 1
-fi
-
-# Extract the target cookie
-COOKIE_ARG=`grep '\-setcookie' $RUNNER_ETC_DIR/vm.args`
-if [ -z "$COOKIE_ARG" ]; then
-    echo "vm.args needs to have a -setcookie parameter."
-    exit 1
-fi
-
-# Parse out release and erts info
-START_ERL=`cat $RUNNER_BIN_DIR/releases/start_erl.data`
-ERTS_VSN=${START_ERL% *}
-APP_VSN=${START_ERL#* }
-
-# Add ERTS bin dir to our path
-ERTS_PATH=$RUNNER_BIN_DIR/erts-$ERTS_VSN/bin
-
-# Setup command to control the node
-NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
-
-
 # Check the first argument for instructions
 case "$1" in
     start)
-        # Make sure there is not already a node running
-        RES=`$NODETOOL ping`
-        if [ "$RES" = "pong" ]; then
-            echo "Node is already running!"
-            exit 1
-        fi
+        node_down_check
 
 
         HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
@@ -116,12 +68,7 @@ case "$1" in
         ;;
 
     attach)
-        # Make sure a node IS running
-        RES=`$NODETOOL ping`
-        if [ "$RES" != "pong" ]; then
-            echo "Node is not running!"
-            exit 1
-        fi
+        node_up_check
 
         shift
         $ERTS_PATH/to_erl $PIPE_DIR
