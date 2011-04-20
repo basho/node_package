@@ -43,12 +43,16 @@ install: build
                -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/bin/ \; ;fi
 
 	if [ -d rel/{{package_install_name}}/sbin ]; then \
-	   mkdir -p debin/{{package_name}}/usr/sbin; \
+	   mkdir -p debian/{{package_name}}/usr/sbin; \
 	   find rel/{{package_install_name}}/sbin -type f \
               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
 
 	cp -R rel/{{package_install_name}}/etc/* \
               debian/{{package_name}}/etc/{{package_install_name}}
+
+	mkdir -p debian/{{package_name}}/var/lib
+	cp -R rel/{{package_install_name}}/data/* \
+              debian/{{package_name}}/var/lib/{{package_install_name}}
 
 	install -m755 debian/init.script \
               debian/{{package_name}}/etc/init.d/{{package_install_name}}
