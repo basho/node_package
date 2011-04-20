@@ -9,6 +9,14 @@ main(Args) ->
     %% Extract the args
     {RestArgs, TargetNode} = process_args(Args, [], undefined),
 
+    %% Extract the RPC timeout from process dictionary, if it's defined
+    RpcTimeout = case erlang:get(rpctimeout) of
+                     undefined ->
+                         60000;
+                     Value ->
+                         Value
+                 end,
+
     %% See if the node is currently running  -- if it's not, we'll bail
     case {net_kernel:hidden_connect_node(TargetNode), net_adm:ping(TargetNode)} of
         {true, pong} -> 
@@ -24,14 +32,14 @@ main(Args) ->
             %% a "pong"
             io:format("pong\n");
         ["stop"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, stop, [], 60000)]);
+            io:format("~p\n", [rpc:call(TargetNode, init, stop, [], RpcTimeout)]);
         ["restart"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, restart, [], 60000)]);
+            io:format("~p\n", [rpc:call(TargetNode, init, restart, [], RpcTimeout)]);
         ["reboot"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, reboot, [], 60000)]);
+            io:format("~p\n", [rpc:call(TargetNode, init, reboot, [], RpcTimeout)]);
         ["rpc", Module, Function | RpcArgs] ->
             case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
-                          [RpcArgs], 60000) of
+                          [RpcArgs], RpcTimeout) of
                 ok ->
                     ok;
                 {badrpc, Reason} ->
@@ -42,7 +50,7 @@ main(Args) ->
             end;
         ["rpcterms", Module, Function, ArgsAsString] ->
             case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
-                          consult(ArgsAsString), 60000) of
+                          consult(ArgsAsString), RpcTimeout) of
                 {badrpc, Reason} ->
                     io:format("RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
@@ -68,6 +76,13 @@ process_args(["-sname", TargetName | Rest], Acc, _) ->
     ThisNode = append_node_suffix(TargetName, "_maint_"),
     {ok, _} = net_kernel:start([ThisNode, shortnames]),
     process_args(Rest, Acc, nodename(TargetName));
+process_args(["-rpctimeout", TimeoutStr | Rest], Acc, TargetNode) ->
+    Timeout = case TimeoutStr of
+                  "infinity" -> infinity;
+                  _          -> list_to_integer(TimeoutStr)
+              end,
+    erlang:put(rpctimeout, Timeout),
+    process_args(Rest, Acc, TargetNode);
 process_args([Arg | Rest], Acc, Opts) ->
     process_args(Rest, [Arg | Acc], Opts).
 
