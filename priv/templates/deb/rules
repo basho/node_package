@@ -61,8 +61,6 @@ install: build
 	# 	debian/{{package_name}}/usr/share/man/man1/riak.1.gz
 	# install -p -D -m 0644 doc/man/man1/riak-admin.1.gz \
 	# 	debian/{{package_name}}/usr/share/man/man1/riak-admin.1.gz
-	# install -m644 rel/riak/etc/snmp/agent/conf/* \
-	# 	debian/{{package_name}}/etc/riak/snmp/agent/conf
 	# chmod 555 debian/{{package_name}}/usr/lib/riak/lib/riak_jmx-*/priv/riak_jmx.sh
 
 binary-indep: install
