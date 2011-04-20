@@ -9,9 +9,9 @@
 # Description:       {{package_desc}}
 ### END INIT INFO
 
-DESC={{package_shortdesc}}
+DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
-DAEMON=/usr/bin/$NAME
+DAEMON=/usr/sbin/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
