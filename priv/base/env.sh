@@ -10,6 +10,7 @@ RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_LOG_DIR={{runner_log_dir}}
 PIPE_DIR={{pipe_dir}}
 RUNNER_USER={{runner_user}}
+SSL_DIST_CONFIG={{platform_data_dir}}/ssl_distribution.args_file
 
 # Extract the target node name from node.args
 NAME_ARG=`grep '\-[s]*name' $RUNNER_ETC_DIR/vm.args`
@@ -50,6 +51,11 @@ ERTS_PATH=$RUNNER_BIN_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
 NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
+
+# Scrape out SSL distribution config info from vm.args into $SSL_DIST_CONFIG
+rm -f $SSL_DIST_CONFIG
+sed -n '/Begin SSL distribution items/,/End SSL distribution items/p' \
+    $RUNNER_ETC_DIR/vm.args > $SSL_DIST_CONFIG
 
 # Function to su into correct user
 function check_user() {
