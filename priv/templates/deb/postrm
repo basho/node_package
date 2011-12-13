@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for riak
+# postrm script for {{package_name}}
 #
 # see: dh_installdeb(1)
 

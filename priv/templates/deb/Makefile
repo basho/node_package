@@ -1,7 +1,7 @@
 
 default:
-	export DEBFULLNAME="Basho Buildbot Packager"; \
-	export DEBEMAIL="support@basho.com"; \
+	export DEBFULLNAME="{{vendor_contact_name}}"; \
+	export DEBEMAIL="{{vendor_contact_email}}"; \
 	dch  --create --package {{package_name}} -v "$(PKG_VERSION)-$(PKG_BUILD)" \
              "Build from $(PKG_VERSION)";\
 	debuild --no-lintian \

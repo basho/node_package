@@ -1,10 +1,9 @@
+%% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
 %%
-%% -*- erlang-indent-level: 4;indent-tabs-mode: nil -*-
-%%
-{variables, [{package_name, "riak"},
-             {package_install_name, "riak"},
-             {package_install_user, "riak"},
-             {package_install_group, "riak"}]}.
+{variables, [{package_name, "package_name"},
+             {package_install_name, "package_install_name"},
+             {package_install_user, "package_install_user"},
+             {package_install_group, "package_install_group"}]}.
 {template, "Makefile", "Makefile"}.
 {template, "compat", "compat"}.
 {template, "control", "control"}.
