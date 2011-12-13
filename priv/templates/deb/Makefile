@@ -4,8 +4,7 @@ default:
 	export DEBEMAIL="{{vendor_contact_email}}"; \
 	dch  --create --package {{package_name}} -v "$(PKG_VERSION)-$(PKG_BUILD)" \
              "Build from $(PKG_VERSION)";\
-	debuild --no-lintian \
-                --prepend-path=$(ERLANG_BIN) \
+	debuild --prepend-path=$(ERLANG_BIN) \
 		-e REVISION=$(PKG_VERSION) \
 		-e RELEASE=$(PKG_BUILD) \
                 -e REBAR=$(REBAR) \
