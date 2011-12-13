@@ -5,6 +5,8 @@
 
 set -e
 
+# install startup script
+update-rc.d {{package_install_name}} default >/dev/null
 
 # create group
 if ! getent group {{package_install_group}} >/dev/null; then

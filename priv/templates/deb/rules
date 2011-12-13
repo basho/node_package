@@ -63,7 +63,8 @@ install: build
               debian/{{package_name}}/etc/init.d/{{package_install_name}}
 
 # We have nothing to do by default.
-binary-indep: install
+binary-indep: install build-stamp
+build-stamp:
 
 # Build architecture-dependent files here.
 binary-arch: install

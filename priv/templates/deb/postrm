@@ -17,6 +17,7 @@
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+set -e
 
 case "$1" in
     purge)

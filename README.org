@@ -2,8 +2,8 @@
 ** Overview
 node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for packaging embedded Erlang nodes. 
 ** Variables
-The following variables need to be set to customize the package.
-
+The following variables describe a package
+*** Required Variables
  * `package_name` - The name of the package
  * `package_install_name` - The name of the binary installed
  * `package_install_user` - The user to create and run the daemon from
@@ -13,4 +13,6 @@ The following variables need to be set to customize the package.
  * `vendor_url` - The website of the person or company who is releasing this package
  * `vendor_contact_name` - The name of the maintainer (ex: Basho Packaging)
  * `vendor_contact_email` - The email address of the maintainer (ex: riak@basho.com)
-
+*** Optional Variables
+ * `license_full_text` - If the full text of a license needs to be included, use this variable
+ * `deb_depends` - Dependencies you require on deb sytems.  This should be a comma separated list.

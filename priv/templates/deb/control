@@ -3,12 +3,10 @@ Section: net
 Priority: extra
 Maintainer: {{vendor_contact_name}} <{{vendor_contact_email}}>
 Build-Depends: debhelper (>= 7)
-Standards-Version: 3.8.3
+Standards-Version: 3.9.2
 Homepage: {{vendor_url}}
 
 Package: {{package_name}}
 Architecture: any
-Depends: {{deb_depends}}
+Depends: ${misc:Depends}, ${shlibs:Depends}, adduser, logrotate, sudo, {{deb_depends}}
 Description: {{package_shortdesc}}
-  {{package_desc}}
-
