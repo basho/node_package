@@ -8,6 +8,7 @@ The following variables describe a package
  * `package_install_name` - The name of the binary installed
  * `package_install_user` - The user to create and run the daemon from
  * `package_install_group` - The group to create and add the above user to
+ * `copyright` - The copyright holder (ex: 2011 Basho Technologies, Inc)
  * `license_type` - The short desciption of what license the app is under
  * `vendor_name` - The name of the person or company who is releasing this package
  * `vendor_url` - The website of the person or company who is releasing this package
