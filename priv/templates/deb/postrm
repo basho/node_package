@@ -22,6 +22,8 @@ set -e
 case "$1" in
     purge)
         rm -f /etc/default/{{package_install_name}}
+        
+        # ensure we remove the rc.d scripts installed by postinst
         update-rc.d {{package_install_name}} remove >/dev/null
 
         if [ -d /var/lib/{{package_install_name}} ]; then
