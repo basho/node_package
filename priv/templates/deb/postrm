@@ -45,6 +45,8 @@ case "$1" in
         fi
     ;;
 
+    update-rc.d -f {{package_install_name}} remove
+
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 
