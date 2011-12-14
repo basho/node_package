@@ -27,6 +27,9 @@ clean:
 
 ## TODO: Need to add a way to loop through a list of further things to install
 ##       like man pages and scripts -jared
+##
+## dh_shlibdeps was added to figure out the dependencies on shared libraries
+##   and will populate the ${shlibs:Depends} callout in the control file
 install: build
 	dh_testdir
 	dh_testroot
