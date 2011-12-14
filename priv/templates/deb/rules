@@ -62,6 +62,8 @@ install: build
 	install -m755 debian/init.script \
               debian/{{package_name}}/etc/init.d/{{package_install_name}}
 
+	dh_shlibdeps
+
 # We have nothing to do by default.
 binary-indep: install build-stamp
 build-stamp:
