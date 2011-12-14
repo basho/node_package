@@ -22,6 +22,8 @@ set -e
 case "$1" in
     purge)
         rm -f /etc/default/{{package_install_name}}
+        update-rc.d {{package_install_name}} remove >/dev/null
+
         if [ -d /var/lib/{{package_install_name}} ]; then
                 rm -r /var/lib/{{package_install_name}}
         fi
@@ -44,8 +46,6 @@ case "$1" in
                 delgroup {{package_install_group}}
         fi
     ;;
-
-    update-rc.d -f {{package_install_name}} remove
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
