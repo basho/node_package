@@ -26,4 +26,4 @@ endif
 
 ostype:
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
-	make -f priv/templates/$(PKGERDIR)/Makefile.bootstrap
+	make -C $(PKG_ID) -f deps/node_package/priv/templates/$(PKGERDIR)/Makefile.bootstrap
