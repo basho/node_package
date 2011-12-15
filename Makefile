@@ -24,5 +24,5 @@ PKGERDIR	= osx
 
 .PHONY: bootstrap
 
-.DEFAULT:
+ostype:
 	make -C bootstrap -f priv/templates/$(PKGERDIR)/Makefile.bootstrap
