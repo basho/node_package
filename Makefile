@@ -25,5 +25,5 @@ endif
 .PHONY: ostype
 
 ostype:
-	$(if $(PKERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
+	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
 	make -f priv/templates/$(PKGERDIR)/Makefile.bootstrap
