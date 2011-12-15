@@ -20,9 +20,10 @@ endif
 
 ifeq ($(OS),Darwin)
 PKGERDIR	= osx
+endif
 
-
-.PHONY: bootstrap
+.PHONY: ostype
 
 ostype:
-	make -C bootstrap -f priv/templates/$(PKGERDIR)/Makefile.bootstrap
+	$(if $(PKERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
+	make -f priv/templates/$(PKGERDIR)/Makefile.bootstrap
