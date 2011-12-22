@@ -6,13 +6,16 @@
 # dh-make output file, you may use that output file without restriction.
 # This special exception was added by Craig Small in version 0.37 of dh-make.
 
+# modified for node_package by dizzyd@basho.com and jared@basho.com
+
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-build:
-	## Clear variables that may confound our build of erlang_js; also
-	## note that it is necessary to use overlay_vars relative to .. as
-	## the generate command EXECUTES in rel/
+
+## Clear variables that may confound our build of erlang_js; also
+## note that it is necessary to use overlay_vars relative to .. as
+## the generate command EXECUTES in rel/
+build:	
 	unset CC CFLAGS CPPFLAGS LDFLAGS CXX CXXFLAGS \
 		&& OVERLAY_VARS="overlay_vars=../debian/vars.config" make rel
 	touch build
@@ -22,6 +25,11 @@ clean:
 	rm -f build
 	make clean
 
+## TODO: Need to add a way to loop through a list of further things to install
+##       like man pages and scripts -jared
+##
+## dh_shlibdeps was added to figure out the dependencies on shared libraries
+##   and will populate the ${shlibs:Depends} callout in the control file
 install: build
 	dh_testdir
 	dh_testroot
@@ -57,14 +65,11 @@ install: build
 	install -m755 debian/init.script \
               debian/{{package_name}}/etc/init.d/{{package_install_name}}
 
-	# install -p -D -m 0644 doc/man/man1/riak.1.gz \
-	# 	debian/{{package_name}}/usr/share/man/man1/riak.1.gz
-	# install -p -D -m 0644 doc/man/man1/riak-admin.1.gz \
-	# 	debian/{{package_name}}/usr/share/man/man1/riak-admin.1.gz
-	# chmod 555 debian/{{package_name}}/usr/lib/riak/lib/riak_jmx-*/priv/riak_jmx.sh
+	dh_shlibdeps
 
-binary-indep: install
 # We have nothing to do by default.
+binary-indep: install build-stamp
+build-stamp:
 
 # Build architecture-dependent files here.
 binary-arch: install
