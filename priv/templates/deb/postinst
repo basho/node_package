@@ -18,7 +18,7 @@ if ! getent passwd {{package_install_user}} >/dev/null; then
         adduser --ingroup {{package_install_group}} \
                 --home /var/lib/{{package_install_name}} \
                 --disabled-password \
-		--system --shell /bin/false --no-create-home \
+		--system --shell /bin/bash --no-create-home \
 		--gecos "{{package_install_user}}" {{package_install_user}}
 fi
 
