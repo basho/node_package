@@ -4,6 +4,7 @@
              {package_name, "package_name"},
              {package_install_name, "package_install_name"},
              {package_install_user, "package_install_user"},
+             {package_install_user_desc, "package_install_user_desc"},
              {package_install_group, "package_install_group"},
              {vendor_name, "vendor_name"},
              {vendor_url, "vendor_url"},

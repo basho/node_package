@@ -21,4 +21,4 @@ The following variables describe a package
  * `deb_depends` - Dependencies you require on deb sytems.  This should be a comma separated list.
  * `package_desc` - A long description of the package
  * `solaris_depends` - (not supported yet) Dependencies specific to the solaris package
-
+ * `package_install_user_desc` - The description of the user created for the app

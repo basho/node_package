@@ -5,14 +5,20 @@ export
 
 OS		= $(shell uname -s)
 
+##
+## Support RPM and Debian based linux systems
+##
 ifeq ($(OS),Linux)
-DISTRO		= $(shell cat /etc/redhat-release 2> /dev/null)
-ifeq ($(DISTRO),)
-PKGERDIR	= deb
-else
+ISRPM 		= $(shell cat /etc/redhat-release 2> /dev/null)
+ISDEB		= $(shell cat /etc/debian_version 2> /dev/null)
+ifneq ($(ISRPM),)
 PKGERDIR	= rpm
-endif
-endif
+else
+ifneq ($(ISDEB),)
+PKGERDIR	= deb
+endif  # deb
+endif  # rpm
+endif  # linux
 
 ifeq ($(OS),SunOS)
 PKGERDIR	= solaris

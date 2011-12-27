@@ -91,6 +91,7 @@ if getent passwd {{package_install_user}} >/dev/null 2>&1; then
 else
    useradd -r -g {{package_install_group}} \
            --home %{_localstatedir}/lib/{{package_install_name}} \
+           --comment "{{package_install_user_desc}}" \
            {{package_install_user}}
 fi
 
