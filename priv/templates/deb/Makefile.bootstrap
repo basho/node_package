@@ -4,7 +4,7 @@
 ##
 export
 
-default:
+bootstrap:
 	ln -s $(PKG_ID).tar.gz $(PKG_NAME)_$(PKG_VERSION).orig.tar.gz
 	mkdir -p $(PKG_ID)/debian
 	cd $(PKG_ID)/debian && $(REBAR) -v create \

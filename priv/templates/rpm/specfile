@@ -7,12 +7,12 @@
 Name: {{package_name}}
 Version: %{_version}
 Release: %{_release}%{?dist}
-License: Proprietary
+License: {{license_type}}
 Group: Development/Libraries
 Source: %{name}-%{_revision}.tar.gz
-URL: http://basho.com
-Vendor: Basho Technologies
-Packager: Basho Technologies <support@basho.com>
+URL: {{vendor_url}}
+Vendor: {{vendor_name}}
+Packager: {{vendor_contact_name}} <{{vendor_contact_email}}>
 BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
 Summary: {{package_shortdesc}}
 Obsoletes: {{package_name}}
@@ -91,6 +91,7 @@ if getent passwd {{package_install_user}} >/dev/null 2>&1; then
 else
    useradd -r -g {{package_install_group}} \
            --home %{_localstatedir}/lib/{{package_install_name}} \
+           --comment "{{package_install_user_desc}}" \
            {{package_install_user}}
 fi
 
