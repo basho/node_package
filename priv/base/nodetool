@@ -5,6 +5,8 @@
 %%
 %% -------------------------------------------------------------------
 
+%% installed by node_package (github.com/basho/node_package)
+
 main(Args) ->
     %% Extract the args
     {RestArgs, TargetNode} = process_args(Args, [], undefined),

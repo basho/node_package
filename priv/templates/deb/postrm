@@ -1,5 +1,5 @@
 #!/bin/sh
-# postrm script for riak
+# postrm script for {{package_name}}
 #
 # see: dh_installdeb(1)
 
@@ -17,10 +17,15 @@
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+set -e
 
 case "$1" in
     purge)
         rm -f /etc/default/{{package_install_name}}
+        
+        # ensure we remove the rc.d scripts installed by postinst
+        update-rc.d {{package_install_name}} remove >/dev/null
+
         if [ -d /var/lib/{{package_install_name}} ]; then
                 rm -r /var/lib/{{package_install_name}}
         fi

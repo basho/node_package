@@ -9,6 +9,8 @@
 ## Note that this script makes the assumption that there is a start_clean.boot
 ## file available in $ROOTDIR/release/VSN.
 
+## installed by node_package (github.com/basho/node_package)
+
 # Determine the abspath of where this script is executing from.
 ERTS_BIN_DIR=$(cd ${0%/*} && pwd)
 

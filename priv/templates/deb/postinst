@@ -1,10 +1,12 @@
 #!/bin/sh
-# postinst script for riak
+# postinst script for {{package_name}}
 #
 # see: dh_installdeb(1)
 
 set -e
 
+# install startup script
+update-rc.d {{package_install_name}} defaults >/dev/null
 
 # create group
 if ! getent group {{package_install_group}} >/dev/null; then
@@ -17,7 +19,7 @@ if ! getent passwd {{package_install_user}} >/dev/null; then
                 --home /var/lib/{{package_install_name}} \
                 --disabled-password \
 		--system --shell /bin/bash --no-create-home \
-		--gecos "Riak Data Store" {{package_install_user}}
+		--gecos "{{package_install_user_desc}}" {{package_install_user}}
 fi
 
 for i in lib run log; do
