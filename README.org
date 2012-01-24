@@ -4,21 +4,21 @@ node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for 
 ** Variables
 The following variables describe a package
 *** Required Variables
- * `package_name` - The name of the package
- * `package_shortdesc` - A short (< one line) description of the package
- * `package_install_name` - The name of the binary installed (can be different than the `package_name`)
- * `package_install_user` - The user to create and run the daemon from
- * `package_install_group` - The group to create and add the above user to
- * `copyright` - The copyright holder (ex: 2011 Basho Technologies, Inc)
- * `license_type` - The short desciption of what license the app is under
- * `vendor_name` - The name of the person or company who is releasing this package
- * `vendor_url` - The website of the person or company who is releasing this package
- * `vendor_contact_name` - The name of the maintainer (ex: Basho Packaging)
- * `vendor_contact_email` - The email address of the maintainer (ex: riak@basho.com)
- * `solaris_pkgname` - Package names for Solaris follow a naming convention of MAINTapp (ex: BASHOriak)
+ - =package_name= - The name of the package
+ - =package_shortdesc= - A short (< one line) description of the package
+ - =package_install_name= - The name of the binary installed (can be different than the `package_name`)
+ - =package_install_user= - The user to create and run the daemon from
+ - =package_install_group= - The group to create and add the above user to
+ - =copyright= - The copyright holder (ex: 2011 Basho Technologies, Inc)
+ - =license_type= - The short desciption of what license the app is under
+ - =vendor_name= - The name of the person or company who is releasing this package
+ - =vendor_url= - The website of the person or company who is releasing this package
+ - =vendor_contact_name= - The name of the maintainer (ex: Basho Packaging)
+ - =vendor_contact_email= - The email address of the maintainer (ex: riak@basho.com)
+ - =solaris_pkgname= - Package names for Solaris follow a naming convention of MAINTapp (ex: BASHOriak)
 *** Optional Variables
- * `license_full_text` - If the full text of a license needs to be included, use this variable
- * `deb_depends` - Dependencies you require on deb sytems.  This should be a comma separated list.
- * `package_desc` - A long description of the package
- * `solaris_depends` - (not supported yet) Dependencies specific to the solaris package
- * `package_install_user_desc` - The description of the user created for the app
+ - =license_full_text= - If the full text of a license needs to be included, use this variable
+ - =deb_depends= - Dependencies you require on deb sytems.  This should be a comma separated list.
+ - =package_desc= - A long description of the package
+ - =solaris_depends= - (not supported yet) Dependencies specific to the solaris package
+ - =package_install_user_desc= - The description of the user created for the app
