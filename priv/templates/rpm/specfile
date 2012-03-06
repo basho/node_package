@@ -34,7 +34,7 @@ cat > rpm.vars.config <<EOF
 {runner_etc_dir,    "%{_sysconfdir}/{{package_install_name}}"}.
 {runner_log_dir,    "%{_localstatedir}/log/{{package_install_name}}"}.
 {runner_user,       "{{package_install_user}}"}.
-{pipe_dir,          "%{_localstatedir}/run/{{package_install_name}}"}.
+{pipe_dir,          "%{_localstatedir}/run/{{package_install_name}}/"}.
 EOF
 
 
