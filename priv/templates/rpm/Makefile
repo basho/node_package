@@ -16,4 +16,8 @@ default:
 		 --define "_version $(PKG_VERSION)" \
 		 --define "_release $(PKG_BUILD)" \
 		 -ba $(PWD)/specfile
+	cd packages && \
+		for rpmfile in `ls *.rpm`; do \
+			sha256sum $${rpmfile} > $${rpmfile}.sha \
+		; done
 
