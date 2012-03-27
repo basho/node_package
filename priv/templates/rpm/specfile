@@ -21,7 +21,7 @@ Obsoletes: {{package_name}}
 {{package_desc}}
 
 %define init_script %{_sysconfdir}/init.d/{{package_install_name}}
-
+%define debug_package %{nil}
 %define __prelink_undo_cmd /bin/cat prelink library
 
 %prep
