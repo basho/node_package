@@ -20,13 +20,13 @@ endif  # deb
 endif  # rpm
 endif  # linux
 
-ifeq ($(OS),SunOS)
-PKGERDIR	= solaris
-endif
+#ifeq ($(OS),SunOS)
+#PKGERDIR	= solaris
+#endif
 
-ifeq ($(OS),Darwin)
-PKGERDIR	= osx
-endif
+#ifeq ($(OS),Darwin)
+#PKGERDIR	= osx
+#endif
 
 .PHONY: ostype
 
