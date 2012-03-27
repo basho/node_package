@@ -9,9 +9,9 @@ default:
 		-e RELEASE=$(PKG_BUILD) \
                 -e REBAR=$(REBAR) \
 		-uc -us
-	mkdir -p packages
-	mv debuild/*$(PKG_VERSION)-$(PKG_BUILD)_*.deb packages
-	cd packages && \
+	mkdir -p ../packages
+	cd .. && mv *$(PKG_VERSION)-$(PKG_BUILD)_*.deb packages
+	cd ../packages && \
 		for debfile in `ls *.deb`; do \
 			sha256sum $${debfile} > $${debfile}.sha \
 		; done
