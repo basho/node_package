@@ -18,15 +18,19 @@ if ! getent passwd {{package_install_user}} >/dev/null; then
         adduser --ingroup {{package_install_group}} \
                 --home /var/lib/{{package_install_name}} \
                 --disabled-password \
-		--system --shell /bin/bash --no-create-home \
-		--gecos "{{package_install_user_desc}}" {{package_install_user}}
+                --system --shell /bin/bash --no-create-home \
+                --gecos "{{package_install_user_desc}}" {{package_install_user}}
 fi
 
 for i in lib run log; do
     chown -R {{package_install_user}}:{{package_install_group}} /var/$i/{{package_install_name}}
 done
 
+chown -R {{package_install_user}}:{{package_install_group}} /usr/lib/{{package_install_name}}
+chown -R {{package_install_user}}:{{package_install_group}} /etc/{{package_install_name}}
+
 chmod 0755 /var/run/{{package_install_name}} /etc/{{package_install_name}}
+chmod 0644 /etc/{{package_install_name}}/*
 
 case "$1" in
     configure)
