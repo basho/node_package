@@ -5,7 +5,7 @@
 # installed by node_package (github.com/basho/node_package)
 
 # Pull environment for this install
-source {{runner_bin_dir}}/lib/env.sh
+. {{runner_bin_dir}}/lib/env.sh
 
 # Make sure the user running this script is the owner and/or su to that user
 check_user $@

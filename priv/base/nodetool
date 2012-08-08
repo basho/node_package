@@ -76,7 +76,7 @@ main(Args) ->
                     halt(1)
             end;
         ["rpc_infinity", Module, Function | RpcArgs] ->
-            case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function), [RpcArgs], infinity)
+            case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function), [RpcArgs], infinity) of
                 ok ->
                     ok;
                 {badrpc, Reason} ->
