@@ -9,6 +9,11 @@
 
 # Make sure the user running this script is the owner and/or su to that user
 check_user $@
+ES=$?
+if [ "$ES" -ne 0 ]; then
+    exit $ES
+fi
+
 
 # Make sure CWD is set to runner run dir
 cd $RUNNER_RUN_DIR
@@ -29,6 +34,9 @@ case "$1" in
         if [ "$ES" -ne 0 ]; then
             exit $ES
         fi
+
+        # Warn the user if ulimit is too low
+        check_ulimit
 
         HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
         export HEART_COMMAND

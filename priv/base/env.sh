@@ -31,10 +31,13 @@ ULIMIT_WARN=4096
 
 WHOAMI=$(whoami)
 
+# Echo to stderr on errors
+echoerr() { echo "$@" 1>&2; }
+
 # Extract the target node name from node.args
 NAME_ARG=`egrep '^\-s?name' $RUNNER_ETC_DIR/vm.args`
 if [ -z "$NAME_ARG" ]; then
-    echo "vm.args needs to have either -name or -sname parameter."
+    echoerr "vm.args needs to have either -name or -sname parameter."
     exit 1
 fi
 
@@ -56,7 +59,7 @@ fi
 # Extract the target cookie
 COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args`
 if [ -z "$COOKIE_ARG" ]; then
-    echo "vm.args needs to have a -setcookie parameter."
+    echoerr "vm.args needs to have a -setcookie parameter."
     exit 1
 fi
 
@@ -85,7 +88,7 @@ check_user() {
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         type sudo > /dev/null 2>&1
         if [ $? -ne 0 ]; then
-            echo "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
+            echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
             exit 1
         fi
         echo "Attempting to restart script through sudo -H -u $RUNNER_USER"
@@ -97,7 +100,7 @@ check_user() {
 node_down_check() {
     RES=`ping_node`
     if [ "$RES" = "pong" ]; then
-        echo "Node is already running!"
+        echoerr "Node is already running!"
         exit 1
     fi
 }
@@ -106,7 +109,7 @@ node_down_check() {
 node_up_check() {
     RES=`ping_node`
     if [ "$RES" != "pong" ]; then
-        echo "Node is not running!"
+        echoerr "Node is not running!"
         exit 1
     fi
 }
@@ -115,8 +118,8 @@ node_up_check() {
 check_config() {
     RES=`$NODETOOL_LITE chkconfig $RUNNER_ETC_DIR/app.config`
     if [ "$RES" != "ok" ]; then
-        echo "Error reading $RUNNER_ETC_DIR/app.config"
-        echo $RES
+        echoerr "Error reading $RUNNER_ETC_DIR/app.config"
+        echoerr $RES
         exit 1
     fi
     echo "config is OK"
