@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # -*- tab-width:4;indent-tabs-mode:nil -*-
 # ex: ts=4 sw=4 et
 
@@ -16,8 +16,11 @@ cd $RUNNER_RUN_DIR
 # Check the first argument for instructions
 case "$1" in
     start)
+        # Make sure there is not already a node running
         node_down_check
 
+        # Sanity check the app.config file
+        check_config
 
         HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
         export HEART_COMMAND
@@ -34,6 +37,7 @@ case "$1" in
                 # some reason.
                 COMMAND_MODE=unix2003
         esac
+
         # Wait for the node to completely stop...
         case $UNAME_S in
             Linux|Darwin|FreeBSD|DragonFly|NetBSD|OpenBSD)
@@ -47,8 +51,14 @@ case "$1" in
                     grep "$RUNNER_BIN_DIR/.*/[b]eam"|awk '{print $1}'`
                 ;;
         esac
+
         $NODETOOL stop
-        while `kill -0 $PID 2>/dev/null`;
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
+
+        while `kill -s 0 $PID 2>/dev/null`;
         do
             sleep 1
         done
@@ -57,39 +67,55 @@ case "$1" in
     restart)
         ## Restart the VM without exiting the process
         $NODETOOL restart
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
         ;;
 
     reboot)
         ## Restart the VM completely (uses heart to restart it)
         $NODETOOL reboot
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
         ;;
 
     ping)
         ## See if the VM is alive
-        $NODETOOL ping
+        ping_node
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
         ;;
 
     attach)
-        node_up_check
+        # Allow attaching to a node without pinging it
+        if [ "$2" = "-f" ]; then
+          echo "Forcing connection..."
+        else
+          # Make sure a node is running
+          node_up_check
+        fi
 
         shift
-        $ERTS_PATH/to_erl $PIPE_DIR
+        exec $ERTS_PATH/to_erl $PIPE_DIR
         ;;
 
     console)
-        RES=`$NODETOOL ping`
+        RES=`ping_node`
         if [ "$RES" = "pong" ]; then
             echo "Node is already running - use '$SCRIPT attach' instead"
             exit 1
         fi
 
-        # Warn the user if ulimit -n is less than 1024
-        ULIMIT_F=`ulimit -n`
-        if [ "$ULIMIT_F" -lt 4096 ]; then
-            echo "!!!!"
-            echo "!!!! WARNING: ulimit -n is ${ULIMIT_F}; 1024 is the recommended minimum."
-            echo "!!!!"
-        fi
+        # Sanity check the app.config file
+        check_config
+
+        # Warn the user if ulimit -n is less than the defined threshold
+        check_ulimit
 
         # Make sure log directory exists
         mkdir -p $RUNNER_LOG_DIR
@@ -121,9 +147,19 @@ case "$1" in
     ertspath)
         echo $ERTS_PATH
         ;;
+    chkconfig)
+        check_config
+        ;;
+    escript)
+        shift
+        $ERTS_PATH/escript "$@"
+        ;;
+    version)
+        echo $APP_VERSION
+        ;;
 
     *)
-        echo "Usage: $SCRIPT {start|stop|restart|reboot|ping|console|attach}"
+        echo "Usage: $SCRIPT {start|stop|restart|reboot|ping|console|attach|ertspath|chkconfig|escript|version}"
         exit 1
         ;;
 esac
