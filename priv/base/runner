@@ -18,9 +18,17 @@ case "$1" in
     start)
         # Make sure there is not already a node running
         node_down_check
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
 
         # Sanity check the app.config file
-        check_config
+        check_config > /dev/null
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
 
         HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
         export HEART_COMMAND
@@ -98,6 +106,10 @@ case "$1" in
         else
           # Make sure a node is running
           node_up_check
+          ES=$?
+          if [ "$ES" -ne 0 ]; then
+              exit $ES
+          fi
         fi
 
         shift
@@ -113,6 +125,10 @@ case "$1" in
 
         # Sanity check the app.config file
         check_config
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
 
         # Warn the user if ulimit -n is less than the defined threshold
         check_ulimit
