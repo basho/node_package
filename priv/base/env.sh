@@ -91,7 +91,6 @@ check_user() {
             echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
             exit 1
         fi
-        echo "Attempting to restart script through sudo -H -u $RUNNER_USER"
         exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $@
     fi
 }
