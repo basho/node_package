@@ -1,7 +1,19 @@
+#!/bin/sh
 # -*- tab-width:4;indent-tabs-mode:nil -*-
 # ex: ts=4 sw=4 et
 
 # installed by node_package (github.com/basho/node_package)
+
+# /bin/sh on Solaris is not a POSIX compatible shell, but /usr/bin/ksh is.
+if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
+    POSIX_SHELL="true"
+    export POSIX_SHELL
+    # To support 'whoami' add /usr/ucb to path
+    PATH=/usr/ucb:$PATH
+    export PATH
+    exec /usr/bin/ksh $0 "$@"
+fi
+unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as well
 
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 RUNNER_SCRIPT=${0##*/}
@@ -12,11 +24,20 @@ RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_LOG_DIR={{runner_log_dir}}
 PIPE_DIR={{pipe_dir}}
 RUNNER_USER={{runner_user}}
+APP_VERSION={{app_version}}
+
+# Threshold where users will be warned of low ulimit file settings
+ULIMIT_WARN=4096
+
+WHOAMI=$(whoami)
+
+# Echo to stderr on errors
+echoerr() { echo "$@" 1>&2; }
 
 # Extract the target node name from node.args
-NAME_ARG=`grep '\-[s]*name' $RUNNER_ETC_DIR/vm.args`
+NAME_ARG=`egrep '^\-s?name' $RUNNER_ETC_DIR/vm.args`
 if [ -z "$NAME_ARG" ]; then
-    echo "vm.args needs to have either -name or -sname parameter."
+    echoerr "vm.args needs to have either -name or -sname parameter."
     exit 1
 fi
 
@@ -36,9 +57,9 @@ else
 fi
 
 # Extract the target cookie
-COOKIE_ARG=`grep '\-setcookie' $RUNNER_ETC_DIR/vm.args`
+COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args`
 if [ -z "$COOKIE_ARG" ]; then
-    echo "vm.args needs to have a -setcookie parameter."
+    echoerr "vm.args needs to have a -setcookie parameter."
     exit 1
 fi
 
@@ -52,36 +73,64 @@ ERTS_PATH=$RUNNER_BIN_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
 NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
+NODETOOL_LITE="$ERTS_PATH/escript $ERTS_PATH/nodetool"
+
+# Ping node without stealing stdin
+ping_node() {
+    $NODETOOL ping < /dev/null
+}
 
 # Function to su into correct user
-function check_user() {
+check_user() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
-    if [ "$RUNNER_RUN_DIR" -a ! -O "$RUNNER_RUN_DIR" ]; then
-        if [ "$LOGNAME" == "root" ]; then
-            su - $RUNNER_USER $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT -- $@
-            exit $?
-        else
-            echo "You must be $RUNNER_USER or root to invoke this script!"
+
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
+        type sudo > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
             exit 1
         fi
+        exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $@
     fi
 }
 
 # Function to validate the node is down
-function node_down_check() {
-    RES=`$NODETOOL ping`
+node_down_check() {
+    RES=`ping_node`
     if [ "$RES" = "pong" ]; then
-        echo "Node is already running!"
+        echoerr "Node is already running!"
         exit 1
     fi
 }
 
 # Function to validate the node is up
-function node_up_check() {
-    RES=`$NODETOOL ping`
+node_up_check() {
+    RES=`ping_node`
     if [ "$RES" != "pong" ]; then
-        echo "Node is not running!"
+        echoerr "Node is not running!"
         exit 1
+    fi
+}
+
+# Function to check if the config file is valid
+check_config() {
+    RES=`$NODETOOL_LITE chkconfig $RUNNER_ETC_DIR/app.config`
+    if [ "$RES" != "ok" ]; then
+        echoerr "Error reading $RUNNER_ETC_DIR/app.config"
+        echoerr $RES
+        exit 1
+    fi
+    echo "config is OK"
+}
+
+# Function to check if ulimit is properly set
+check_ulimit() {
+
+    ULIMIT_F=`ulimit -n`
+    if [ "$ULIMIT_F" -lt $ULIMIT_WARN ]; then
+        echo "!!!!"
+        echo "!!!! WARNING: ulimit -n is ${ULIMIT_F}; ${ULIMIT_WARN} is the recommended minimum."
+        echo "!!!!"
     fi
 }

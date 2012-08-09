@@ -1,8 +1,24 @@
 * node_package
 ** Overview
-node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for packaging embedded Erlang nodes. 
+
+node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for packaging embedded Erlang nodes.
+
+*** Supported Operating Systems
+
+Currently supported operating systems / distros
+ - Redhat / Fedora and variants
+ - Debian / Ubuntu and variants
+
+Planned supported operating systems
+ - Solaris
+ - FreeBSD
+ - OSX
+ - SmartOS
+
 ** Variables
+
 The following variables describe a package
+
 *** Required Variables
  - =package_name= - The name of the package
  - =package_shortdesc= - A short (< one line) description of the package
@@ -16,6 +32,7 @@ The following variables describe a package
  - =vendor_contact_name= - The name of the maintainer (ex: Basho Packaging)
  - =vendor_contact_email= - The email address of the maintainer (ex: riak@basho.com)
  - =solaris_pkgname= - Package names for Solaris follow a naming convention of MAINTapp (ex: BASHOriak)
+
 *** Optional Variables
  - =license_full_text= - If the full text of a license needs to be included, use this variable
  - =deb_depends= - Dependencies you require on deb sytems.  This should be a comma separated list.
