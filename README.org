@@ -10,10 +10,28 @@ Currently supported operating systems / distros
  - Debian / Ubuntu and variants
 
 Planned supported operating systems
- - Solaris
  - FreeBSD
  - OSX
  - SmartOS
+
+** Use
+
+*** Makefile Variables
+
+**** Required Variables
+
+The following variables need to be exported for node_package to work correctly.
+
+ - =PKG_NAME= - The name of your application (ex: riak)
+ - =PKG_VERSION= - The version of your application (ex: 1.2.0)
+ - =PKG_ID= - The full name of the package, typically =PKG_NAME-PKG_VERSION= (ex: riak-1.2.0)
+
+**** Defaulted Variables
+
+The following variables will have a default, but can be overriden in your application.
+
+ - =PKG_BUILD= - (Default: 1) Sets the "release" version of the build (ex: app-5.4-1 <- the '1')
+ - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang binary
 
 ** Variables
 
