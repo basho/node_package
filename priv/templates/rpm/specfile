@@ -100,7 +100,7 @@ fi
 find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
 
 # Make sure shell library file is readable
-chmod 0755 %{_localstatedir}/lib/{{package_install_name}}/lib/env.sh
+chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
 
 
 %files
