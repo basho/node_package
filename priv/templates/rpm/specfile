@@ -42,7 +42,7 @@ EOF
 OVERLAY_VARS="overlay_vars=../rpm.vars.config" make rel
 
 %install
-%define relpath	      %{_builddir}/%{buildsubdir}/rel/{{package_install_name}}
+%define relpath       %{_builddir}/%{buildsubdir}/rel/{{package_install_name}}
 %define buildroot_lib %{buildroot}%{_libdir}/{{package_install_name}}
 %define buildroot_etc %{buildroot}%{_sysconfdir}/{{package_install_name}}
 
@@ -99,6 +99,9 @@ fi
 # Fixup perms for SELinux
 find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
 
+# Make sure shell library file is readable
+chmod 0755 %{_localstatedir}/lib/{{package_install_name}}/lib/env.sh
+
 
 %files
 %defattr(-,{{package_install_user}},{{package_install_group}})
@@ -114,5 +117,3 @@ find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t 
 
 %clean
 rm -rf %{buildroot}
-
-
