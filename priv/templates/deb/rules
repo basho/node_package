@@ -15,7 +15,7 @@ export DH_VERBOSE=1
 ## Clear variables that may confound our build of sub-projects; also
 ## note that it is necessary to use overlay_vars relative to .. as
 ## the generate command EXECUTES in rel/
-build:	
+build:
 	unset CC CFLAGS CPPFLAGS LDFLAGS CXX CXXFLAGS \
 		&& OVERLAY_VARS="overlay_vars=../debian/vars.config" make rel
 	touch build
@@ -55,6 +55,7 @@ install: build
 	   find rel/{{package_install_name}}/sbin -type f \
               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
 
+	mkdir -p debian/{{package_name}}/etc/{{package_install_name}}
 	cp -R rel/{{package_install_name}}/etc/* \
               debian/{{package_name}}/etc/{{package_install_name}}
 
