@@ -26,6 +26,13 @@ endif  # deb
 endif  # rpm
 endif  # linux
 
+ifeq ($(OS),Darwin)          # OSX
+OSNAME		= OSX
+ARCH		= $(shell uname -m)
+PKGERDIR	= osx
+BUILDDIR	= osxbuild
+endif
+
 DATE            = $(shell date +%Y-%m-%d)
 
 # Set the version that shows for `<app> version`

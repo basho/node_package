@@ -29,8 +29,7 @@ Obsoletes: {{package_name}}
 cat > rpm.vars.config <<EOF
 {data_dir,          "%{_localstatedir}/lib/{{package_install_name}}"}.
 {runner_script_dir, "/usr/sbin"}.
-{runner_bin_dir,    "%{_libdir}/{{package_install_name}}"}.
-{runner_run_dir,    "%{_localstatedir}/lib/{{package_install_name}}"}.
+{runner_base_dir,    "%{_libdir}/{{package_install_name}}"}.
 {runner_etc_dir,    "%{_sysconfdir}/{{package_install_name}}"}.
 {runner_log_dir,    "%{_localstatedir}/log/{{package_install_name}}"}.
 {runner_user,       "{{package_install_user}}"}.

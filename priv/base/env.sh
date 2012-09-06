@@ -18,8 +18,7 @@ unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as w
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 RUNNER_SCRIPT=${0##*/}
 
-RUNNER_BIN_DIR={{runner_bin_dir}}
-RUNNER_RUN_DIR={{runner_run_dir}}
+RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_LOG_DIR={{runner_log_dir}}
 PIPE_DIR={{pipe_dir}}
@@ -64,12 +63,12 @@ if [ -z "$COOKIE_ARG" ]; then
 fi
 
 # Parse out release and erts info
-START_ERL=`cat $RUNNER_BIN_DIR/releases/start_erl.data`
+START_ERL=`cat $RUNNER_BASE_DIR/releases/start_erl.data`
 ERTS_VSN=${START_ERL% *}
 APP_VSN=${START_ERL#* }
 
 # Add ERTS bin dir to our path
-ERTS_PATH=$RUNNER_BIN_DIR/erts-$ERTS_VSN/bin
+ERTS_PATH=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
 NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
