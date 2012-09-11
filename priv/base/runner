@@ -5,7 +5,7 @@
 # installed by node_package (github.com/basho/node_package)
 
 # Pull environment for this install
-. "{{runner_bin_dir}}/lib/env.sh"
+. "{{runner_base_dir}}/lib/env.sh"
 
 # Make sure the user running this script is the owner and/or su to that user
 check_user $@
@@ -14,9 +14,8 @@ if [ "$ES" -ne 0 ]; then
     exit $ES
 fi
 
-
 # Make sure CWD is set to runner run dir
-cd $RUNNER_RUN_DIR
+cd $RUNNER_BASE_DIR
 
 # Check the first argument for instructions
 case "$1" in
@@ -59,12 +58,12 @@ case "$1" in
             Linux|Darwin|FreeBSD|DragonFly|NetBSD|OpenBSD)
                 # PID COMMAND
                 PID=`ps ax -o pid= -o command=|\
-                    grep "$RUNNER_BIN_DIR/.*/[b]eam"|awk '{print $1}'`
+                    grep "$RUNNER_BASE_DIR/.*/[b]eam"|awk '{print $1}'`
                 ;;
             SunOS)
                 # PID COMMAND
                 PID=`ps -ef -o pid= -o args=|\
-                    grep "$RUNNER_BIN_DIR/.*/[b]eam"|awk '{print $1}'`
+                    grep "$RUNNER_BASE_DIR/.*/[b]eam"|awk '{print $1}'`
                 ;;
         esac
 
@@ -145,11 +144,11 @@ case "$1" in
         mkdir -p $RUNNER_LOG_DIR
 
         # Setup beam-required vars
-        ROOTDIR=$RUNNER_BIN_DIR
-        BINDIR=$RUNNER_BIN_DIR/erts-$ERTS_VSN/bin
+        ROOTDIR=$RUNNER_BASE_DIR
+        BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BIN_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
+        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
             -embedded -config $RUNNER_ETC_DIR/app.config \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
