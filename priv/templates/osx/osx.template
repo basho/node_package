@@ -3,15 +3,8 @@
 {variables, [
              {package_name, "package_name"},
              {package_install_name, "package_install_name"},
-             {package_install_user, "package_install_user"},
-             {package_install_user_desc, "package_install_user_desc"},
-             {package_install_group, "package_install_group"},
-             {license_type, "license_type"},
-             {license_full_text, "license_full_text"},
-             {vendor_name, "vendor_name"},
-             {vendor_url, "vendor_url"},
-             {vendor_contact_name, "vendor_contact"},
-             {vendor_contact_email, "vendor_contact_email"}
+             {package_install_user, "package_install_user"}
              ]
 }.
 {template, "Makefile", "Makefile"}.
+{template, "vars.config", "vars.config"}.
