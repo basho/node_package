@@ -6,8 +6,9 @@ default: buildrel
 	cd $(PKG_ID) && \
 		cp -R rel/{{package_install_name}} \
 		   ../osxbuild/{{package_name}}-$(PKG_VERSION)
-	tar -czf packages/$(PKGNAME) \
-		 osxbuild/{{package_name}}-$(PKG_VERSION)
+	cd osxbuild && \
+		tar -czf ../packages/$(PKGNAME) \
+			 {{package_name}}-$(PKG_VERSION)
 	cd packages && \
 	   for tarfile in `ls *.gz`; do \
 	       shasum -a 256 $${tarfile} > $${tarfile}.sha \
@@ -16,4 +17,4 @@ default: buildrel
 
 buildrel: $(PKG_ID)
 	cd $^ && \
-		$(MAKE) deps compile rel
+		OVERLAY_VARS="overlay_vars=../../vars.config" $(MAKE) rel
