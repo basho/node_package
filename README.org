@@ -8,10 +8,10 @@ node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for 
 Currently supported operating systems / distros
  - Redhat / Fedora and variants
  - Debian / Ubuntu and variants
+ - OSX
 
 Planned supported operating systems
  - FreeBSD
- - OSX
  - SmartOS
 
 ** Use
