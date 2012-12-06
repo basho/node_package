@@ -37,6 +37,9 @@ case "$1" in
         # Warn the user if ulimit is too low
         check_ulimit
 
+        # Make sure log directory exists
+        mkdir -p $RUNNER_LOG_DIR
+
         HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
         export HEART_COMMAND
         mkdir -p $PIPE_DIR
