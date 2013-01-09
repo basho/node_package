@@ -24,14 +24,28 @@ Obsoletes: {{package_name}}
 %define debug_package %{nil}
 %define __prelink_undo_cmd /bin/cat prelink library
 
+%define platform_bin_dir %{_{{bin_or_sbin}}dir}
+%define platform_data_dir %{_localstatedir}/lib/{{package_install_name}}
+%define platform_etc_dir %{_sysconfdir}/{{package_install_name}}
+%define platform_base_dir %{_libdir}/{{package_install_name}}
+%define platform_lib_dir %{platform_base_dir}/lib
+%define platform_log_dir %{_localstatedir}/log/{{package_install_name}}
+
 %prep
 %setup -q -n {{package_name}}-%{_revision}
 cat > rpm.vars.config <<EOF
-{data_dir,          "%{_localstatedir}/lib/{{package_install_name}}"}.
-{runner_script_dir, "/usr/sbin"}.
-{runner_base_dir,    "%{_libdir}/{{package_install_name}}"}.
-{runner_etc_dir,    "%{_sysconfdir}/{{package_install_name}}"}.
-{runner_log_dir,    "%{_localstatedir}/log/{{package_install_name}}"}.
+%% Platform-specific installation paths
+{platform_bin_dir,  "%{platform_bin_dir}"}.
+{platform_data_dir, "%{platform_data_dir}"}.
+{platform_etc_dir,  "%{platform_etc_dir}"}.
+{platform_base_dir, "%{platform_base_dir}"}.
+{platform_lib_dir,  "%{platform_lib_dir}"}.
+{platform_log_dir,  "%{platform_log_dir}"}.
+
+{runner_script_dir, "%{platform_bin_dir}"}.
+{runner_base_dir,   "%{platform_base_dir}"}.
+{runner_etc_dir,    "%{platform_etc_dir}"}.
+{runner_log_dir,    "%{platform_log_dir}"}.
 {runner_user,       "{{package_install_user}}"}.
 {pipe_dir,          "%{_localstatedir}/run/{{package_install_name}}/"}.
 EOF
@@ -55,15 +69,15 @@ cp -R %{relpath}/lib       %{buildroot_lib}
 cp -R %{relpath}/erts-*    %{buildroot_lib}
 cp -R %{relpath}/releases  %{buildroot_lib}
 
-mkdir -p %{buildroot}%{_bindir}
-if [ -d %{relpath}/bin ]; then \
-   find %{relpath}/bin -type f \
-        -exec install -p -D -m 0755 {} %{buildroot}%{_bindir}/ \; ;fi
+mkdir -p %{buildroot}%{_{{bin_or_sbin}}dir}
+if [ -d %{relpath}/{{bin_or_sbin}} ]; then \
+   find %{relpath}/{{bin_or_sbin}} -type f \
+        -exec install -p -D -m 0755 {} %{buildroot}%{_{{bin_or_sbin}}dir}/ \; ;fi
 
-mkdir -p %{buildroot}%{_sbindir}
-if [ -d %{relpath}/sbin ]; then \
-   find %{relpath}/sbin -type f \
-        -exec install -p -D -m 0755 {} %{buildroot}%{_sbindir}/ \; ;fi
+mkdir -p %{buildroot}%{_mandir}/man1
+if [ -d %{_builddir}/%{buildsubdir}/doc/man/man1 ]; then \
+   {{#package_commands}}install -p -D -m 0455 %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz %{buildroot}%{_mandir}/man1 && \
+   {{/package_commands}}echo -n; fi
 
 cp -R %{relpath}/etc/* %{buildroot_etc}
 
@@ -107,12 +121,12 @@ chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
 %{_libdir}/*
 %dir %{_sysconfdir}/{{package_install_name}}
 %config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
-%{_bindir}
-%{_sbindir}
+%{_{{bin_or_sbin}}dir}
 %{_localstatedir}/lib/{{package_install_name}}
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
 %{_sysconfdir}/init.d/{{package_install_name}}
+%{_mandir}/man1
 
 %clean
 rm -rf %{buildroot}

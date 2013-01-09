@@ -6,7 +6,6 @@ export
 
 bootstrap:
 	$(REBAR) -v create \
-                    package_name=$(PKG_NAME) \
                     template_dir=$(PKG_ID)/deps/node_package/priv/templates \
                     template_vars=$(PKG_ID)/pkg.vars.config template=rpm
 	make -f Makefile

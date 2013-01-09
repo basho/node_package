@@ -4,7 +4,7 @@
 #
 # chkconfig: 2345 80 30
 # description: {{package_shortdesc}}
-# processname: beam 
+# processname: beam
 # config: /etc/{{package_install_name}}/app.config
 # config: /etc/{{package_install_name}}/vm.args
 #
@@ -26,19 +26,19 @@ DAEMON=/usr/sbin/$NAME
 
 
 start() {
-	# Start daemons.
-	echo -n $"Starting {{package_name}}: "
-	su - {{package_install_user}} -c "$DAEMON start" && success || failure $"$NAME start"
-	RETVAL=$?
-	[ $RETVAL -eq 0 ]
+        # Start daemons.
+        echo -n $"Starting {{package_install_name}}: "
+        su - {{package_install_user}} -c "$DAEMON start" && success || failure $"$NAME start"
+        RETVAL=$?
+        [ $RETVAL -eq 0 ]
         echo
-	return $RETVAL
+        return $RETVAL
 }
 
 stop() {
         # Stop daemon.
-	echo -n $"Stopping {{package_name}}: "
-  	$DAEMON stop 2>/dev/null 1>&2
+        echo -n $"Stopping {{package_install_name}}: "
+        $DAEMON stop 2>/dev/null 1>&2
         sleep 2
         RETVAL=`pidof beam.smp`
         [ "$RETVAL" = "" ] && success && echo && return 0 || failure $"$NAME stop"
@@ -54,21 +54,21 @@ stop() {
 # See how we were called.
 case "$1" in
   start)
-	start
-	;;
+        start
+        ;;
   stop)
-	stop
-	;;
+        stop
+        ;;
   restart)
- 	stop
-	start
-	;;
+        stop
+        start
+        ;;
   ping)
-	$DAEMON ping || exit $?
+        $DAEMON ping || exit $?
         ;;
   *)
-	echo $"Usage: $0 {start|stop|restart|ping}"
-	exit 1
+        echo $"Usage: $0 {start|stop|restart|ping}"
+        exit 1
 esac
 
 exit $?

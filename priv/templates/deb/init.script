@@ -28,10 +28,10 @@ do_start()
 {
     # Startup with the appropriate user
     start-stop-daemon --start \
-	--name {{package_install_name}} \
-	--user {{package_install_user}} \
-	--exec $DAEMON -- start \
-	|| return 2
+        --name {{package_install_name}} \
+        --user {{package_install_user}} \
+        --exec $DAEMON -- start \
+        || return 2
 }
 
 #
@@ -47,10 +47,10 @@ do_stop()
 
     # Make sure it's down by using a more direct approach
     start-stop-daemon --stop \
-		      --quiet \
-		      --retry=TERM/30/KILL/5 \
-		      --user {{package_install_user}} \
-		      --exec $ERTS_PATH/run_erl
+                      --quiet \
+                      --retry=TERM/30/KILL/5 \
+                      --user {{package_install_user}} \
+                      --exec $ERTS_PATH/run_erl
     return $?
 }
 
@@ -65,53 +65,52 @@ do_reload() {
 
 case "$1" in
     start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
-	do_start
-	case "$?" in
-	    0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-	    2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+        do_start
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
     stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-	do_stop
-	case "$?" in
-	    0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-	    2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        do_stop
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
     ping)
-	# See if the VM is alive
-	$DAEMON ping || exit $?
-	;;
+        # See if the VM is alive
+        $DAEMON ping || exit $?
+        ;;
     reload|force-reload)
-	log_daemon_msg "Reloading $DESC" "$NAME"
-	do_reload
-	log_end_msg $?
-	;;
+        log_daemon_msg "Reloading $DESC" "$NAME"
+        do_reload
+        log_end_msg $?
+        ;;
     restart)
-	log_daemon_msg "Restarting $DESC" "$NAME"
-	do_stop
-	case "$?" in
-	    0|1)
-		do_start
-		case "$?" in
-		    0) log_end_msg 0 ;;
-		    1) log_end_msg 1 ;; # Old process is still running
-		    *) log_end_msg 1 ;; # Failed to start
-		esac
-		;;
-	    *)
-	  	# Failed to stop
-		log_end_msg 1
-		;;
-	esac
-	;;
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        do_stop
+        case "$?" in
+            0|1)
+                do_start
+                case "$?" in
+                    0) log_end_msg 0 ;;
+                    1) log_end_msg 1 ;; # Old process is still running
+                    *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+            *)
+                # Failed to stop
+                log_end_msg 1
+                ;;
+        esac
+        ;;
     *)
-	echo "Usage: $SCRIPTNAME {start|stop|ping|restart|force-reload}" >&2
-	exit 3
-	;;
+        echo "Usage: $SCRIPTNAME {start|stop|ping|restart|force-reload}" >&2
+        exit 3
+        ;;
 esac
 
 :
-

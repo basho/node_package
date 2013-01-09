@@ -1,7 +1,8 @@
 * node_package
 ** Overview
 
-node_package is a set of RPM/Debian/Solaris templates and scripts, suitable for packaging embedded Erlang nodes.
+`node_package` is a set of RPM/Debian/Solaris templates and scripts, suitable for
+packaging embedded Erlang nodes.
 
 *** Supported Operating Systems
 
@@ -22,16 +23,19 @@ Planned supported operating systems
 
 The following variables need to be exported for node_package to work correctly.
 
- - =PKG_NAME= - The name of your application (ex: riak)
  - =PKG_VERSION= - The version of your application (ex: 1.2.0)
- - =PKG_ID= - The full name of the package, typically =PKG_NAME-PKG_VERSION= (ex: riak-1.2.0)
+ - =PKG_ID= - The full name of the package, typically ={{package_name}}-PKG_VERSION=
+   (ex: riak-1.2.0)
 
 **** Defaulted Variables
 
-The following variables will have a default, but can be overriden in your application.
+The following variables will have a default, but can be overriden in your
+application.
 
- - =PKG_BUILD= - (Default: 1) Sets the "release" version of the build (ex: app-5.4-1 <- the '1')
- - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang binary
+ - =PKG_BUILD= - (Default: 1) Sets the "release" version of the build
+   (ex: app-5.4-1 <- the '1')
+ - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang
+   binary
 
 ** Variables
 
@@ -39,21 +43,35 @@ The following variables describe a package
 
 *** Required Variables
  - =package_name= - The name of the package
+ - =package_install_name= - The name used in the install directories
+    eg: /usr/lib/{{package_install_name}}. Usually the same as package_name.
  - =package_shortdesc= - A short (< one line) description of the package
- - =package_install_name= - The name of the binary installed (can be different than the `package_name`)
  - =package_install_user= - The user to create and run the daemon from
  - =package_install_group= - The group to create and add the above user to
  - =copyright= - The copyright holder (ex: 2011 Basho Technologies, Inc)
  - =license_type= - The short desciption of what license the app is under
- - =vendor_name= - The name of the person or company who is releasing this package
- - =vendor_url= - The website of the person or company who is releasing this package
+ - =vendor_name= - The name of the person or company who is releasing this
+    package
+ - =vendor_url= - The website of the person or company who is releasing this
+    package
  - =vendor_contact_name= - The name of the maintainer (ex: Basho Packaging)
- - =vendor_contact_email= - The email address of the maintainer (ex: riak@basho.com)
- - =solaris_pkgname= - Package names for Solaris follow a naming convention of MAINTapp (ex: BASHOriak)
+ - =vendor_contact_email= - The email address of the maintainer (ex: packages@basho.com)
+ - =solaris_pkgname= - Package names for Solaris follow a naming convention of
+    MAINTapp (ex: BASHOriak)
+ - =runner_wait_process= - The erlang process to wait for to determine if your
+   app started or not. (ex: `riak_core_node_watcher` in riak's case)
+
 
 *** Optional Variables
- - =license_full_text= - If the full text of a license needs to be included, use this variable
- - =deb_depends= - Dependencies you require on deb sytems.  This should be a comma separated list.
+ - =license_full_text= - If the full text of a license needs to be included, use
+    this variable
+ - =deb_depends= - Dependencies you require on deb sytems.  This should be a
+    comma separated list.
  - =package_desc= - A long description of the package
- - =solaris_depends= - (not supported yet) Dependencies specific to the solaris package
+ - =solaris_depends= - (not supported yet) Dependencies specific to the solaris
+    package
  - =package_install_user_desc= - The description of the user created for the app
+ - =runner_ulimit_warn= - The runner script will warn if `ulimit -n` is less than
+   this value.  This defaults to 4096 in all packages.
+ - =platform_patch_dir= - Directory to include in erlang's load path to allow for
+   patches to be hotloaded.  (ex: {platform_lib_dir}/basho-patches)

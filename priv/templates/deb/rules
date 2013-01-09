@@ -25,9 +25,6 @@ clean:
 	rm -f build
 	make clean
 
-## TODO: Need to add a way to loop through a list of further things to install
-##       like man pages and scripts -jared
-##
 ## dh_shlibdeps was added to figure out the dependencies on shared libraries
 ##   and will populate the ${shlibs:Depends} callout in the control file
 install: build
@@ -45,15 +42,17 @@ install: build
 	cp -R rel/{{package_install_name}}/releases \
               debian/{{package_name}}/usr/lib/{{package_install_name}}
 
-	if [ -d rel/{{package_install_name}}/bin ]; then \
-	    mkdir -p debian/{{package_name}}/usr/bin; \
-	    find rel/{{package_install_name}}/bin -type f \
-               -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/bin/ \; ;fi
+## executables
+	if [ -d rel/{{package_install_name}}/{{bin_or_sbin}} ]; then \
+	    mkdir -p debian/{{package_name}}/usr/{{bin_or_sbin}} && \
+	    {{#package_commands}}install -p -D -m 0755 rel/{{package_install_name}}/{{bin_or_sbin}}/{{name}} debian/{{package_name}}/usr/{{bin_or_sbin}}/ && \
+	    {{/package_commands}}echo -n; fi
 
-	if [ -d rel/{{package_install_name}}/sbin ]; then \
-	   mkdir -p debian/{{package_name}}/usr/sbin; \
-	   find rel/{{package_install_name}}/sbin -type f \
-              -exec install -p -D -m 0755 {} debian/{{package_name}}/usr/sbin/ \; ;fi
+## man pages
+	if [ -d doc/man/man1 ]; then \
+	    mkdir -p debian/usr/share/man/man1 && \
+	    {{#package_commands}}install -p -D -m 0544 doc/man/man1/{{name}}.1.gz debian/{{package_name}}/usr/share/man/man1/ && \
+	    {{/package_commands}}echo -n; fi
 
 	mkdir -p debian/{{package_name}}/etc/{{package_install_name}}
 	cp -R rel/{{package_install_name}}/etc/* \
