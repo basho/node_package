@@ -9,12 +9,12 @@
              {package_install_group, "package_install_group"},
 
              %% Platform-specific installation paths
-             {platform_bin_dir,  "/usr/local/sbin"},
-             {platform_data_dir, "/var/db/{{package_install_name}}"},
-             {platform_etc_dir,  "/usr/local/etc/{{package_install_name}}"},
-             {platform_base_dir, "/usr/local/lib/{{package_install_name}}"},
-             {platform_lib_dir,  "/usr/local/lib/{{package_install_name}}/lib"},
-             {platform_log_dir,  "/var/log/{{package_install_name}}"},
+             {platform_bin_dir,  "/opt/{{package_install_name}}/{{bin_or_sbin}}"},
+             {platform_data_dir, "/opt/{{package_install_name}}/data"},
+             {platform_etc_dir,  "/opt/{{package_install_name}}/etc"},
+             {platform_base_dir, "/opt/{{package_install_name}}"},
+             {platform_lib_dir,  "/opt/{{package_install_name}}/lib"},
+             {platform_log_dir,  "/opt/{{package_install_name}}/log"},
              {bin_or_sbin, "bin"},
              {solaris_pkgname, "MAINTapp"}
              ]

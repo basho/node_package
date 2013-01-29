@@ -9,7 +9,7 @@ fi
 # create {{package_install_user}} user only if it doesn't already exist
 getent passwd {{package_install_user}} >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-        useradd -g {{package_install_group}} -d /opt/riak {{package_install_user}}
+        useradd -g {{package_install_group}} -d /opt/{{pkg_install_name}} {{package_install_user}}
         usermod -c "{{package_install_user_desc}}" {{package_install_user}}
 fi
 

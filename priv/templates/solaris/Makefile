@@ -27,7 +27,7 @@ buildrel:
 	@# Make sure we set our EUID properly
 	@# Ye Olde Bourne Shell on Solaris means we have to do it old school
 	echo "Using `which erl` to build"; \
-	$(MAKE) deps rel
+	OVERLAY_VARS="overlay_vars=../solaris/vars.config" $(MAKE) deps rel
 	chmod 0755 rel/{{package_name}}/{{bin_or_sbin}}/* \
 		rel/{{package_name}}/erts-*/bin/*
 
