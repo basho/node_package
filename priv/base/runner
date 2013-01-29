@@ -88,27 +88,11 @@ case "$1" in
         ;;
 
     stop)
-        UNAME_S=`uname -s`
-        case $UNAME_S in
-            Darwin)
-                # Make sure we explicitly set this because iTerm.app doesn't for
-                # some reason.
-                COMMAND_MODE=unix2003
-        esac
-
-        # Wait for the node to completely stop...
-        case $UNAME_S in
-            Linux|Darwin|FreeBSD|DragonFly|NetBSD|OpenBSD)
-                # PID COMMAND
-                PID=`ps ax -o pid= -o command=|\
-                    grep "$RUNNER_BASE_DIR/.*/[b]eam"|awk '{print $1}'`
-                ;;
-            SunOS)
-                # PID COMMAND
-                PID=`ps -ef -o pid= -o args=|\
-                    grep "$RUNNER_BASE_DIR/.*/[b]eam"|awk '{print $1}'`
-                ;;
-        esac
+        get_pid
+        ES=$?
+        if [ "$ES" -ne 0 ] || [ -z $PID ]; then
+            exit $ES
+        fi
 
         $NODETOOL stop
         ES=$?

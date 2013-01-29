@@ -40,7 +40,6 @@ pkginfo:
 		-e 's/@@PKGNAME@@/$(APP)/g' \
 		< $(PKGERDIR)/pkginfo.tmpl > pkginfo
 
-# NOTE!  The instances of riak below shouldn't change
 prototype:
 	echo "i pkginfo" > prototype
 	echo "i copyright" >> prototype
@@ -51,7 +50,7 @@ prototype:
 	echo '' >> prototype
 	pkgproto rel/{{package_name}}={{package_name}} >> prototype
 	sed -e "s/ $(LOGNAME) .*$$/ {{package_install_user}} {{package_install_group}}/" \
-	    -e 's/f none riak\/etc/e preserve riak\/etc/' prototype > prototype.tmp && mv prototype.tmp prototype
+	    -e 's/f none {{package_install_name}}\/etc/e preserve {{package_install_name}}\/etc/' prototype > prototype.tmp && mv prototype.tmp prototype
 
 $(PKGERDIR)/pkgclean:
 	rm -rf copyright depend pkgbuild pkginfo prototype
