@@ -40,6 +40,13 @@ PKGERDIR	= fbsd
 BUILDDIR	= fbsdbuild
 endif
 
+ifeq ($(OS),SunOS)
+OSNAME		= FreeBSD
+ARCH		= $(shell uname -p)
+PKGERDIR	= solaris
+BUILDDIR	= solarisbuild
+endif
+
 DATE            = $(shell date +%Y-%m-%d)
 
 # Default the package build version to 1 if not already set
