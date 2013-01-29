@@ -2,8 +2,6 @@
 PKG		 = {{solaris_pkgname}}
 APP		 = {{package_name}}
 # possible ARCH values are i386, sparc, all
-DISTRO		 = $(shell head -1 /etc/release|awk \
-		   '{if ($$1 == "OmniOS") {print $$1} else {print "Solaris"}}')
 KERNEL		 = $(shell uname -r)
 SOLARIS_VER	?= $(shell echo "$(KERNEL)" | sed -e 's/^5\.//')
 PKGFILE		 = $(PKG_NAME)-$(PKG_VERSION)-$(DISTRO)$(SOLARIS_VER)-$(ARCH).pkg

@@ -1,0 +1,65 @@
+#!/bin/sh
+
+if [ "$2" = "PRE-INSTALL" ]; then
+    if ! getent group "{{package_install_group}}" 2>/dev/null 1>&2; then
+        groupadd {{package_install_group}}
+    fi
+
+    if ! getent passwd "{{package_install_user}}" 2>/dev/null 1>&2; then
+        useradd -g {{package_install_group}} -d {{platform_base_dir}} -s /bin/sh {{package_install_user}}
+    fi
+
+    # Create var directories outside of +CONTENTS
+    mkdir -p {{platform_data_dir}}
+    chown -R {{package_install_user}}:{{package_install_group}} {{platform_data_dir}}
+    chmod 700 {{platform_data_dir}}
+    mkdir -p {{platform_log_dir}}
+    chmod 700 {{platform_log_dir}}
+    chown -R {{package_install_user}}:{{package_install_group}} {{platform_log_dir}}
+
+
+    # Backup config files if they already exist
+    if [ -f {{platform_etc_dir}}/vm.args ]; then
+        echo "Config file exists: backing up {{platform_etc_dir}}/vm.args to {{platform_etc_dir}}/vm.args.bak"
+        cp {{platform_etc_dir}}/vm.args {{platform_etc_dir}}/vm.args.bak
+    fi
+
+    if [ -f {{platform_etc_dir}}/app.config ]; then
+        echo "Config file exists: backing up {{platform_etc_dir}}/app.config to {{platform_etc_dir}}/app.config.bak"
+        cp {{platform_etc_dir}}/app.config {{platform_etc_dir}}/app.config.bak
+    fi
+
+fi
+
+if [ "$2" = "POST-INSTALL" ]; then
+
+    # Ensure proper permissions on {{package_name}} scripts
+    for i in {{#package_commands}}{{name}} {{/package_commands}}; do
+        chown {{package_install_user}}:{{package_install_group}} {{platform_bin_dir}}/$i
+        chmod 755 {{platform_bin_dir}}/$i
+    done
+
+    # Ensure proper ownership of lib directory
+    chown -R {{package_install_user}}:{{package_install_group}} {{platform_lib_dir}}
+
+    # Ensure proper ownership of etc directory
+    # This shouldn't have to happen in the post-install, but
+    # there is some non-deterministic stuff happening during
+    # install on SmartOS that causes wrong ownership.
+    chown -R root:{{package_install_group}} {{platform_etc_dir}}
+    chmod -R g+r+X {{platform_etc_dir}}
+
+    # Create {{package_install_name}} project
+    if ! projects -l {{package_insyall_name}}  >/dev/null 2>&1; then
+        projadd -U {{package_install_user}} -G {{package_install_group}} \
+        -K "process.max-file-descriptor=(priv,262140,deny)" \
+        -c "{{package_name}} default project" {{package_install_name}}
+    fi
+
+    # Import SMF definitions
+    svccfg import /opt/local/share/smf/{{package_install_name}}-epmd/manifest.xml
+    chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
+    svccfg import /opt/local/share/smf/{{package_install_name}}/manifest.xml
+fi
+
+exit 0

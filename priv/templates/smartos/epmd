@@ -1,0 +1,15 @@
+# Wrapper script for starting epmd
+
+. /lib/svc/share/smf_include.sh
+
+case "$1" in
+'start')
+        {{platform_base_dir}}/%ERTS_PATH%/bin/epmd -kill
+        {{platform_base_dir}}/%ERTS_PATH%/bin/epmd -daemon
+        ;;
+
+*)
+        exit 1
+        ;;
+esac
+exit 0

@@ -28,23 +28,34 @@ endif  # linux
 
 ifeq ($(OS),Darwin)          # OSX
 OSNAME		= OSX
-ARCH		= $(shell uname -m)
+ARCH		  = $(shell uname -m)
 PKGERDIR	= osx
 BUILDDIR	= osxbuild
 endif
 
 ifeq ($(OS),FreeBSD)
 OSNAME		= FreeBSD
-ARCH		= $(shell uname -m)
+ARCH		  = $(shell uname -m)
 PKGERDIR	= fbsd
 BUILDDIR	= fbsdbuild
 endif
 
-ifeq ($(OS),SunOS)
-OSNAME		= FreeBSD
-ARCH		= $(shell uname -p)
+ifeq ($(OS),SunOS)         # Solaris flavors
+KERNELVER = $(shell uname -v | grep -c joyent 2> /dev/null)
+ARCH      = $(shell uname -p)
+
+ifneq ($(KERNELVER),0)       # SmartOS
+OSNAME    = SmartOS
+PKGERDIR  = smartos
+BUILDDIR  = smartosbuild
+else                         # Solaris / OmniOS
+DISTRO    = $(shell head -1 /etc/release|awk \
+             '{if ($$1 == "OmniOS") {print $$1} else {print "Solaris"}}')
+OSNAME    = ${DISTRO}
 PKGERDIR	= solaris
 BUILDDIR	= solarisbuild
+endif
+
 endif
 
 DATE            = $(shell date +%Y-%m-%d)
