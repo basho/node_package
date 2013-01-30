@@ -8,7 +8,6 @@ bootstrap:
 	ln -sf $(PKG_ID).tar.gz $(PKG_NAME)_$(PKG_VERSION).orig.tar.gz
 	mkdir -p $(PKG_ID)/smartos
 	cd $(PKG_ID)/smartos && $(REBAR) -v create \
-                              package_name=$(PKG_NAME) \
                               template_dir=../deps/node_package/priv/templates \
                               template_vars=../pkg.vars.config template=smartos
 	$(MAKE) -C $(PKG_ID) -f smartos/Makefile

@@ -20,7 +20,7 @@ ESMF_DIR         := $(BUILD_STAGE_DIR)/share/smf/{{package_install_name}}-epmd
 
 # Recursive assignment of ERTS version
 # We will know this after building the rel
-ERTS_PATH        = $(shell ls $(BUILDDIR)/rel/{{package_name}} | egrep -o "erts-.*")
+ERTS_PATH        = $(shell ls $(BUILDDIR)/rel/{{package_install_name}} | egrep -o "erts-.*")
 
 # /var based dirs are handled in the +INSTALL file
 
@@ -62,8 +62,8 @@ build: packing_list_files
 #   to populate the files
 packing_list_files: $(BUILD_STAGE_DIR) templates
 	@echo "Adding to packaging list $(PKG_NAME)-$(PKG_VERSION)"
-	echo "@name $(PKG_NAME)-$(PKG_VERSION)" >> plist
-	echo "@pkgcfl {{package_install_name}}-*" >> plist
+	echo "@name {{package_name}}-$(PKG_VERSION)" >> plist
+	echo "@pkgcfl {{package_name}}-*" >> plist
 	echo "@pkgdep sudo-[0-9]*" >> plist
 	echo "@pkgdep openssl-0.9.8*" >> plist
 
@@ -131,15 +131,15 @@ templates: $(BUILD_STAGE_DIR)
 $(BUILD_STAGE_DIR): buildrel
 	@echo "Copying rel directory to staging directory"
 	mkdir -p $@
-	cp -R $(BUILDDIR)/rel/{{package_name}} $(BUILD_STAGE_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}} $(BUILD_STAGE_DIR)
 	mkdir -p $(PBIN_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_name}}/{{bin_or_sbin}}/* $(PBIN_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/{{bin_or_sbin}}/* $(PBIN_DIR)
 	mkdir -p $(PETC_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_name}}/etc/* $(PETC_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/etc/* $(PETC_DIR)
 	mkdir -p $(PLIB_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_name}}/lib $(PLIB_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_name}}/erts-* $(PLIB_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_name}}/releases $(PLIB_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/lib $(PLIB_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/erts-* $(PLIB_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/releases $(PLIB_DIR)
 	echo "Copying man pages to staging directory"
 	mkdir -p $(PMAN_DIR)
 	if [ -d $(BUILDDIR)/doc/man/man1 ]; then \
