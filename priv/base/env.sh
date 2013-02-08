@@ -21,12 +21,16 @@ RUNNER_SCRIPT=${0##*/}
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_LOG_DIR={{runner_log_dir}}
+RUNNER_PATCH_DIR={{platform_patch_dir}}
 PIPE_DIR={{pipe_dir}}
 RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Threshold where users will be warned of low ulimit file settings
-ULIMIT_WARN=4096
+ULIMIT_WARN={{runner_ulimit_warn}}
+
+# Registered process to wait for to consider start a success
+WAIT_FOR_PROCESS={{runner_wait_process}}
 
 WHOAMI=$(whoami)
 
@@ -126,10 +130,38 @@ check_config() {
 # Function to check if ulimit is properly set
 check_ulimit() {
 
-    ULIMIT_F=`ulimit -n`
-    if [ "$ULIMIT_F" -lt $ULIMIT_WARN ]; then
-        echo "!!!!"
-        echo "!!!! WARNING: ulimit -n is ${ULIMIT_F}; ${ULIMIT_WARN} is the recommended minimum."
-        echo "!!!!"
+    # don't fail if this is unset
+    if [ ! -z "$ULIMIT_WARN" ]; then
+        ULIMIT_F=`ulimit -n`
+        if [ "$ULIMIT_F" -lt $ULIMIT_WARN ]; then
+            echo "!!!!"
+            echo "!!!! WARNING: ulimit -n is ${ULIMIT_F}; ${ULIMIT_WARN} is the recommended minimum."
+            echo "!!!!"
+        fi
     fi
+}
+
+# Set the PID global variable, return 1 on error
+get_pid() {
+    PID=`$NODETOOL getpid < /dev/null`
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        echo "Node is not running!"
+        return 1
+    fi
+
+    # don't allow empty or init pid's
+    if [ -z $PID ] || [ "$PID" -le 1 ]; then
+        return 1
+    fi
+
+    return 0
+}
+
+subcommand() {
+    main_usage
+}
+
+subcommand_usage() {
+    return 0
 }

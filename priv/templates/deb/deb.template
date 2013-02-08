@@ -12,7 +12,9 @@
              {vendor_contact_email, "vendor_contact_email"},
              {copyright, "copyright"},
              {license_type, "license_type"},
-             {license_full_text, ""}
+             {license_full_text, ""},
+             {bin_or_sbin, "bin"},
+             {runner_ulimit_warn, "4096"}
             ]
 }.
 {template, "Makefile", "Makefile"}.
@@ -25,4 +27,3 @@
 {template, "rules", "rules"}.
 {template, "vars.config", "vars.config"}.
 {template, "init.script", "init.script"}.
-

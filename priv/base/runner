@@ -14,8 +14,21 @@ if [ "$ES" -ne 0 ]; then
     exit $ES
 fi
 
+# Keep track of where script was invoked
+ORIGINAL_DIR=$(pwd)
+
 # Make sure CWD is set to runner run dir
 cd $RUNNER_BASE_DIR
+
+# Identify the script name
+SCRIPT=`basename $0`
+
+usage() {
+    echo "Usage: $SCRIPT {start | stop| restart | reboot | ping | console | attach | "
+    echo "                    ertspath | chkconfig | escript | version | getpid |"
+    echo "                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
+}
+
 
 # Check the first argument for instructions
 case "$1" in
@@ -45,6 +58,33 @@ case "$1" in
         mkdir -p $PIPE_DIR
         $ERTS_PATH/run_erl -daemon $PIPE_DIR/ $RUNNER_LOG_DIR \
             "exec $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT console" 2>&1
+
+        if [ ! -z "$WAIT_FOR_PROCESS" ]; then
+            # Wait for the node to come up. We can't just ping it because
+            # distributed erlang comes up for a second before the node crashes
+            # (eg. in the case of an unwriteable disk). Once the node comes
+            # up we check for the $WAIT_FOR_PROCESS} process. If that's running
+            # then we assume things are good enough. This will at least let
+            # the user know when the node is crashing right after startup.
+            WAIT=${WAIT_FOR_ERLANG:-15}
+            while [ $WAIT -gt 0 ]; do
+                WAIT=`expr $WAIT - 1`
+                sleep 1
+                RES=`ping_node`
+                if [ "$?" -ne 0 ]; then
+                    continue
+                fi
+                PROCESS=`$NODETOOL rpcterms erlang whereis "'${WAIT_FOR_PROCESS}'."`
+                if [ "$PROCESS" != "undefined" ]; then
+                    exit 0
+                fi
+            done
+            echo "${SCRIPT} failed to start within ${WAIT_FOR_ERLANG:-15} seconds,"
+            echo "see the output of '${SCRIPT} console' for more information."
+            echo "If you want to wait longer, set the environment variable"
+            echo "WAIT_FOR_ERLANG to the number of seconds to wait."
+            exit 1
+        fi
         ;;
 
     stop)
@@ -153,7 +193,7 @@ case "$1" in
         PROGNAME=`echo $0 | sed 's/.*\///'`
         CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
             -embedded -config $RUNNER_ETC_DIR/app.config \
-            -pa $RUNNER_LIB_DIR/basho-patches \
+            -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
         export ROOTDIR
@@ -181,7 +221,7 @@ case "$1" in
         MYPID=$$
         NODE_NAME=${NAME_ARG#* }
         $ERTS_PATH/erl -noshell -noinput \
-            -pa $RUNNER_LIB_DIR/basho-patches \
+            -pa $RUNNER_PATCH_DIR \
             -hidden $NAME_PARAM np_etop$MYPID$NAME_HOST $COOKIE_ARG \
             -s etop -s erlang halt -output text \
             -node $NODE_NAME \
@@ -200,12 +240,17 @@ case "$1" in
     version)
         echo $APP_VERSION
         ;;
-
+    getpid)
+        # Get the PID from nodetool
+        get_pid
+        ES=$?
+        if [ "$ES" -ne 0 ] || [ -z $PID ]; then
+            exit $ES
+        fi
+        echo $PID
+        ;;
     *)
-        echo "Usage: $SCRIPT {start | stop| restart| reboot| ping| console| attach| "
-        echo "                    ertspath| chkconfig| escript| version | "
-        echo "                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
-        exit 1
+        usage
         ;;
 esac
 
