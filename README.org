@@ -9,10 +9,10 @@ packaging embedded Erlang nodes.
 Currently supported operating systems / distros
  - Redhat / Fedora and variants
  - Debian / Ubuntu and variants
-
-Planned supported operating systems
  - FreeBSD
  - OSX
+
+Planned supported operating systems
  - SmartOS
 
 ** Use
@@ -75,3 +75,5 @@ The following variables describe a package
    this value.  This defaults to 4096 in all packages.
  - =platform_patch_dir= - Directory to include in erlang's load path to allow for
    patches to be hotloaded.  (ex: {platform_lib_dir}/basho-patches)
+ - =bin_or_sbin= - Tells where to put the binaries, in */bin or */sbin
+   (default: bin)

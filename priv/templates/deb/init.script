@@ -11,7 +11,7 @@
 
 DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
-DAEMON=/usr/sbin/$NAME
+DAEMON=/usr/{{bin_or_sbin}}/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Read configuration variable file if it is present
