@@ -3,7 +3,8 @@
 {variables, [
              {package_name, "package_name"},
              {package_install_name, "package_install_name"},
-             {package_install_user, "package_install_user"}
+             {package_install_user, "package_install_user"},
+             {runner_ulimit_warn, "4096"}
              ]
 }.
 {template, "Makefile", "Makefile"}.

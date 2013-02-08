@@ -4,24 +4,24 @@
 export
 
 OS		= $(shell uname -s)
-ERLANG_BIN     ?= $(shell dirname $(shell which erl))
+ERLANG_BIN	?= $(shell dirname $(shell which erl))
 
 ##
 ## Support RPM and Debian based linux systems
 ##
 ifeq ($(OS),Linux)
-ARCH            = $(shell uname -m)
-ISRPM 		= $(shell cat /etc/redhat-release 2> /dev/null)
+ARCH		= $(shell uname -m)
+ISRPM		= $(shell cat /etc/redhat-release 2> /dev/null)
 ISDEB		= $(shell cat /etc/debian_version 2> /dev/null)
 ifneq ($(ISRPM),)
-OSNAME          = RedHat
+OSNAME= RedHat
 PKGERDIR	= rpm
-BUILDDIR        = rpmbuild
+BUILDDIR	= rpmbuild
 else
 ifneq ($(ISDEB),)
-OSNAME          = Debian
+OSNAME		= Debian
 PKGERDIR	= deb
-BUILDDIR        = debuild
+BUILDDIR	= debuild
 endif  # deb
 endif  # rpm
 endif  # linux
@@ -33,10 +33,14 @@ PKGERDIR	= osx
 BUILDDIR	= osxbuild
 endif
 
-DATE            = $(shell date +%Y-%m-%d)
+ifeq ($(OS),FreeBSD)
+OSNAME		= FreeBSD
+ARCH		= $(shell uname -m)
+PKGERDIR	= fbsd
+BUILDDIR	= fbsdbuild
+endif
 
-# Set the version that shows for `<app> version`
-VERSIONSTRING   =  $(PKG_NAME) ($(PKG_VERSION) $(DATE)) $(OSNAME) $(ARCH)
+DATE            = $(shell date +%Y-%m-%d)
 
 # Default the package build version to 1 if not already set
 PKG_BUILD      ?= 1
@@ -46,7 +50,7 @@ PKG_BUILD      ?= 1
 ## Check required settings before continuing
 ostype: varcheck
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
-	make -f $(PKG_ID)/deps/node_package/priv/templates/$(PKGERDIR)/Makefile.bootstrap
+	$(MAKE) -f $(PKG_ID)/deps/node_package/priv/templates/$(PKGERDIR)/Makefile.bootstrap
 
 varcheck:
 	$(if $(PKG_VERSION),,$(error "Variable PKG_VERSION must be set and exported, see basho/node_package readme"))

@@ -5,10 +5,8 @@
 export
 
 bootstrap:
-	ln -s $(PKG_ID).tar.gz $(PKG_NAME)_$(PKG_VERSION).orig.tar.gz
 	mkdir -p $(PKG_ID)/debian
 	cd $(PKG_ID)/debian && $(REBAR) -v create \
-                              package_name=$(PKG_NAME) \
                               template_dir=../deps/node_package/priv/templates \
                               template_vars=../pkg.vars.config template=deb
 	make -C $(PKG_ID) -f debian/Makefile

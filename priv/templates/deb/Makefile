@@ -1,5 +1,6 @@
 
 default:
+	ln -sf $(PKG_ID).tar.gz ../{{package_name}}_$(PKG_VERSION).orig.tar.gz
 	export DEBFULLNAME="{{vendor_contact_name}}"; \
 	export DEBEMAIL="{{vendor_contact_email}}"; \
 	dch  --create --package {{package_name}} -v "$(PKG_VERSION)-$(PKG_BUILD)" \
