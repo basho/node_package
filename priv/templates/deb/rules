@@ -43,9 +43,9 @@ install: build
               debian/{{package_name}}/usr/lib/{{package_install_name}}
 
 ## executables
-	if [ -d rel/{{package_install_name}}/{{bin_or_sbin}} ]; then \
+	if [ -d rel/{{package_install_name}}/bin ]; then \
 	    mkdir -p debian/{{package_name}}/usr/{{bin_or_sbin}} && \
-	    {{#package_commands}}install -p -D -m 0755 rel/{{package_install_name}}/{{bin_or_sbin}}/{{name}} debian/{{package_name}}/usr/{{bin_or_sbin}}/ && \
+	    {{#package_commands}}install -p -D -m 0755 rel/{{package_install_name}}/bin/{{name}} debian/{{package_name}}/usr/{{bin_or_sbin}}/ && \
 	    {{/package_commands}}echo -n; fi
 
 ## man pages

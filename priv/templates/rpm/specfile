@@ -70,8 +70,8 @@ cp -R %{relpath}/erts-*    %{buildroot_lib}
 cp -R %{relpath}/releases  %{buildroot_lib}
 
 mkdir -p %{buildroot}%{_{{bin_or_sbin}}dir}
-if [ -d %{relpath}/{{bin_or_sbin}} ]; then \
-   find %{relpath}/{{bin_or_sbin}} -type f \
+if [ -d %{relpath}/bin ]; then \
+   find %{relpath}/bin -type f \
         -exec install -p -D -m 0755 {} %{buildroot}%{_{{bin_or_sbin}}dir}/ \; ;fi
 
 mkdir -p %{buildroot}%{_mandir}/man1

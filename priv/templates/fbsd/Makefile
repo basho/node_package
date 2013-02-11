@@ -130,7 +130,7 @@ $(BUILD_STAGE_DIR): buildrel
 	@echo "Copying rel directory to staging directory"
 	mkdir -p $@
 	mkdir -p $(PBIN_DIR)
-	cp -R rel/{{package_install_name}}/{{bin_or_sbin}}/* $(PBIN_DIR)
+	cp -R rel/{{package_install_name}}/bin/* $(PBIN_DIR)
 	mkdir -p $(PETC_DIR)
 	cp -R rel/{{package_install_name}}/etc/* $(PETC_DIR)
 	mkdir -p $(PLIB_DIR)
@@ -151,7 +151,7 @@ buildrel:
 	# make the app version available for templating
 	echo "{app_version, \"$(PKG_VERSION)\"}." >> $(PKGERDIR)/vars.config
 	OVERLAY_VARS="overlay_vars=../fbsd/vars.config" $(MAKE) deps rel
-	chmod 0755 rel/{{package_install_name}}/{{bin_or_sbin}}/* rel/{{package_install_name}}/erts-*/bin/*
+	chmod 0755 rel/{{package_install_name}}/bin/* rel/{{package_install_name}}/erts-*/bin/*
 
 $(BUILDDIR):
 	mkdir -p $@

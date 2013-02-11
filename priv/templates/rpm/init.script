@@ -16,10 +16,10 @@ RETVAL=0
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
-DAEMON=/usr/sbin/$NAME
+DAEMON=/usr/{{bin_or_sbin}}/$NAME
 
 # Check for script, config and data dirs
-[ -x /usr/sbin/$NAME ] || exit 0
+[ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
 [ -d /etc/$NAME ] || exit 0
 [ -d /var/lib/$NAME ] || exit 0
 [ -d /var/run/$NAME ] || exit 0
