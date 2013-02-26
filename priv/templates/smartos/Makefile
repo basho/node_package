@@ -133,7 +133,7 @@ $(BUILD_STAGE_DIR): buildrel
 	mkdir -p $@
 	cp -R $(BUILDDIR)/rel/{{package_install_name}} $(BUILD_STAGE_DIR)
 	mkdir -p $(PBIN_DIR)
-	cp -R $(BUILDDIR)/rel/{{package_install_name}}/{{bin_or_sbin}}/* $(PBIN_DIR)
+	cp -R $(BUILDDIR)/rel/{{package_install_name}}/bin/* $(PBIN_DIR)
 	mkdir -p $(PETC_DIR)
 	cp -R $(BUILDDIR)/rel/{{package_install_name}}/etc/* $(PETC_DIR)
 	mkdir -p $(PLIB_DIR)
@@ -161,7 +161,7 @@ buildrel: $(BUILDDIR)
 	# make the app version available for templating
 	echo "{app_version, \"$(PKG_VERSION)\"}." >> $(PKGERDIR)/vars.config
 	OVERLAY_VARS="overlay_vars=../smartos/vars.config" $(MAKE) deps rel
-	chmod 0755 $(BUILDDIR)/rel/{{package_install_name}}/{{bin_or_sbin}}/* $(BUILDDIR)/rel/{{package_install_name}}/erts-*/bin/*
+	chmod 0755 $(BUILDDIR)/rel/{{package_install_name}}/bin/* $(BUILDDIR)/rel/{{package_install_name}}/erts-*/bin/*
 
 $(BUILDDIR):
 	mkdir -p $@
