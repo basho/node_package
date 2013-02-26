@@ -1,5 +1,8 @@
 BUILDDIR        = $(shell pwd)
-BUILD_STAGE_DIR = $(BUILDDIR)/$(PKG_NAME)
+# SmartOS doesn't like package names with '-' in the name, so clean any if they
+# exist
+PACKAGE_NAME_CLEAN = $(shell echo "{{package_name}}" | sed -e 's/-/_/g')
+BUILD_STAGE_DIR = $(BUILDDIR)/$(PACKAGE_NAME_CLEAN)
 
 
 # SmartOS changed pkgsrc versions which majorly changed
@@ -24,8 +27,8 @@ ERTS_PATH        = $(shell ls $(BUILDDIR)/rel/{{package_install_name}} | egrep -
 
 # /var based dirs are handled in the +INSTALL file
 
-TARNAME := $(PKG_NAME)-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tar
-PKGNAME := $(PKG_NAME)-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tgz
+TARNAME := $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tar
+PKGNAME := $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tgz
 
 # pkg_add on Smartos requires that the tar file
 # and +CONTENTS files are in the exact same order
@@ -61,9 +64,9 @@ build: packing_list_files
 #   to the destination folder where we use 'find'
 #   to populate the files
 packing_list_files: $(BUILD_STAGE_DIR) templates
-	@echo "Adding to packaging list $(PKG_NAME)-$(PKG_VERSION)"
-	echo "@name {{package_name}}-$(PKG_VERSION)" >> plist
-	echo "@pkgcfl {{package_name}}-*" >> plist
+	@echo "Adding to packaging list $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)"
+	echo "@name $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)" >> plist
+	echo "@pkgcfl $(PACKAGE_NAME_CLEAN)-*" >> plist
 	echo "@pkgdep sudo-[0-9]*" >> plist
 	echo "@pkgdep openssl-0.9.8*" >> plist
 

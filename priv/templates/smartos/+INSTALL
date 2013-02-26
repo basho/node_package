@@ -50,10 +50,10 @@ if [ "$2" = "POST-INSTALL" ]; then
     chmod -R g+r+X {{platform_etc_dir}}
 
     # Create {{package_install_name}} project
-    if ! projects -l {{package_insyall_name}}  >/dev/null 2>&1; then
+    if ! projects -l {{package_install_name}}  >/dev/null 2>&1; then
         projadd -U {{package_install_user}} -G {{package_install_group}} \
         -K "process.max-file-descriptor=(priv,262140,deny)" \
-        -c "{{package_name}} default project" {{package_install_name}}
+        -c "{{package_install_name}} default project" {{package_install_name}}
     fi
 
     # Import SMF definitions
