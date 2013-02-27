@@ -37,11 +37,13 @@ application.
  - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang
    binary
 
-** Variables
+** Package and Script Variables
 
-The following variables describe a package
+*** Package Variables
+The following variables describe a package and should be put in the
+=pkg.vars.config= file.
 
-*** Required Variables
+**** Required Variables
  - =package_name= - The name of the package
  - =package_install_name= - The name used in the install directories
     eg: /usr/lib/{{package_install_name}}. Usually the same as package_name.
@@ -62,7 +64,7 @@ The following variables describe a package
    app started or not. (ex: `riak_core_node_watcher` in riak's case)
 
 
-*** Optional Variables
+**** Optional Variables
  - =license_full_text= - If the full text of a license needs to be included, use
     this variable
  - =deb_depends= - Dependencies you require on deb sytems.  This should be a
@@ -71,12 +73,29 @@ The following variables describe a package
  - =solaris_depends= - (not supported yet) Dependencies specific to the solaris
     package
  - =package_install_user_desc= - The description of the user created for the app
+ - =bin_or_sbin= - Tells where to put the binaries, in */bin or */sbin
+   (default: bin)
+
+*** Script Variables
+The following variables are used in the =env.sh= and =runner= scripts which can
+be used by reltool for =rel= and =devrel= builds.  They should be set in
+your application's =vars.config=.
+
+**** Required Variables
+ - =runner_script_dir= -
+ - =runner_base_dir= -
+ - =runner_etc_dir= -
+ - =runner_log_dir= -
+ - =pipe_dir= -
+
+**** Optional Variables
  - =runner_ulimit_warn= - The runner script will warn if `ulimit -n` is less than
    this value.  This defaults to 4096 in all packages.
  - =platform_patch_dir= - Directory to include in erlang's load path to allow for
    patches to be hotloaded.  (ex: {platform_lib_dir}/basho-patches)
- - =bin_or_sbin= - Tells where to put the binaries, in */bin or */sbin
-   (default: bin)
+ - =runner_user= - The username to run the application as
+ - =runner_wait_process= - Registered process to wait for to consider start a
+   success
 
 *** Templating Order
 There are several templating steps done in node_package:
