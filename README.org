@@ -81,13 +81,6 @@ The following variables are used in the =env.sh= and =runner= scripts which can
 be used by reltool for =rel= and =devrel= builds.  They should be set in
 your application's =vars.config=.
 
-**** Required Variables
- - =runner_script_dir= -
- - =runner_base_dir= -
- - =runner_etc_dir= -
- - =runner_log_dir= -
- - =pipe_dir= -
-
 **** Optional Variables
  - =runner_ulimit_warn= - The runner script will warn if `ulimit -n` is less than
    this value.  This defaults to 4096 in all packages.
