@@ -87,8 +87,9 @@ There are several templating steps done in node_package:
   to the values from <osname>.template and pkg.vars.config, with pkg.vars.config trumping
   values from <osname>.template. This includes vars.config, which will be used in the next
   templating step.
-- Finally, as part of the rebar generate phase, the values from vars.config are used to
-  template any overlay files marked as a template in rel/reltool.config.
+- Finally, as part of the rebar generate phase, the values from the package's rel/vars.config
+  and  node_package's vars.config are used to template any overlay files marked as a template
+  in rel/reltool.config. Values from node_package's vars.config trump the ones from rel/vars.config.
 
 So, if you want to have a variable persist all the way through to the final reltool step,
 the variable needs to be set in pkg.vars.config (or defaulted in <osname>.template) AND be
