@@ -154,15 +154,8 @@ $(BUILD_STAGE_DIR): buildrel
 #  * Patch rel/files/riak with our version
 #  * Ensure all binaries are executable
 #  * copy the vars.config over for build config
+# TODO, solve the .patch issue we have in riak
 buildrel: $(BUILDDIR)
-	#cp $(BUILDDIR)/rel/files/riak $(BUILDDIR)/rel/files/riak.tmp
-	#sed -e "s/^RIAK_VERSION.*$$/RIAK_VERSION=\"${VERSIONSTRING}\"/" < \
-	#       $(BUILDDIR)/rel/files/riak.tmp > $(BUILDDIR)/rel/files/riak
-	#cp $(PKGERDIR)/patches/* $(BUILDDIR)/rel/files/
-	#cd $(BUILDDIR)/rel/files && \
-	#	patch -p3 < rel-files.patch
-	# make the app version available for templating
-	echo "{app_version, \"$(PKG_VERSION)\"}." >> $(PKGERDIR)/vars.config
 	OVERLAY_VARS="overlay_vars=../smartos/vars.config" $(MAKE) deps rel
 	chmod 0755 $(BUILDDIR)/rel/{{package_install_name}}/bin/* $(BUILDDIR)/rel/{{package_install_name}}/erts-*/bin/*
 

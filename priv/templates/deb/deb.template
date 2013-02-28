@@ -13,7 +13,15 @@
              {copyright, "copyright"},
              {license_type, "license_type"},
              {license_full_text, ""},
-             {bin_or_sbin, "bin"}
+             {bin_or_sbin, "bin"},
+
+             %% Platform Specific Settings
+             {platform_bin_dir,  "/usr/{{bin_or_sbin}}"},
+             {platform_data_dir, "/var/lib/{{package_install_name}}"},
+             {platform_etc_dir,  "/etc/{{package_install_name}}"},
+             {platform_base_dir, "/usr/lib/{{package_install_name}}"},
+             {platform_lib_dir,  "/usr/lib/{{package_install_name}}/lib"},
+             {platform_log_dir,  "/var/log/{{package_install_name}}"}
             ]
 }.
 {template, "Makefile", "Makefile"}.

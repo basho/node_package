@@ -8,8 +8,7 @@
              {package_install_user_desc, "package_install_user_desc"},
              {package_install_group, "package_install_group"},
              {bin_or_sbin, "bin"},
-             {runner_ulimit_warn, "4096"},
-             
+
              %% Platform specific settings
              {platform_bin_dir,  "/opt/local/{{bin_or_sbin}}"},
              {platform_data_dir, "/var/db/{{package_install_name}}"},

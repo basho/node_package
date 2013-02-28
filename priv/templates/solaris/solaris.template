@@ -17,7 +17,7 @@
              {platform_log_dir,  "/opt/{{package_install_name}}/log"},
              {bin_or_sbin, "bin"},
              {solaris_pkgname, "MAINTapp"}
-             ]
+            ]
 }.
 {template, "Makefile", "Makefile"}.
 {template, "vars.config", "vars.config"}.

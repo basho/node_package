@@ -148,8 +148,6 @@ $(BUILD_STAGE_DIR): buildrel
 #  * Ensure all binaries are executable
 #  * copy the vars.config over for build config
 buildrel:
-	# make the app version available for templating
-	echo "{app_version, \"$(PKG_VERSION)\"}." >> $(PKGERDIR)/vars.config
 	OVERLAY_VARS="overlay_vars=../fbsd/vars.config" $(MAKE) deps rel
 	chmod 0755 rel/{{package_install_name}}/bin/* rel/{{package_install_name}}/erts-*/bin/*
 

@@ -15,8 +15,9 @@
              {platform_etc_dir,  "/usr/local/etc/{{package_install_name}}"},
              {platform_base_dir, "/usr/local/lib/{{package_install_name}}"},
              {platform_lib_dir,  "/usr/local/lib/{{package_install_name}}/lib"},
-             {platform_log_dir,  "/var/log/{{package_install_name}}"},
-             ]
+             {platform_log_dir,  "/var/log/{{package_install_name}}"}
+            ]
+>>>>>>> 3453983... Continuing cleanups to platform_patch_dir and readying for release
 }.
 {template, "Makefile", "Makefile"}.
 {template, "vars.config", "vars.config"}.
