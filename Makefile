@@ -65,11 +65,16 @@ PKG_BUILD      ?= 1
 
 .PHONY: ostype varcheck
 
-## Check required settings before continuing
-ostype: varcheck
+## Call platform dependent makefile
+ostype: varcheck setversion
 	$(if $(PKGERDIR),,$(error "Operating system '$(OS)' not supported by node_package"))
 	$(MAKE) -f $(PKG_ID)/deps/node_package/priv/templates/$(PKGERDIR)/Makefile.bootstrap
 
+## Set app version
+setversion: varcheck
+	echo "{app_version, \"$(PKG_VERSION)\"}." >> $(PKG_ID)/deps/node_package/priv/templates/$(PKGERDIR)/vars.config
+
+## Check required settings before continuing
 varcheck:
 	$(if $(PKG_VERSION),,$(error "Variable PKG_VERSION must be set and exported, see basho/node_package readme"))
 	$(if $(PKG_ID),,$(error "Variable PKK_ID must be set and exported, see basho/node_package readme"))
