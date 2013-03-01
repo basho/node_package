@@ -4,7 +4,7 @@ APP		 = {{package_name}}
 # possible ARCH values are i386, sparc, all
 KERNEL		 = $(shell uname -r)
 SOLARIS_VER	?= $(shell echo "$(KERNEL)" | sed -e 's/^5\.//')
-PKGFILE		 = $(PKG_NAME)-$(PKG_VERSION)-$(DISTRO)$(SOLARIS_VER)-$(ARCH).pkg
+PKGFILE		 = $(PKG)-$(PKG_VERSION)-$(DISTRO)$(SOLARIS_VER)-$(ARCH).pkg
 
 build: buildrel depend pkginfo prototype
 	cp $(PKGERDIR)/copyright $(PKGERDIR)/preinstall $(PKGERDIR)/*.preserve .
@@ -52,4 +52,3 @@ prototype:
 
 $(PKGERDIR)/pkgclean:
 	rm -rf copyright depend pkgbuild pkginfo prototype
-
