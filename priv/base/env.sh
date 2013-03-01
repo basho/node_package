@@ -27,12 +27,16 @@ RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Threshold where users will be warned of low ulimit file settings
+# default it if it is not set
 ULIMIT_WARN={{runner_ulimit_warn}}
+if [ -z "$ULIMIT_WARN" ]; then
+    ULIMIT_WARN=4096
+fi
 
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
 
-WHOAMI=`whoami`
+WHOAMI=$(whoami)
 
 # Echo to stderr on errors
 echoerr() { echo "$@" 1>&2; }
