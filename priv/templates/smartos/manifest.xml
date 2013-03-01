@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<service_bundle type="manifest" name="{{package_install_name}}">
+  <service name="application/{{package_install_name}}" type="service" version="1">
+    <create_default_instance enabled="false" />
+    <single_instance />
+    <dependency name="network" grouping="require_all" restart_on="error" type="service">
+      <service_fmri value="svc:/milestone/network:default" />
+    </dependency>
+    <dependency name="filesystem" grouping="require_all" restart_on="error" type="service">
+      <service_fmri value="svc:/system/filesystem/local" />
+    </dependency>
+    <dependency name="{{package_install_name}}-epmd" grouping="require_all" restart_on="error" type="service">
+      <service_fmri value="svc:/network/{{package_install_name}}-epmd:default" />
+    </dependency>
+    <method_context working_directory="/tmp" project="{{package_install_name}}">
+      <method_credential user="{{package_install_user}}" group="{{package_install_group}}" />
+      <method_environment>
+        <envvar name="HOME" value="{{platform_base_dir}}" />
+        <envvar name="LOGNAME" value="{{package_install_user}}" />
+        <envvar name="PATH" value="/usr/bin:/bin:/opt/local/bin:/opt/local/sbin" />
+        <envvar name="LD_PRELOAD_32" value="/lib/libumem.so.1" />
+        <envvar name="LD_PRELOAD_64" value="/lib/64/libumem.so.1:/opt/local/lib/amd64/libgcc_s.so.1:/opt/local/lib/amd64/libstdc++.so.6"/>
+        <envvar name="UMEM_OPTIONS" value="allocator=best" />
+      </method_environment>
+    </method_context>
+    <exec_method type="method" name="start" exec="{{platform_bin_dir}}/{{package_install_name}} start" timeout_seconds="60" />
+    <exec_method type="method" name="stop" exec="{{platform_bin_dir}}/{{package_install_name}} stop" timeout_seconds="60" />
+    <exec_method type="method" name="restart" exec="{{platform_bin_dir}}/{{package_install_name}} restart" timeout_seconds="60" />
+    <property_group name="startd" type="framework">
+      <propval name="duration" type="astring" value="contract" />
+      <propval name="ignore_error" type="astring" value="core,signal" />
+    </property_group>
+    <stability value="Evolving" />
+    <template>
+      <common_name>
+        <loctext xml:lang="C">{{package_shortdesc}}</loctext>
+      </common_name>
+    </template>
+  </service>
+</service_bundle>

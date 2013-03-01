@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# create {{package_install_group}} group only if it doesn't already exist
+getent group {{package_install_group}} >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+        groupadd {{package_install_group}}
+fi
+
+# create {{package_install_user}} user only if it doesn't already exist
+getent passwd {{package_install_user}} >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+        useradd -g {{package_install_group}} -d /opt/{{package_install_name}} -s /usr/bin/ksh {{package_install_user}}
+        usermod -c "{{package_install_user_desc}}" {{package_install_user}}
+fi
+
