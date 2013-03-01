@@ -12,7 +12,6 @@ Group: Development/Libraries
 Source: %{name}-%{_revision}.tar.gz
 URL: {{vendor_url}}
 Vendor: {{vendor_name}}
-Copyright: {{copyright}}
 Packager: {{vendor_contact_name}} <{{vendor_contact_email}}>
 BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
 Summary: {{package_shortdesc}}
