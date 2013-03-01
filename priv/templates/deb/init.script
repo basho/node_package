@@ -26,6 +26,11 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
+    # Return
+    #   0 if daemon has been started
+    #   1 if daemon was already running
+    #   2 if daemon could not be started
+
     # Startup with the appropriate user
     start-stop-daemon --start \
         --name {{package_install_name}} \
@@ -45,6 +50,11 @@ do_stop()
     # Attempt a clean shutdown.
     $DAEMON stop
 
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
     # Make sure it's down by using a more direct approach
     start-stop-daemon --stop \
                       --quiet \
@@ -62,6 +72,11 @@ do_reload() {
     $DAEMON restart && return $? || return 2
 }
 
+# Checks the status of a node
+do_status() {
+    $DAEMON ping && echo $"$NAME is running" && return 0
+    echo $"$NAME is stopped" && return 2
+}
 
 case "$1" in
     start)
@@ -106,6 +121,9 @@ case "$1" in
                 log_end_msg 1
                 ;;
         esac
+        ;;
+    status)
+        do_status && exit 0 || exit $?
         ;;
     *)
         echo "Usage: $SCRIPTNAME {start|stop|ping|restart|force-reload}" >&2

@@ -50,6 +50,11 @@ stop() {
 
 }
 
+status() {
+        # Check status of daemon
+        $DAEMON ping && success && echo $"$NAME is running..." && return 0 || failure $"$NAME is stopped"
+        return 2
+}
 
 # See how we were called.
 case "$1" in
@@ -65,6 +70,9 @@ case "$1" in
         ;;
   ping)
         $DAEMON ping || exit $?
+        ;;
+  status)
+        status && exit 0 || exit $?
         ;;
   *)
         echo $"Usage: $0 {start|stop|restart|ping}"
