@@ -28,14 +28,14 @@ endif  # linux
 
 ifeq ($(OS),Darwin)          # OSX
 OSNAME		= OSX
-ARCH		  = $(shell uname -m)
+ARCH		= $(shell uname -m)
 PKGERDIR	= osx
 BUILDDIR	= osxbuild
 endif
 
 ifeq ($(OS),FreeBSD)
 OSNAME		= FreeBSD
-ARCH		  = $(shell uname -m)
+ARCH		= $(shell uname -m)
 PKGERDIR	= fbsd
 BUILDDIR	= fbsdbuild
 endif
