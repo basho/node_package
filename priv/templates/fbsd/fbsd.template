@@ -16,7 +16,6 @@
              {platform_base_dir, "/usr/local/lib/{{package_install_name}}"},
              {platform_lib_dir,  "/usr/local/lib/{{package_install_name}}/lib"},
              {platform_log_dir,  "/var/log/{{package_install_name}}"},
-             {runner_ulimit_warn, "4096"}
              ]
 }.
 {template, "Makefile", "Makefile"}.

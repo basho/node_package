@@ -13,8 +13,7 @@
              {copyright, "copyright"},
              {license_type, "license_type"},
              {license_full_text, ""},
-             {bin_or_sbin, "bin"},
-             {runner_ulimit_warn, "4096"}
+             {bin_or_sbin, "bin"}
             ]
 }.
 {template, "Makefile", "Makefile"}.
