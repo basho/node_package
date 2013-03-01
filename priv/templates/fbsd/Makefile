@@ -54,7 +54,7 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	echo "@conflicts {{package_name}}-*" >> plist
 	echo "@exec if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi" >> plist
 	echo "@exec if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_base_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi" >> plist
-	echo "@comment ORIGIN:basho/{{package_install_name}}" >> plist
+	echo "@comment ORIGIN:{{vendor_name}}/{{package_install_name}}" >> plist
 
 	@echo "Copying Man pages to staging directory"
 	if [ -d doc/man/man1 ]; then \

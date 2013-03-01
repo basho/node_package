@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2010 by Basho Technologies, Inc.
+# {{copyright}}
 
 PKGBASE=/var/sadm/pkg/{{solaris_pkgname}}
 RELOC=$PKGBASE/save/pspool/{{solaris_pkgname}}/reloc

@@ -11,9 +11,8 @@ Currently supported operating systems / distros
  - Debian / Ubuntu and variants
  - FreeBSD
  - OSX
-
-Planned supported operating systems
  - SmartOS
+ - Solaris
 
 ** Use
 
