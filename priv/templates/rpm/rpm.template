@@ -12,7 +12,7 @@
              {vendor_url, "vendor_url"},
              {vendor_contact_name, "vendor_contact"},
              {vendor_contact_email, "vendor_contact_email"},
-             {bin_or_sbin, "bin"},
+             {bin_or_sbin, "bin"}
             ]
 }.
 {template, "Makefile", "Makefile"}.
