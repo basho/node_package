@@ -75,6 +75,9 @@ The following variables describe a package and should be put in the
  - =package_install_user_desc= - The description of the user created for the app
  - =bin_or_sbin= - Tells where to put the binaries, in */bin or */sbin
    (default: bin)
+ - =freebsd_package_category= - The subsection the package is filed under in FreeBSD
+   (ex: in this line, "ORIGIN: db/riak" 'db' would be the package_category)
+   This defaults to 'db' if not specified for lack of a better default.
 
 *** Script Variables
 The following variables are used in the =env.sh= and =runner= scripts which can
