@@ -1,0 +1,22 @@
+#!/bin/sh
+
+if [ "$2" != "POST-DEINSTALL" ]; then
+    exit 0
+fi
+
+
+if getent group "{{package_install_group}}" 2>/dev/null 1>&2; then
+    echo "To delete {{package_install_group}} group permanently, use 'groupdel {{package_install_group}}'"
+fi
+
+if getent passwd "{{package_install_user}}" 2>/dev/null 1>&2; then
+        echo "To delete {{package_install_user}} user permanently, use 'userdel {{package_install_user}}'"
+fi
+
+echo "-------------------------------------------------------"
+echo "Data and log directories were not removed automatically"
+echo "Remove {{platform_data_dir}} and {{platform_log_dir}} to"
+echo "completely clean your system"
+echo "-------------------------------------------------------"
+
+exit 0

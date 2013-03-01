@@ -21,13 +21,18 @@ RUNNER_SCRIPT=${0##*/}
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_LOG_DIR={{runner_log_dir}}
-RUNNER_PATCH_DIR={{platform_patch_dir}}
+RUNNER_LIB_DIR={{runner_lib_dir}}
+RUNNER_PATCH_DIR={{runner_patch_dir}}
 PIPE_DIR={{pipe_dir}}
 RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Threshold where users will be warned of low ulimit file settings
+# default it if it is not set
 ULIMIT_WARN={{runner_ulimit_warn}}
+if [ -z "$ULIMIT_WARN" ]; then
+    ULIMIT_WARN=4096
+fi
 
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}

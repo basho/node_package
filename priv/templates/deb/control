@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: {{vendor_contact_name}} <{{vendor_contact_email}}>
 Build-Depends: debhelper (>= 7)
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: {{vendor_url}}
 
 Package: {{package_name}}

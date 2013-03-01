@@ -13,8 +13,7 @@
              {vendor_contact_name, "vendor_contact"},
              {vendor_contact_email, "vendor_contact_email"},
              {bin_or_sbin, "bin"},
-             {runner_ulmit_warn, "4096"}
-             ]
+            ]
 }.
 {template, "Makefile", "Makefile"}.
 {template, "specfile", "specfile"}.
