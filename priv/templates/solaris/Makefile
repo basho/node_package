@@ -26,8 +26,8 @@ buildrel:
 	@# Ye Olde Bourne Shell on Solaris means we have to do it old school
 	echo "Using `which erl` to build"; \
 	OVERLAY_VARS="overlay_vars=../solaris/vars.config" $(MAKE) deps rel
-	chmod 0755 rel/{{package_name}}/bin/* \
-		rel/{{package_name}}/erts-*/bin/*
+	chmod 0755 rel/{{package_install_name}}/bin/* \
+		rel/{{package_install_name}}/erts-*/bin/*
 
 depend:
 	cp $(PKGERDIR)/depend .
@@ -46,7 +46,7 @@ prototype:
 	echo "i i.preserve" >> prototype
 	echo "i r.preserve" >> prototype
 	echo '' >> prototype
-	pkgproto rel/{{package_name}}={{package_name}} >> prototype
+	pkgproto rel/{{package_install_name}}={{package_install_name}} >> prototype
 	sed -e "s/ $(LOGNAME) .*$$/ {{package_install_user}} {{package_install_group}}/" \
 	    -e 's/f none {{package_install_name}}\/etc/e preserve {{package_install_name}}\/etc/' prototype > prototype.tmp && mv prototype.tmp prototype
 
