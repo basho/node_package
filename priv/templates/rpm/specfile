@@ -32,7 +32,7 @@ Obsoletes: {{package_name}}
 %define platform_log_dir %{_localstatedir}/log/{{package_install_name}}
 
 %prep
-%setup -q -n {{package_name}}-%{_revision}
+%setup -q -n {{package_install_name}}-%{_revision}
 cat > rpm.vars.config <<EOF
 %% Platform-specific installation paths
 {platform_bin_dir,  "%{platform_bin_dir}"}.
