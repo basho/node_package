@@ -26,8 +26,8 @@ buildrel:
 	@# Ye Olde Bourne Shell on Solaris means we have to do it old school
 	echo "Using `which erl` to build"; \
 	OVERLAY_VARS="overlay_vars=../solaris/vars.config" $(MAKE) deps rel
-	chmod 0755 rel/{{package_name}}/bin/* \
-		rel/{{package_name}}/erts-*/bin/*
+	chmod 0755 rel/$(PKG_ID)/bin/* \
+		rel/$(PKG_ID)/erts-*/bin/*
 
 depend:
 	cp $(PKGERDIR)/depend .
