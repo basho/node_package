@@ -9,7 +9,7 @@ Version: %{_version}
 Release: %{_release}%{?dist}
 License: {{license_type}}
 Group: Development/Libraries
-Source: %{name}-%{_revision}.tar.gz
+Source: %{_tarname}
 URL: {{vendor_url}}
 Vendor: {{vendor_name}}
 Packager: {{vendor_contact_name}} <{{vendor_contact_email}}>
