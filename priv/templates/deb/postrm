@@ -41,11 +41,13 @@ case "$1" in
         if [ -e /etc/init.d/{{package_install_name}} ]; then
                 rm  /etc/init.d/{{package_install_name}}
         fi
+        # Remove User & Group, killing any process owned by them
         if getent passwd {{package_install_user}} >/dev/null; then
-                deluser {{package_install_user}}
+                pkill -u {{package_install_user}}
+                deluser --system {{package_install_user}}
         fi
         if getent group {{package_install_group}} >/dev/null; then
-                delgroup {{package_install_group}}
+                delgroup --system --only-if-empty {{package_install_group}}
         fi
     ;;
 
