@@ -40,11 +40,12 @@ stop() {
         echo -n $"Stopping {{package_install_name}}: "
         $DAEMON stop 2>/dev/null 1>&2
         sleep 2
-        RETVAL=`pidof beam.smp`
-        [ "$RETVAL" = "" ] && success && echo && return 0 || failure $"$NAME stop"
+        # Check if the process is still running, muting output of getpid
+        MUTE=`$DAEMON getpid`
+        [ "$?" -ne 0 ] && success && echo && return 0 || failure $"$NAME stop"
         sleep 10
-        RETVAL=`pidof beam.smp`
-        [ "$RETVAL" = "" ] && success && echo && return 0 || failure $"$NAME failed to stop"
+        MUTE=`$DAEMON getpid`
+        [ "$?" -ne 0] && success && echo && return 0 || failure $"$NAME failed to stop"
         echo
         return 1
 
@@ -75,7 +76,7 @@ case "$1" in
         status && exit 0 || exit $?
         ;;
   *)
-        echo $"Usage: $0 {start|stop|restart|ping}"
+        echo $"Usage: $0 {start|stop|restart|ping|status}"
         exit 1
 esac
 
