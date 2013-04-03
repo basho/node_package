@@ -126,7 +126,7 @@ case "$1" in
         do_status && exit 0 || exit $?
         ;;
     *)
-        echo "Usage: $SCRIPTNAME {start|stop|ping|restart|force-reload}" >&2
+        echo "Usage: $SCRIPTNAME {start|stop|ping|restart|force-reload|status}" >&2
         exit 3
         ;;
 esac

@@ -34,7 +34,7 @@ usage() {
 case "$1" in
     start)
         # Make sure there is not already a node running
-        node_down_check
+        node_down_check 2> /dev/null
         ES=$?
         if [ "$ES" -ne 0 ]; then
             exit $ES
@@ -70,7 +70,10 @@ case "$1" in
             while [ $WAIT -gt 0 ]; do
                 WAIT=`expr $WAIT - 1`
                 sleep 1
-                RES=`ping_node`
+
+                # squash stderr output to not frighten users if the node does not
+                # come up right away
+                MUTE=`ping_node 2> /dev/null`
                 if [ "$?" -ne 0 ]; then
                     continue
                 fi
