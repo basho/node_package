@@ -95,7 +95,7 @@ check_user() {
 
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         type sudo > /dev/null 2>&1
-        if [ $? -ne 0 ]; then
+        if [ "$?" -ne 0 ]; then
             echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
             exit 1
         fi
@@ -105,8 +105,8 @@ check_user() {
 
 # Function to validate the node is down
 node_down_check() {
-    RES=`ping_node`
-    if [ "$RES" = "pong" ]; then
+    MUTE=`ping_node`
+    if [ "$?" -eq 0 ]; then
         echoerr "Node is already running!"
         exit 1
     fi
@@ -114,8 +114,8 @@ node_down_check() {
 
 # Function to validate the node is up
 node_up_check() {
-    RES=`ping_node`
-    if [ "$RES" != "pong" ]; then
+    MUTE=`ping_node`
+    if [ "$?" -ne 0 ]; then
         echoerr "Node is not running!"
         exit 1
     fi
@@ -123,10 +123,9 @@ node_up_check() {
 
 # Function to check if the config file is valid
 check_config() {
-    RES=`$NODETOOL_LITE chkconfig $RUNNER_ETC_DIR/app.config`
-    if [ "$RES" != "ok" ]; then
+    MUTE=`$NODETOOL_LITE chkconfig $RUNNER_ETC_DIR/app.config`
+    if [ "$?" -ne 0 ]; then
         echoerr "Error reading $RUNNER_ETC_DIR/app.config"
-        echoerr $RES
         exit 1
     fi
     echo "config is OK"
@@ -149,8 +148,7 @@ check_ulimit() {
 # Set the PID global variable, return 1 on error
 get_pid() {
     PID=`$NODETOOL getpid < /dev/null`
-    ES=$?
-    if [ "$ES" -ne 0 ]; then
+    if [ "$?" -ne 0 ]; then
         echo "Node is not running!"
         return 1
     fi
@@ -160,13 +158,5 @@ get_pid() {
         return 1
     fi
 
-    return 0
-}
-
-subcommand() {
-    main_usage
-}
-
-subcommand_usage() {
     return 0
 }

@@ -34,10 +34,14 @@ main(Args) ->
                     io:format("ok\n"),
                     halt(0);
                 {error, {Line, Mod, Term}} ->
-                    io:format(["Error on line ", file:format_error({Line, Mod, Term}), "\n"]),
+                    io:format(standard_error, 
+                              ["Error on line ", 
+                               file:format_error({Line, Mod, Term}), "\n"], []),
                     halt(1);
                 {error, R} ->
-                    io:format(["Error reading config file: ", file:format_error(R), "\n"]),
+                    io:format(standard_error,
+                              ["Error reading config file: ", 
+                               file:format_error(R), "\n"], []),
                     halt(1)
             end;
         _ ->
@@ -48,8 +52,11 @@ main(Args) ->
     case {net_kernel:hidden_connect_node(TargetNode), net_adm:ping(TargetNode)} of
         {true, pong} ->
             ok;
+        {false, pong} ->
+            io:format(standard_error, "failed to connect to node ~p .\n", [TargetNode]),
+            halt(1);
         {_, pang} ->
-            io:format("Node ~p not responding to pings.\n", [TargetNode]),
+            io:format(standard_error, "Node ~p not responding to pings.\n", [TargetNode]),
             halt(1)
     end,
 
@@ -72,7 +79,7 @@ main(Args) ->
                 ok ->
                     ok;
                 {badrpc, Reason} ->
-                    io:format("RPC to ~p failed: ~p\n", [TargetNode, Reason]),
+                    io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
                 _ ->
                     halt(1)
@@ -82,7 +89,7 @@ main(Args) ->
                 ok ->
                     ok;
                 {badrpc, Reason} ->
-                    io:format("RPC to ~p failed: ~p\n", [TargetNode, Reason]),
+                    io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
                 _ ->
                     halt(1)
@@ -91,7 +98,7 @@ main(Args) ->
             case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
                           consult(ArgsAsString), RpcTimeout) of
                 {badrpc, Reason} ->
-                    io:format("RPC to ~p failed: ~p\n", [TargetNode, Reason]),
+                    io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
                 Other ->
                     io:format("~p\n", [Other])
