@@ -17,6 +17,8 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
 DAEMON=/usr/{{bin_or_sbin}}/$NAME
+lockfile=/var/lock/subsys/$NAME
+pidfile=/var/run/$NAME.pid
 
 # Check for script, config and data dirs
 [ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
@@ -24,60 +26,120 @@ DAEMON=/usr/{{bin_or_sbin}}/$NAME
 [ -d /var/lib/$NAME ] || exit 0
 [ -d /var/run/$NAME ] || exit 0
 
+status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
+running=$?
+
+check_pid_status() {
+	pid=$(ps ax | grep beam.smp | grep "\-progname $NAME" | awk '{print $1}')
+    if [ "$pid" = "" ]; then
+        # prog not running?
+        return 1
+    else
+        # running
+        return 0
+    fi
+}
 
 start() {
-        # Start daemons.
-        echo -n $"Starting {{package_install_name}}: "
-        su - {{package_install_user}} -c "$DAEMON start" && success || failure $"$NAME start"
-        RETVAL=$?
-        [ $RETVAL -eq 0 ]
-        echo
-        return $RETVAL
+	# Start daemons.
+	echo -n $"Starting {{package_install_name}}: "
+	su - {{package_install_user}} -c "$DAEMON start"
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		pid=$(ps ax | grep beam.smp | grep "\-progname $NAME" | awk '{print $1}')
+		echo "$pid" > $pidfile
+		touch $lockfile
+		success
+	else
+		failure $"$NAME start"
+	fi
+	echo
+	return $RETVAL
 }
 
 stop() {
-        # Stop daemon.
-        echo -n $"Stopping {{package_install_name}}: "
-        $DAEMON stop 2>/dev/null 1>&2
-        sleep 2
-        # Check if the process is still running, muting output of getpid
-        MUTE=`$DAEMON getpid`
-        [ "$?" -ne 0 ] && success && echo && return 0 || failure $"$NAME stop"
-        sleep 10
-        MUTE=`$DAEMON getpid`
-        [ "$?" -ne 0] && success && echo && return 0 || failure $"$NAME failed to stop"
-        echo
-        return 1
-
+	# Stop daemon.
+	echo -n $"Shutting down {{package_install_name}}: "
+	$DAEMON stop 2>/dev/null 1>&2
+	for n in $(seq 1 10); do
+		sleep 1
+		check_pid_status
+		RETVAL=$?
+		if [ $RETVAL -eq 1 ]; then
+			break
+		fi
+	done
+	if [ $retval -eq 1 ]; then
+		rm -f $lockfile $pidfile
+		success
+	else
+		failure $"$NAME stop"
+	fi
+	echo
+	return $retval
 }
 
-status() {
-        # Check status of daemon
-        $DAEMON ping && success && echo $"$NAME is running..." && return 0 || failure $"$NAME is stopped"
-        return 2
+hardstop() {
+	echo -n $"Shutting down $NAME: "
+	su - {{packge_install_user}} -c "ps -ef | grep beam.smp | grep '\-progname $NAME ' | grep -v grep | awk '{print \$2}' | xargs kill -9"
+	for n in $(seq 1 10); do
+		sleep 1
+		check_pid_status
+		RETVAL=$?
+		if [ $RETVAL -eq 1 ]; then
+			break
+		fi
+	done
+	if [ $RETVAL -eq 1 ]; then
+		rm -f $lockfile $pidfile
+		success
+	else
+		failure $"$NAME stop"
+	fi
+	echo
+	return $RETVAL
 }
 
 # See how we were called.
 case "$1" in
-  start)
-        start
-        ;;
-  stop)
-        stop
-        ;;
-  restart)
-        stop
-        start
-        ;;
-  ping)
-        $DAEMON ping || exit $?
-        ;;
-  status)
-        status && exit 0 || exit $?
-        ;;
-  *)
-        echo $"Usage: $0 {start|stop|restart|ping|status}"
-        exit 1
+	start)
+		[ $running -eq 0 ] && exit 0
+		start
+		;;
+	stop)
+		if [ $running -eq 0 ]; then
+			stop
+		else
+			check_pid_status
+			RETVAL=$?
+			if [ $RETVAL -eq 1 ]; then
+				rm -f $lockfile $pidfile
+			fi
+			exit 0
+		fi
+		;;
+	restart|force-reload)
+		[ $running -eq 0 ] && stop
+		start
+		;;
+	hardstop)
+		[ $running -eq 0 ] || exit 0
+		hardstop
+		;;
+	condrestart)
+		[ $running -eq 0 ] || exit 0
+		stop
+		start
+		;;
+	status)
+		status -p $pidfile -l $(basename $lockfile) $NAME
+		;;
+	ping)
+		$DAEMON ping || exit $?
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|force-reload|hardstop|condrestart|ping}"
+		exit 1
 esac
 
 exit $?
