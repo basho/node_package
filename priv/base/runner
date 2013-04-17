@@ -35,10 +35,6 @@ case "$1" in
     start)
         # Make sure there is not already a node running
         node_down_check 2> /dev/null
-        ES=$?
-        if [ "$ES" -ne 0 ]; then
-            exit $ES
-        fi
 
         # Sanity check the app.config file
         check_config > /dev/null
@@ -143,10 +139,6 @@ case "$1" in
         else
           # Make sure a node is running
           node_up_check
-          ES=$?
-          if [ "$ES" -ne 0 ]; then
-              exit $ES
-          fi
         fi
 
         shift
