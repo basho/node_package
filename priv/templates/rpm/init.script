@@ -24,7 +24,7 @@ pidfile=/var/run/$NAME.pid
 [ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
 [ -d /etc/$NAME ] || exit 0
 [ -d /var/lib/$NAME ] || exit 0
-[ -d /var/run/$NAME ] || exit 0
+[ -d /var/run/$NAME ] || mkdir /var/run/$NAME || exit 0
 
 status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
 running=$?
@@ -76,7 +76,7 @@ stop() {
 		failure $"$NAME stop"
 	fi
 	echo
-	return $retval
+	return $RETVAL
 }
 
 hardstop() {
