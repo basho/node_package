@@ -111,8 +111,8 @@ else
 fi
 
 %post
-# Fixup perms for SELinux
-find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
+# Fixup perms for SELinux (if it is enabled)
+selinuxenabled && find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
 
 # Make sure shell library file is readable
 chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
