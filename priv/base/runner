@@ -34,7 +34,7 @@ usage() {
 case "$1" in
     start)
         # Make sure there is not already a node running
-        node_down_check 2> /dev/null
+        node_down_check
 
         # Sanity check the app.config file
         check_config > /dev/null
