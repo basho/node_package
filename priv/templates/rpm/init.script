@@ -69,7 +69,7 @@ stop() {
             break
         fi
     done
-    if [ $retval -eq 1 ]; then
+    if [ $RETVAL -eq 1 ]; then
         rm -f $lockfile $pidfile
         success
     else
