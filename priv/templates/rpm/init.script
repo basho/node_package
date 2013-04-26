@@ -137,7 +137,7 @@ case "$1" in
         $DAEMON ping || exit $?
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|force-reload|hardstop|condrestart|try-restart|ping}"
+        echo $"Usage: $0 {start|stop|restart|force-reload|hardstop|condrestart|try-restart|status|ping}"
         exit 1
 esac
 
