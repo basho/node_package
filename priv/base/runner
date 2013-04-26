@@ -25,8 +25,8 @@ SCRIPT=`basename $0`
 
 usage() {
     echo "Usage: $SCRIPT {start | stop| restart | reboot | ping | console | attach | "
-    echo "                    ertspath | chkconfig | escript | version | getpid |"
-    echo "                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
+    echo "                    attach-direct | ertspath | chkconfig | escript | version | "
+    echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
 }
 
 
@@ -34,11 +34,7 @@ usage() {
 case "$1" in
     start)
         # Make sure there is not already a node running
-        node_down_check 2> /dev/null
-        ES=$?
-        if [ "$ES" -ne 0 ]; then
-            exit $ES
-        fi
+        node_down_check
 
         # Sanity check the app.config file
         check_config > /dev/null
@@ -136,26 +132,31 @@ case "$1" in
         fi
         ;;
 
-    attach)
+    attach-direct)
         # Allow attaching to a node without pinging it
         if [ "$2" = "-f" ]; then
           echo "Forcing connection..."
         else
           # Make sure a node is running
           node_up_check
-          ES=$?
-          if [ "$ES" -ne 0 ]; then
-              exit $ES
-          fi
         fi
 
         shift
         exec $ERTS_PATH/to_erl $PIPE_DIR
         ;;
 
+    attach)
+        # Make sure a node is running
+        node_up_check
+
+        shift
+        NODE_NAME=${NAME_ARG#* }
+        exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
+        ;;
+
     console)
         RES=`ping_node`
-        if [ "$RES" = "pong" ]; then
+        if [ "$?" -eq 0 ]; then
             echo "Node is already running - use '$SCRIPT attach' instead"
             exit 1
         fi
@@ -179,7 +180,7 @@ case "$1" in
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
         CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
-            -embedded -config $RUNNER_ETC_DIR/app.config \
+             -config $RUNNER_ETC_DIR/app.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
@@ -199,11 +200,8 @@ case "$1" in
         ;;
     top)
         # Make sure the local node IS running
-        RES=`ping_node`
-        if [ "$RES" != "pong" ]; then
-            echo "Node is not running!"
-            exit 1
-        fi
+        node_up_check
+
         shift
         MYPID=$$
         NODE_NAME=${NAME_ARG#* }

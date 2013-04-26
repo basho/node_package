@@ -105,7 +105,7 @@ check_user() {
 
 # Function to validate the node is down
 node_down_check() {
-    MUTE=`ping_node`
+    MUTE=`ping_node 2> /dev/null`
     if [ "$?" -eq 0 ]; then
         echoerr "Node is already running!"
         exit 1
@@ -114,7 +114,7 @@ node_down_check() {
 
 # Function to validate the node is up
 node_up_check() {
-    MUTE=`ping_node`
+    MUTE=`ping_node 2> /dev/null`
     if [ "$?" -ne 0 ]; then
         echoerr "Node is not running!"
         exit 1
