@@ -49,11 +49,11 @@ case "$1" in
         # Make sure log directory exists
         mkdir -p $RUNNER_LOG_DIR
 
-        HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
+        HEART_COMMAND="$RUNNER_SCRIPT start"
         export HEART_COMMAND
         mkdir -p $PIPE_DIR
         $ERTS_PATH/run_erl -daemon $PIPE_DIR/ $RUNNER_LOG_DIR \
-            "exec $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT console" 2>&1
+            "exec $RUNNER_SCRIPT console" 2>&1
 
         if [ ! -z "$WAIT_FOR_PROCESS" ]; then
             # Wait for the node to come up. We can't just ping it because
