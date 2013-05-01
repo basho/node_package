@@ -130,8 +130,10 @@ create_pid_file() {
     # Validate a pid directory even exists
     if [ -w $PID_DIR ]; then
         # Grab the proper pid from getpid
-        if [ ! getpid ]; then
-            return 1
+        get_pid
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            return $ES
         else
             # Remove pid file if it already exists since we do not
             # plan for multiple identical runners on a single machine
@@ -148,7 +150,7 @@ create_pid_file() {
 check_user() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
-    if ([ "$RUNNER_USER" ] && [ -w $RUN_DIR ]); then
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         type sudo > /dev/null 2>&1
         if [ "$?" -ne 0 ]; then
             echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
