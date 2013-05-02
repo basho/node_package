@@ -7,12 +7,6 @@
 # Pull environment for this install
 . "{{runner_base_dir}}/lib/env.sh"
 
-# Make sure the user running this script is the owner and/or su to that user
-check_user $@
-ES=$?
-if [ "$ES" -ne 0 ]; then
-    exit $ES
-fi
 
 # Keep track of where script was invoked
 ORIGINAL_DIR=$(pwd)
@@ -29,10 +23,38 @@ usage() {
     echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
 }
 
+# All commands must either call bootstrap or bootstrapd
+# Call bootstrap for non-daemon commands like ping or chkconfig
+# Call bootstrapd for daemon commands like start/stop/console
+bootstrap() {
+    # Make sure the user running this script is the owner and/or su to that user
+    check_user $@
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        exit $ES
+    fi
+}
+
+bootstrapd() {
+    # Create PID directory if it does not exist before dropping permissiongs
+    # to the runner user
+    create_pid_dir
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        echoerr "Unable to access $PID_DIR, permission denied, run script as root"
+        exit 1
+    fi
+
+    # Now call bootstrap to drop to $RUNNER_USER
+    bootstrap $@
+}
 
 # Check the first argument for instructions
 case "$1" in
     start)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         # Make sure there is not already a node running
         node_down_check
 
@@ -75,6 +97,8 @@ case "$1" in
                 fi
                 PROCESS=`$NODETOOL rpcterms erlang whereis "'${WAIT_FOR_PROCESS}'."`
                 if [ "$PROCESS" != "undefined" ]; then
+                    # Attempt to create a .pid file for the process
+                    create_pid_file
                     exit 0
                 fi
             done
@@ -84,9 +108,15 @@ case "$1" in
             echo "WAIT_FOR_ERLANG to the number of seconds to wait."
             exit 1
         fi
+
+        # Attempt to create .pid file
+        create_pid_file
         ;;
 
     stop)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         get_pid
         ES=$?
         if [ "$ES" -ne 0 ] || [ -z $PID ]; then
@@ -103,9 +133,15 @@ case "$1" in
         do
             sleep 1
         done
+
+        # remove pid file
+        rm -f $PID_FILE
         ;;
 
     restart)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         ## Restart the VM without exiting the process
         $NODETOOL restart
         ES=$?
@@ -115,6 +151,9 @@ case "$1" in
         ;;
 
     reboot)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         ## Restart the VM completely (uses heart to restart it)
         $NODETOOL reboot
         ES=$?
@@ -124,6 +163,9 @@ case "$1" in
         ;;
 
     ping)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
+
         ## See if the VM is alive
         ping_node
         ES=$?
@@ -133,6 +175,9 @@ case "$1" in
         ;;
 
     attach-direct)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         # Allow attaching to a node without pinging it
         if [ "$2" = "-f" ]; then
           echo "Forcing connection..."
@@ -146,6 +191,9 @@ case "$1" in
         ;;
 
     attach)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         # Make sure a node is running
         node_up_check
 
@@ -155,6 +203,9 @@ case "$1" in
         ;;
 
     console)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
+
         RES=`ping_node`
         if [ "$?" -eq 0 ]; then
             echo "Node is already running - use '$SCRIPT attach' instead"
@@ -198,7 +249,11 @@ case "$1" in
         # Start the VM
         exec $CMD
         ;;
+
     top)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
+
         # Make sure the local node IS running
         node_up_check
 
@@ -212,20 +267,34 @@ case "$1" in
             -node $NODE_NAME \
             $* -tracing off
         ;;
+
     ertspath)
         echo $ERTS_PATH
         ;;
+
     chkconfig)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
+
         check_config
         ;;
+
     escript)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
+
         shift
         $ERTS_PATH/escript "$@"
         ;;
+
     version)
         echo $APP_VERSION
         ;;
+
     getpid)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
+
         # Get the PID from nodetool
         get_pid
         ES=$?

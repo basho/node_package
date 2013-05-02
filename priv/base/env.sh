@@ -27,6 +27,13 @@ PIPE_DIR={{pipe_dir}}
 RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
+# Variables needed to support creation of .pid files
+# PID directory and pid file name of this app
+# ex: /var/run/riak & /var/run/riak/riak.pid
+RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
+PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
+PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
+
 # Threshold where users will be warned of low ulimit file settings
 # default it if it is not set
 ULIMIT_WARN={{runner_ulimit_warn}}
@@ -88,11 +95,71 @@ ping_node() {
     $NODETOOL ping < /dev/null
 }
 
+# Attempts to create a pid directory like /var/run/APPNAME and then
+# changes the permissions on that directory so the $RUNNER_USER can
+# read/write/delete .pid files during startup/shutdown
+create_pid_dir() {
+    # Validate RUNNER_USER is set and they have permissions to write to /var/run
+    # Don't continue if we've already sudo'd to RUNNER_USER
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
+        if [ -w $RUN_DIR ]; then
+            mkdir -p $PID_DIR
+            ES=$?
+            if [ "$ES" -ne 0 ]; then
+                return 1
+            else
+                # Change permissions on $PID_DIR
+                chown $RUNNER_USER $PID_DIR
+                ES=$?
+                if [ "$ES" -ne 0 ]; then
+                    return 1
+                else
+                    return 0
+                fi
+            fi
+        else
+            # If we don't have permissions, fail
+            return 1
+        fi
+    fi
+
+    # If RUNNER_USER is not set this is probably a test setup (devrel) and does
+    # not need a .pid file, so do not return error
+    return 0
+}
+
+# Attempt to create a pid file for the process
+# This function assumes the process is already up and running and can
+#    respond to a getpid call.  It also assumes that two processes
+#    with the same name will not be run on the machine
+# Do not print any error messages as failure to create a pid file because
+#    pid files are strictly optional
+# This function should really only be called in a "start" function
+#    you have been warned
+create_pid_file() {
+    # Validate a pid directory even exists
+    if [ -w $PID_DIR ]; then
+        # Grab the proper pid from getpid
+        get_pid
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            return $ES
+        else
+            # Remove pid file if it already exists since we do not
+            # plan for multiple identical runners on a single machine
+            rm -f $PID_FILE
+            echo $PID > $PID_FILE
+            return 0
+        fi
+    else
+        return 1
+    fi
+}
+
 # Function to su into correct user
 check_user() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
-
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         type sudo > /dev/null 2>&1
         if [ "$?" -ne 0 ]; then
