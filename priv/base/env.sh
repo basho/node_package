@@ -100,16 +100,21 @@ ping_node() {
 # read/write/delete .pid files during startup/shutdown
 create_pid_dir() {
     # Validate RUNNER_USER is set and they have permissions to write to /var/run
-    if ([ "$RUNNER_USER" ] && [ -w $RUN_DIR ]); then
-        if [ ! mkdir -p $PID_DIR]; then
-            return 1
-        else
-            # Change permissions on $PID_DIR
-            if [ ! chown $RUNNER_USER $PID_DIR]; then
+    if [ "$RUNNER_USER" ]; then
+        if [ -w $RUN_DIR ]; then
+            if [ ! mkdir -p $PID_DIR]; then
                 return 1
             else
-                return 0
+                # Change permissions on $PID_DIR
+                if [ ! chown $RUNNER_USER $PID_DIR]; then
+                    return 1
+                else
+                    return 0
+                fi
             fi
+        else
+            # If we don't have permissions, fail
+            return 1
         fi
     fi
 

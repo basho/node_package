@@ -11,7 +11,8 @@
 # Create PID directory if it does not exist before dropping permissiongs
 # to the runner user
 if [ ! create_pid_dir ]; then
-    echoerr "Warning: Unable to create $PID_DIR, .pid files will not be used"
+    echoerr "Unable to create $PID_DIR, permission denied, run script as root"
+    exit 1
 fi
 
 # Make sure the user running this script is the owner and/or su to that user
