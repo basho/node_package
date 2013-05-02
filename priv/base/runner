@@ -23,10 +23,10 @@ usage() {
     echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
 }
 
-# All commands must either call boostrap or boostrapd
-# Call boostrap for non-daemon commands like ping or chkconfig
-# Call boostrapd for daemon commands like start/stop/console
-boostrap() {
+# All commands must either call bootstrap or bootstrapd
+# Call bootstrap for non-daemon commands like ping or chkconfig
+# Call bootstrapd for daemon commands like start/stop/console
+bootstrap() {
     # Make sure the user running this script is the owner and/or su to that user
     check_user $@
     ES=$?
@@ -35,7 +35,7 @@ boostrap() {
     fi
 }
 
-boostrapd() {
+bootstrapd() {
     # Create PID directory if it does not exist before dropping permissiongs
     # to the runner user
     create_pid_dir
@@ -45,15 +45,15 @@ boostrapd() {
         exit 1
     fi
 
-    # Now call boostrap to drop to $RUNNER_USER
-    boostrap
+    # Now call bootstrap to drop to $RUNNER_USER
+    bootstrap $@
 }
 
 # Check the first argument for instructions
 case "$1" in
     start)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         # Make sure there is not already a node running
         node_down_check
@@ -114,8 +114,8 @@ case "$1" in
         ;;
 
     stop)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         get_pid
         ES=$?
@@ -139,8 +139,8 @@ case "$1" in
         ;;
 
     restart)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         ## Restart the VM without exiting the process
         $NODETOOL restart
@@ -151,8 +151,8 @@ case "$1" in
         ;;
 
     reboot)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         ## Restart the VM completely (uses heart to restart it)
         $NODETOOL reboot
@@ -163,8 +163,8 @@ case "$1" in
         ;;
 
     ping)
-        # Boostrap command (simply drop to $RUNNER_USER)
-        boostrap
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap $@
 
         ## See if the VM is alive
         ping_node
@@ -175,8 +175,8 @@ case "$1" in
         ;;
 
     attach-direct)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         # Allow attaching to a node without pinging it
         if [ "$2" = "-f" ]; then
@@ -191,8 +191,8 @@ case "$1" in
         ;;
 
     attach)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         # Make sure a node is running
         node_up_check
@@ -203,8 +203,8 @@ case "$1" in
         ;;
 
     console)
-        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
-        boostrapd
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
 
         RES=`ping_node`
         if [ "$?" -eq 0 ]; then
@@ -252,7 +252,7 @@ case "$1" in
 
     top)
         # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap
+        bootstrap $@
 
         # Make sure the local node IS running
         node_up_check
@@ -274,14 +274,14 @@ case "$1" in
 
     chkconfig)
         # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap
+        bootstrap $@
 
         check_config
         ;;
 
     escript)
         # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap
+        bootstrap $@
 
         shift
         $ERTS_PATH/escript "$@"
@@ -293,7 +293,7 @@ case "$1" in
 
     getpid)
         # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap
+        bootstrap $@
 
         # Get the PID from nodetool
         get_pid
