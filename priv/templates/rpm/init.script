@@ -46,8 +46,6 @@ start() {
     su - {{package_install_user}} -c "$DAEMON start"
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
-        pid=$(ps ax | grep beam.smp | grep "\-progname $NAME" | awk '{print $1}')
-        echo "$pid" > $pidfile
         touch $lockfile
         success
     else
