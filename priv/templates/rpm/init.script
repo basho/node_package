@@ -18,13 +18,12 @@ DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
 DAEMON=/usr/{{bin_or_sbin}}/$NAME
 lockfile=/var/lock/subsys/$NAME
-pidfile=/var/run/$NAME.pid
+pidfile=/var/run/$NAME/$NAME.pid
 
 # Check for script, config and data dirs
 [ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
 [ -d /etc/$NAME ] || exit 0
 [ -d /var/lib/$NAME ] || exit 0
-[ -d /var/run/$NAME ] || mkdir /var/run/$NAME || exit 0
 
 status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
 running=$?
@@ -79,7 +78,7 @@ stop() {
 
 hardstop() {
     echo -n $"Shutting down $NAME: "
-    su - {{packge_install_user}} -c "ps -ef | grep beam.smp | grep '\-progname $NAME ' | grep -v grep | awk '{print \$2}' | xargs kill -9"
+    su - {{package_install_user}} -c "ps -ef | grep beam.smp | grep '\-progname $NAME ' | grep -v grep | awk '{print \$2}' | xargs kill -9"
     for n in $(seq 1 10); do
         sleep 1
         check_pid_status
