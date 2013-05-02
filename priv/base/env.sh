@@ -96,17 +96,22 @@ ping_node() {
 }
 
 # Attempts to create a pid directory like /var/run/APPNAME and then
-# changes the permissions on that directory so the RUNNER_USER can
+# changes the permissions on that directory so the $RUNNER_USER can
 # read/write/delete .pid files during startup/shutdown
 create_pid_dir() {
     # Validate RUNNER_USER is set and they have permissions to write to /var/run
-    if [ "$RUNNER_USER" ]; then
+    # Don't continue if we've already sudo'd to RUNNER_USER
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         if [ -w $RUN_DIR ]; then
-            if [ ! mkdir -p $PID_DIR]; then
+            mkdir -p $PID_DIR
+            ES=$?
+            if [ "$ES" -ne 0 ]; then
                 return 1
             else
                 # Change permissions on $PID_DIR
-                if [ ! chown $RUNNER_USER $PID_DIR]; then
+                chown $RUNNER_USER $PID_DIR
+                ES=$?
+                if [ "$ES" -ne 0 ]; then
                     return 1
                 else
                     return 0

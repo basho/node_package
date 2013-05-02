@@ -8,20 +8,6 @@
 . "{{runner_base_dir}}/lib/env.sh"
 
 
-# Create PID directory if it does not exist before dropping permissiongs
-# to the runner user
-if [ ! create_pid_dir ]; then
-    echoerr "Unable to create $PID_DIR, permission denied, run script as root"
-    exit 1
-fi
-
-# Make sure the user running this script is the owner and/or su to that user
-check_user $@
-ES=$?
-if [ "$ES" -ne 0 ]; then
-    exit $ES
-fi
-
 # Keep track of where script was invoked
 ORIGINAL_DIR=$(pwd)
 
@@ -37,10 +23,38 @@ usage() {
     echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
 }
 
+# All commands must either call boostrap or boostrapd
+# Call boostrap for non-daemon commands like ping or chkconfig
+# Call boostrapd for daemon commands like start/stop/console
+boostrap() {
+    # Make sure the user running this script is the owner and/or su to that user
+    check_user $@
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        exit $ES
+    fi
+}
+
+boostrapd() {
+    # Create PID directory if it does not exist before dropping permissiongs
+    # to the runner user
+    create_pid_dir
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        echoerr "Unable to access $PID_DIR, permission denied, run script as root"
+        exit 1
+    fi
+
+    # Now call boostrap to drop to $RUNNER_USER
+    boostrap
+}
 
 # Check the first argument for instructions
 case "$1" in
     start)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         # Make sure there is not already a node running
         node_down_check
 
@@ -100,6 +114,9 @@ case "$1" in
         ;;
 
     stop)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         get_pid
         ES=$?
         if [ "$ES" -ne 0 ] || [ -z $PID ]; then
@@ -122,6 +139,9 @@ case "$1" in
         ;;
 
     restart)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         ## Restart the VM without exiting the process
         $NODETOOL restart
         ES=$?
@@ -131,6 +151,9 @@ case "$1" in
         ;;
 
     reboot)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         ## Restart the VM completely (uses heart to restart it)
         $NODETOOL reboot
         ES=$?
@@ -140,6 +163,9 @@ case "$1" in
         ;;
 
     ping)
+        # Boostrap command (simply drop to $RUNNER_USER)
+        boostrap
+
         ## See if the VM is alive
         ping_node
         ES=$?
@@ -149,6 +175,9 @@ case "$1" in
         ;;
 
     attach-direct)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         # Allow attaching to a node without pinging it
         if [ "$2" = "-f" ]; then
           echo "Forcing connection..."
@@ -162,6 +191,9 @@ case "$1" in
         ;;
 
     attach)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         # Make sure a node is running
         node_up_check
 
@@ -171,6 +203,9 @@ case "$1" in
         ;;
 
     console)
+        # Boostrap daemon command (check perms & drop to $RUNNER_USER)
+        boostrapd
+
         RES=`ping_node`
         if [ "$?" -eq 0 ]; then
             echo "Node is already running - use '$SCRIPT attach' instead"
@@ -214,7 +249,11 @@ case "$1" in
         # Start the VM
         exec $CMD
         ;;
+
     top)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap
+
         # Make sure the local node IS running
         node_up_check
 
@@ -228,20 +267,34 @@ case "$1" in
             -node $NODE_NAME \
             $* -tracing off
         ;;
+
     ertspath)
         echo $ERTS_PATH
         ;;
+
     chkconfig)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap
+
         check_config
         ;;
+
     escript)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap
+
         shift
         $ERTS_PATH/escript "$@"
         ;;
+
     version)
         echo $APP_VERSION
         ;;
+
     getpid)
+        # Bootstrap command (simply drop to $RUNNER_USER)
+        bootstrap
+
         # Get the PID from nodetool
         get_pid
         ES=$?
