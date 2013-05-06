@@ -42,7 +42,7 @@ check_pid_status() {
 start() {
     # Start daemons.
     echo -n $"Starting {{package_install_name}}: "
-    su - {{package_install_user}} -c "$DAEMON start"
+    $DAEMON start
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
         touch $lockfile
@@ -57,7 +57,7 @@ start() {
 stop() {
     # Stop daemon.
     echo -n $"Shutting down {{package_install_name}}: "
-    $DAEMON stop 2>/dev/null 1>&2
+    $DAEMON stop 2>/dev/null
     for n in $(seq 1 10); do
         sleep 1
         check_pid_status
@@ -91,7 +91,7 @@ hardstop() {
         rm -f $lockfile $pidfile
         success
     else
-        failure $"$NAME stop"
+        failure $"$NAME hardstop"
     fi
     echo
     return $RETVAL
