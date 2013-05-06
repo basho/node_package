@@ -123,12 +123,14 @@ case "$1" in
             exit $ES
         fi
 
+        # Tell nodetool to stop
         $NODETOOL stop
         ES=$?
         if [ "$ES" -ne 0 ]; then
             exit $ES
         fi
 
+        # Now wait for the app to *really* stop
         while `kill -s 0 $PID 2>/dev/null`;
         do
             sleep 1
