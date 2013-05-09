@@ -63,7 +63,9 @@ packing_list_files: $(BUILD_STAGE_DIR)
 		echo "@cwd /usr/local" >> plist  && \
 		echo "@owner root" >> plist && \
 		echo "@group wheel" >> plist && \
-		{{#package_commands}}echo "man/man1/{{name}}.1.gz" >> plist && \
+                {{#package_commands}}if [ -f doc/man/man1/{{name}}.1.gz ]; then \
+                                         echo "man/man1/{{name}}.1.gz" >> plist \
+                                     ; fi && \
 		{{/package_commands}} echo -n; fi
 
 	@echo "Copying staging package listing to +CONTENTS"

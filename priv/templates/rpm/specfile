@@ -78,7 +78,10 @@ if [ -d %{relpath}/bin ]; then \
 
 mkdir -p %{buildroot}%{_mandir}/man1
 if [ -d %{_builddir}/%{buildsubdir}/doc/man/man1 ]; then \
-   {{#package_commands}}install -p -D -m 0455 %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz %{buildroot}%{_mandir}/man1 && \
+   {{#package_commands}}if [ -f %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz ]; then \
+                            install -p -D -m 0455 %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz \
+                                    %{buildroot}%{_mandir}/man1 \
+                        ; fi && \
    {{/package_commands}}echo -n; fi
 
 cp -R %{relpath}/etc/* %{buildroot_etc}
