@@ -126,12 +126,12 @@ chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
 %{_libdir}/*
 %dir %{_sysconfdir}/{{package_install_name}}
 %config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
-%{_{{bin_or_sbin}}dir}
+%{_{{bin_or_sbin}}dir}/*
 %{_localstatedir}/lib/{{package_install_name}}
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
 %{_sysconfdir}/init.d/{{package_install_name}}
-%{_mandir}/man1
+%{_mandir}/man1/*
 
 %clean
 rm -rf %{buildroot}
