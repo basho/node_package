@@ -43,7 +43,8 @@ endif
 
 ifeq ($(OS),SunOS)         # Solaris flavors
 KERNELVER = $(shell uname -v | grep -c joyent 2> /dev/null)
-ARCH      = $(shell uname -p)
+ARCH      = $(shell file `which erlc` | grep -c 64-bit 2> /dev/null | awk \
+                    '{if ($$1 == "0") {print "i386"} else {print "x86_64"}}')
 
 ifneq ($(KERNELVER),0)       # SmartOS
 OSNAME    = SmartOS
