@@ -6,5 +6,5 @@
   {vsn, "1.2.2"},
   {modules, []},
   {registered, []},
-  {applications, []}
+  {applications, [kernel, stdlib]}
 ]}.
