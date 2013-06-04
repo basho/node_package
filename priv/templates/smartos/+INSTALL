@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Variable that will get replaced by the Makefile dirs_create target
+CREATE_DIRS="%DIRS_CREATE%"
+
 if [ "$2" = "PRE-INSTALL" ]; then
     if ! getent group "{{package_install_group}}" 2>/dev/null 1>&2; then
         groupadd {{package_install_group}}
@@ -10,13 +13,17 @@ if [ "$2" = "PRE-INSTALL" ]; then
     fi
 
     # Create var directories outside of +CONTENTS
-    mkdir -p {{platform_data_dir}}
-    chown -R {{package_install_user}}:{{package_install_group}} {{platform_data_dir}}
-    chmod 700 {{platform_data_dir}}
-    mkdir -p {{platform_log_dir}}
-    chmod 700 {{platform_log_dir}}
-    chown -R {{package_install_user}}:{{package_install_group}} {{platform_log_dir}}
-
+    # Read directories from the CREATE_DIRS variable
+    for i in $CREATE_DIRS; do
+        if [ -d $i ]; then
+            echo "Skipping directory creation of $i, directory already exists"
+        else
+            echo "Creating directory $i owned by {{package_install_user}}"
+            mkdir -p $i
+            chown -R {{package_install_user}}:{{package_install_group}} $i
+            chmod 700 $i
+        fi
+    done
 
     # Backup config files if they already exist
     if [ -f {{platform_etc_dir}}/vm.args ]; then
@@ -61,5 +68,3 @@ if [ "$2" = "POST-INSTALL" ]; then
     chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
     svccfg import /opt/local/share/smf/{{package_install_name}}/manifest.xml
 fi
-
-exit 0

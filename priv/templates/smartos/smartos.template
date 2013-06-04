@@ -29,4 +29,5 @@
 {template, "epmd-manifest.xml", "epmd-manifest.xml"}.
 {template, "manifest.xml", "manifest.xml"}.
 {template, "manifest18.xml", "manifest18.xml"}.
+{template, "manifest131.xml", "manifest131.xml"}.
 {template, "epmd", "epmd"}.
