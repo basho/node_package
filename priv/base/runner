@@ -188,6 +188,7 @@ case "$1" in
           node_up_check
         fi
 
+        echo "Direct Shell: Use \"Ctrl-D\" to quit. \"Ctrl-C\" will terminate the $SCRIPT node."
         shift
         exec $ERTS_PATH/to_erl $PIPE_DIR
         ;;
@@ -199,6 +200,7 @@ case "$1" in
         # Make sure a node is running
         node_up_check
 
+        echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
         shift
         NODE_NAME=${NAME_ARG#* }
         exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
