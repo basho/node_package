@@ -20,9 +20,9 @@ BUILD_STAGE_DIR = $(BUILDDIR)/$(PACKAGE_NAME_CLEAN)
 ##
 ## ## SMF Manifest Mapping
 ##   SmartOS     Manifest File
-##   1.6         manifest.xml
+##   1.6         manifest16.xml
 ##   1.8         manifest18.xml
-##  13.1         manifest18.xml
+##  13.1         manifest131.xml
 
 PKGSRC_VERSION = $(shell head -1 /etc/pkgsrc_version 2>/dev/null | cut -d' ' -f2)
 
@@ -30,7 +30,7 @@ ifeq ($(PKGSRC_VERSION),2011Q4)  # SmartOS 1.6
 NCURSES_DEP = ncurses-5*
 OPENSSL_DEP = openssl-0.9.8*
 GCC_DEP     = gcc-runtime-4.6.2
-SMF_MANIFEST = manifest.xml
+SMF_MANIFEST = manifest16.xml
 endif
 ifeq ($(PKGSRC_VERSION),2012Q2)  # SmartOS 1.8
 NCURSES_DEP = ncurses-5*
