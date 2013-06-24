@@ -205,7 +205,7 @@ templates: $(BUILD_STAGE_DIR)
 # file so the directories are created in the +INSTALL script
 # We copy the data and log directories if they exist to make
 # scanning them easier later
-$(BUILD_STAGE_DIR): buildrel
+$(BUILD_STAGE_DIR): buildrel patch_runner
 	@echo "Copying rel directory to staging directory"
 	mkdir -p $@
 	cp -R $(BUILDDIR)/rel/{{package_install_name}} $(BUILD_STAGE_DIR)
@@ -235,11 +235,21 @@ smartos_check:
 	$(if $(NCURSES_DEP),,$(error "Unsupported SmartOS version, please add to github.com/basho/node_package"))
 	@echo "Building for pkgsrc version $(PKGSRC_VERSION)"
 
+# Patch the runner script with SmartOS modifications
+patch_runner: buildrel
+	cp $(PKGERDIR)/runner.patch $(BUILDDIR)/rel/{{package_install_name}}/bin/
+	cp $(PKGERDIR)/env.patch $(BUILDDIR)/rel/{{package_install_name}}/lib/
+	cd $(BUILDDIR)/rel/{{package_install_name}}/bin && \
+	   patch -p0 {{package_install_name}} runner.patch
+	rm $(BUILDDIR)/rel/{{package_install_name}}/bin/runner.patch
+	cd $(BUILDDIR)/rel/{{package_install_name}}/lib && \
+	patch -p0 env.sh env.patch
+	rm $(BUILDDIR)/rel/{{package_install_name}}/lib/env.patch
+
+
 # Build the release we need to package
-#  * Patch rel/files/riak with our version
 #  * Ensure all binaries are executable
 #  * copy the vars.config over for build config
-# TODO, solve the .patch issue we have in riak
 buildrel: $(BUILDDIR) smartos_check
 	OVERLAY_VARS="overlay_vars=../smartos/vars.config" $(MAKE) deps rel
 	chmod 0755 $(BUILDDIR)/rel/{{package_install_name}}/bin/* $(BUILDDIR)/rel/{{package_install_name}}/erts-*/bin/*

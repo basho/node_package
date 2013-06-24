@@ -1,0 +1,40 @@
+54a55
+> 
+57a59,64
+>         if [ "${SMF_METHOD}" != "start" ]; then
+>             echo "***"
+>             echo "Warning: please use 'svcadm enable $SCRIPT' instead"
+>             echo "***"
+>         fi
+> 
+68,69c75,81
+<         # Warn the user if ulimit is too low
+<         check_ulimit
+---
+>         # Make sure we have access to enough file descriptors
+>         ULIMIT_S=$(prctl -n process.max-file-descriptor -t basic -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         ULIMIT_H=$(prctl -n process.max-file-descriptor -t priv -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         if [ ${ULIMIT_S} -lt ${ULIMIT_H} ]; then
+>             echo "Trying to raise the file descriptor limit to maximum allowed."
+>             prctl -n process.max-file-descriptor -t basic -v ${ULIMIT_H} $$ || true
+>         fi
+116a129
+> 
+119a133,138
+>         if [ "${SMF_METHOD}" != "stop" ]; then
+>             echo "***"
+>             echo "Warning: please use 'svcadm disable $SCRIPT' instead"
+>             echo "***"
+>         fi
+> 
+226,227c245,251
+<         # Warn the user if ulimit -n is less than the defined threshold
+<         check_ulimit
+---
+>         # Make sure we have access to enough file descriptors
+>         ULIMIT_S=$(prctl -n process.max-file-descriptor -t basic -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         ULIMIT_H=$(prctl -n process.max-file-descriptor -t priv -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         if [ ${ULIMIT_S} -lt ${ULIMIT_H} ]; then
+>             echo "Trying to raise the file descriptor limit to maximum allowed."
+>             prctl -n process.max-file-descriptor -t basic -v ${ULIMIT_H} $$ || true
+>         fi
