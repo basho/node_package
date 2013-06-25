@@ -20,7 +20,7 @@
         <envvar name="LOGNAME" value="{{package_install_user}}" />
         <envvar name="PATH" value="/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin" />
         <envvar name="LD_PRELOAD_32" value="/lib/libumem.so.1" />
-        <envvar name="LD_PRELOAD_64" value="/lib/amd64/libumem.so.1:/opt/local/gcc47/lib/amd64/libgcc_s.so.1"/>
+        <envvar name="LD_PRELOAD_64" value="/lib/amd64/libumem.so.1:/opt/local/gcc47/x86_64-sun-solaris2.11/lib/amd64/libgcc_s.so.1"/>
         <envvar name="UMEM_OPTIONS" value="allocator=best" />
       </method_environment>
     </method_context>
