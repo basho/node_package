@@ -289,6 +289,10 @@ case "$1" in
 
         shift
         $ERTS_PATH/escript "$@"
+        ES=$?
+        if [ "$ES" -ne 0 ]; then
+            exit $ES
+        fi
         ;;
 
     version)
