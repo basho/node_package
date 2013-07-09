@@ -202,8 +202,7 @@ case "$1" in
 
         echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
         shift
-        NODE_NAME=${NAME_ARG#* }
-        exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
+        exec $ERTS_PATH/erl $NAME_PARAM c_$$_$NODE_NAME -hidden -remsh $NODE_NAME$NAME_HOST $COOKIE_ARG
         ;;
 
     console)
@@ -263,12 +262,11 @@ case "$1" in
 
         shift
         MYPID=$$
-        NODE_NAME=${NAME_ARG#* }
         $ERTS_PATH/erl -noshell -noinput \
             -pa $RUNNER_PATCH_DIR \
             -hidden $NAME_PARAM np_etop$MYPID$NAME_HOST $COOKIE_ARG \
             -s etop -s erlang halt -output text \
-            -node $NODE_NAME \
+            -node $NODE_NAME$NAME_HOST \
             $* -tracing off
         ;;
 

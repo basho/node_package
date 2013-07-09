@@ -55,19 +55,20 @@ if [ -z "$NAME_ARG" ]; then
     echoerr "vm.args needs to have either -name or -sname parameter."
     exit 1
 fi
+NODE_NAME=`echo "${NAME_ARG}" | sed -e 's/-s\{0,1\}name \([^@]*\)@\{0,1\}.*$/\1/'`
 
 # Learn how to specify node name for connection from remote nodes
 echo "$NAME_ARG" | grep '^-sname' > /dev/null 2>&1
 if [ "X$?" = "X0" ]; then
     NAME_PARAM="-sname"
-    NAME_HOST=""
+    NAME_HOST="@"`hostname -s`
 else
     NAME_PARAM="-name"
     echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
     if [ "X$?" = "X0" ]; then
         NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
     else
-        NAME_HOST=""
+        NAME_HOST="@"`hostname -f`
     fi
 fi
 
