@@ -61,14 +61,14 @@ NODE_NAME=`echo "${NAME_ARG}" | sed -e 's/-s\{0,1\}name \([^@]*\)@\{0,1\}.*$/\1/
 echo "$NAME_ARG" | grep '^-sname' > /dev/null 2>&1
 if [ "X$?" = "X0" ]; then
     NAME_PARAM="-sname"
-    NAME_HOST="@"`hostname -s`
+    NAME_HOST=`hostname | sed -e 's/\([^.]*\).*$/@\1/'`
 else
     NAME_PARAM="-name"
     echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
     if [ "X$?" = "X0" ]; then
         NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
     else
-        NAME_HOST="@"`hostname -f`
+        NAME_HOST="@"`hostname`
     fi
 fi
 
