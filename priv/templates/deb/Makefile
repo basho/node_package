@@ -9,7 +9,7 @@ default:
 		-e REVISION=$(PKG_VERSION) \
 		-e RELEASE=$(PKG_BUILD) \
                 -e REBAR=$(REBAR) \
-		-uc -us
+		-uc -us -sa
 	mkdir -p ../packages
 	cd .. && mv *$(PKG_VERSION)-$(PKG_BUILD)_*.deb packages
 	cd ../packages && \
