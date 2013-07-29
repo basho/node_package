@@ -105,7 +105,7 @@ if ! getent group {{package_install_group}} >/dev/null 2>&1; then
 fi
 
 if getent passwd {{package_install_user}} >/dev/null 2>&1; then
-   usermod -d %{_localstatedir}/lib/{{package_install_name}} {{package_install_user}}
+   usermod -d %{_localstatedir}/lib/{{package_install_name}} {{package_install_user}} || true
 else
    useradd -r -g {{package_install_group}} \
            --home %{_localstatedir}/lib/{{package_install_name}} \
