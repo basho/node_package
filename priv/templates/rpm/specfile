@@ -31,6 +31,8 @@ Obsoletes: {{package_name}}
 %define platform_lib_dir %{platform_base_dir}/lib
 %define platform_log_dir %{_localstatedir}/log/{{package_install_name}}
 
+
+# Setup vars.config like other platforms, but do it inside of spec file
 %prep
 %setup -q -n {{package_name}}-%{_revision}
 cat > rpm.vars.config <<EOF
@@ -50,8 +52,8 @@ cat > rpm.vars.config <<EOF
 {runner_patch_dir,  "%{platform_lib_dir}/{{package_patch_dir}}"}.
 {runner_user,       "{{package_install_user}}"}.
 {pipe_dir,          "%{_localstatedir}/run/{{package_install_name}}/"}.
+{app_version,       "%{_revision}"}.
 EOF
-
 
 %build
 OVERLAY_VARS="overlay_vars=../rpm.vars.config" make rel
