@@ -29,6 +29,9 @@ APP_VERSION={{app_version}}
 
 # Variables needed to support creation of .pid files
 RUN_DIR={{runner_run_dir}}
+if [ -z "$RUN_DIR" ]; then
+    RUN_DIR=/var/run
+fi
 PID_DIR=$RUN_DIR
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 
