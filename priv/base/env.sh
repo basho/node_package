@@ -28,10 +28,8 @@ RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Variables needed to support creation of .pid files
-# PID directory and pid file name of this app
-# ex: /var/run/riak & /var/run/riak/riak.pid
-RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
-PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
+RUN_DIR={{runner_run_dir}}
+PID_DIR=$RUN_DIR
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 
 # Threshold where users will be warned of low ulimit file settings
