@@ -32,9 +32,10 @@ Obsoletes: {{package_name}}
 %define platform_log_dir %{_localstatedir}/log/{{package_install_name}}
 
 
-# Setup vars.config like other platforms, but do it inside of spec file
 %prep
 %setup -q -n {{package_name}}-%{_revision}
+
+# Setup vars.config like other platforms, but do it inside of spec file
 cat > rpm.vars.config <<EOF
 %% Platform-specific installation paths
 {platform_bin_dir,  "%{platform_bin_dir}"}.
@@ -78,11 +79,17 @@ if [ -d %{relpath}/bin ]; then \
    find %{relpath}/bin -type f \
         -exec install -p -D -m 0755 {} %{buildroot}%{_{{bin_or_sbin}}dir}/ \; ;fi
 
+# Scan for manpages that are optional for each command in the package_commands list
+# If found:
+#     * install manpages
+#     * add manpages to the 'additional_files_list' that will later be added in the %files section
 mkdir -p %{buildroot}%{_mandir}/man1
+touch additional_files_list
 if [ -d %{_builddir}/%{buildsubdir}/doc/man/man1 ]; then \
    {{#package_commands}}if [ -f %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz ]; then \
                             install -p -D -m 0455 %{_builddir}/%{buildsubdir}/doc/man/man1/{{name}}.1.gz \
                                     %{buildroot}%{_mandir}/man1 \
+                            ; echo "%{_mandir}/man1/{{name}}.1.gz" >> additional_files_list \
                         ; fi && \
    {{/package_commands}}echo -n; fi
 
@@ -123,7 +130,8 @@ selinuxenabled && find %{_localstatedir}/lib/{{package_install_name}} -name "*.s
 chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
 
 
-%files
+# Man pages are optional and might be missing, read from file
+%files -f additional_files_list
 %defattr(-,{{package_install_user}},{{package_install_group}})
 %{_libdir}/*
 %dir %{_sysconfdir}/{{package_install_name}}
@@ -133,7 +141,6 @@ chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
 %{_sysconfdir}/init.d/{{package_install_name}}
-%{_mandir}/man1/*
 
 %clean
 rm -rf %{buildroot}
