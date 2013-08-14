@@ -28,10 +28,11 @@ RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Variables needed to support creation of .pid files
-# PID directory and pid file name of this app
-# ex: /var/run/riak & /var/run/riak/riak.pid
-RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
-PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
+RUN_DIR={{runner_run_dir}}
+if [ -z "$RUN_DIR" ]; then
+    RUN_DIR=/var/run
+fi
+PID_DIR=$RUN_DIR
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 
 # Threshold where users will be warned of low ulimit file settings
@@ -55,19 +56,20 @@ if [ -z "$NAME_ARG" ]; then
     echoerr "vm.args needs to have either -name or -sname parameter."
     exit 1
 fi
+NODE_NAME=`echo "${NAME_ARG}" | sed -e 's/-s\{0,1\}name \([^@]*\)@\{0,1\}.*$/\1/'`
 
 # Learn how to specify node name for connection from remote nodes
 echo "$NAME_ARG" | grep '^-sname' > /dev/null 2>&1
 if [ "X$?" = "X0" ]; then
     NAME_PARAM="-sname"
-    NAME_HOST=""
+    NAME_HOST=`hostname | sed -e 's/\([^.]*\).*$/@\1/'`
 else
     NAME_PARAM="-name"
     echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
     if [ "X$?" = "X0" ]; then
         NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
     else
-        NAME_HOST=""
+        NAME_HOST="@"`hostname`
     fi
 fi
 

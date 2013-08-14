@@ -18,7 +18,7 @@ cd $RUNNER_BASE_DIR
 SCRIPT=`basename $0`
 
 usage() {
-    echo "Usage: $SCRIPT {start | stop| restart | reboot | ping | console | attach | "
+    echo "Usage: $SCRIPT {start | stop| restart | reboot | ping | console | console_clean | attach | "
     echo "                    attach-direct | ertspath | chkconfig | escript | version | "
     echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
 }
@@ -202,11 +202,10 @@ case "$1" in
 
         echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
         shift
-        NODE_NAME=${NAME_ARG#* }
-        exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
+        exec $ERTS_PATH/erl $NAME_PARAM c_$$_$NODE_NAME -hidden -remsh $NODE_NAME$NAME_HOST $COOKIE_ARG
         ;;
 
-    console)
+    console|console_clean|console_boot)
         # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
 
@@ -229,12 +228,24 @@ case "$1" in
         # Make sure log directory exists
         mkdir -p $RUNNER_LOG_DIR
 
+        # .boot file typically just $SCRIPT (ie, the app name)
+        # however, for debugging, sometimes start_clean.boot is useful.
+        # For e.g. 'setup', one may even want to name another boot script.
+        case "$1" in
+            console)        BOOTFILE=$SCRIPT ;;
+            console_clean)  BOOTFILE=start_clean ;;
+            console_boot)
+                shift
+                BOOTFILE="$1"
+                shift
+                ;;
+        esac
         # Setup beam-required vars
         ROOTDIR=$RUNNER_BASE_DIR
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
+        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$BOOTFILE \
              -config $RUNNER_ETC_DIR/app.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
@@ -263,12 +274,11 @@ case "$1" in
 
         shift
         MYPID=$$
-        NODE_NAME=${NAME_ARG#* }
         $ERTS_PATH/erl -noshell -noinput \
             -pa $RUNNER_PATCH_DIR \
             -hidden $NAME_PARAM np_etop$MYPID$NAME_HOST $COOKIE_ARG \
             -s etop -s erlang halt -output text \
-            -node $NODE_NAME \
+            -node $NODE_NAME$NAME_HOST \
             $* -tracing off
         ;;
 
