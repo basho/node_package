@@ -18,9 +18,111 @@ cd $RUNNER_BASE_DIR
 SCRIPT=`basename $0`
 
 usage() {
-    echo "Usage: $SCRIPT {start | stop| restart | reboot | ping | console | attach | "
-    echo "                    attach-direct | ertspath | chkconfig | escript | version | "
-    echo "                    getpid | top [-interval N] [-sort reductions|memory|msg_q] [-lines N] }"
+cat <<EOF
+Usage: $SCRIPT «command»
+where «command» is one of the following: 
+    { help | start | stop | restart | reboot | ping | console | attach
+      attach-direct | ertspath | chkconfig | escript | version | getpid
+      top [-interval N] [-sort { reductions | memory | msg_q }] [-lines N] }
+
+Run \`$SCRIPT help\` for more detailed information.
+
+EOF
+}
+
+help() {
+
+NAME_HOST=${NAME_ARG#* }
+NAME_HOST=${NAME_HOST:-\«nodename\»}
+
+cat <<EOF
+Usage: $SCRIPT «command»
+This is the primary script for controlling the $SCRIPT node.
+
+ INFORMATIONAL COMMANDS
+    help
+        You are here.
+
+ SERVICE CONTROL COMMANDS
+    start
+        Starts the $SCRIPT node in the background. If the node is already 
+        started, you will get the message "Node is already running!" If the
+        node is not already running, no output will be given.
+
+    stop
+        Stops the running $SCRIPT node. Prints "ok" when successful.  When 
+        the node is already stopped or not responding, prints:
+        "Node '$NAME_HOST' not responding to pings." 
+
+    restart
+        Stops and then starts the running $SCRIPT node without exiting the 
+        Erlang VM.  Prints "ok" when successful.  When the node is already 
+        stopped or not responding, prints:
+        "Node '$NAME_HOST' not responding to pings." 
+
+    reboot
+        Stops and then starts the running $SCRIPT node, exiting the Erlang VM. 
+        Prints "ok" when successful.  When the node is already stopped or not
+        responding, prints:
+        "Node '$NAME_HOST' not responding to pings." 
+
+    console
+        Starts the $SCRIPT node in the foreground, giving access to the Erlang 
+        shell and runtime messages. Prints "Node is already running - use 
+        '$SCRIPT attach' instead" when the node is running in the background.
+
+ DIAGNOSTIC COMMANDS
+    ping
+        Checks that the $SCRIPT node is running. Prints "pong" when 
+        successful.  When the node is stopped or not responding, prints:
+        "Node '$NAME_HOST' not responding to pings."  
+
+    top [-interval N] [-sort {reductions | memory | msg_q }] [-lines N]
+        Prints performance information about the Erlang Virtual Machine similar
+        to the information provided by the \`top\` command.
+
+        -interval N
+            specifies an interval upon which the statistics are collected.  
+
+        -sort { reductions | memory | msg_q }
+            Sorts the output of the command by Reduction Count, Memory 
+            Utilization, or Message Queue size
+
+        -lines N 
+            Controls the number of processes displayed in the output
+
+    attach             
+        Attaches to the console of a $SCRIPT node running in the background 
+        using an Erlang remote shell, giving access to the Erlang shell and 
+        runtime messages. Prints "Node is not running!" when the node cannot
+        be reached. Exit \`$SCRIPT attach\` by pressing Ctrl-C twice.
+
+    attach-direct
+        Attaches to the console of a $SCRIPT node running in the background
+        using a directly connected FIFO, giving access to the Erlang shell 
+        and runtime messages. Prints "Node is not running!" when the node
+        cannot be reached. Exit \`$SCRIPT attach-direct\` by pressing Ctrl-D.
+
+    chkconfig          
+        Confirms whether the app.config is valid.
+
+SCRIPTING COMMANDS    
+    ertspath
+        Outputs the path to the $SCRIPT Erlang runtime environment
+
+    escript
+        Provides a means to call the \`escript\` application within the $SCRIPT
+        Erlang runtime environment
+    
+    version
+        Outputs the $SCRIPT version identifier
+    
+    getpid
+        Outputs the process identifier for a currently running instance of 
+        $SCRIPT.
+
+EOF
+
 }
 
 # All commands must either call bootstrap or bootstrapd
@@ -310,6 +412,10 @@ case "$1" in
             exit $ES
         fi
         echo $PID
+        ;;
+
+    help)
+        help
         ;;
     *)
         usage
