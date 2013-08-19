@@ -195,7 +195,7 @@ node_up_check() {
 # Function to check if the config file is valid
 check_config() {
     if [ -z "$CUTTLEFISH" ]; then
-        CONFIG_FILE = $RUNNER_ETC_DIR/app.config
+        CONFIG_FILE="$RUNNER_ETC_DIR/app.config"
     else
         cuttlefish
     fi
