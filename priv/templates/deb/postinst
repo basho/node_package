@@ -31,7 +31,7 @@ chown -R {{package_install_user}}:{{package_install_group}} /etc/{{package_insta
 
 chmod 0755 /var/run/{{package_install_name}} /etc/{{package_install_name}}
 chmod 0644 /etc/{{package_install_name}}/*
-chmod -R +X /etc/{{package_insall_name}}
+chmod -R +X /etc/{{package_install_name}}
 chmod 0755 /usr/lib/{{package_install_name}}/lib/env.sh
 
 case "$1" in
