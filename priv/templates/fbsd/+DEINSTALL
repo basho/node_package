@@ -10,4 +10,10 @@ if pw usershow "${USER}" 2>/dev/null 1>&2; then
         echo "To delete {{package_name}} user permanently, use 'pw userdel ${USER}'"
 fi
 
+echo ""
+echo "To completely clean your system you will need to remove the following directories manually"
+echo "* {{platform_data_dir}}"
+echo "* {{platform_log_dir}}"
+
+
 exit 0
