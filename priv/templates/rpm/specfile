@@ -33,7 +33,7 @@ Obsoletes: {{package_name}}
 
 
 %prep
-%setup -q -n {{package_install_name}}-%{_revision}
+%setup -q -n %{_tarname_base}-%{_revision}
 
 # Setup vars.config like other platforms, but do it inside of spec file
 cat > rpm.vars.config <<EOF

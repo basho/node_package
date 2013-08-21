@@ -19,6 +19,7 @@ default:
 		--define "_version $(PKG_VERSION_NO_H)" \
 		--define "_release $(PKG_BUILD)" \
 		--define "_tarname $(PKG_ID).tar.gz" \
+		--define "_tarname_base $(PKG_ID)" \
 		-ba $(PWD)/specfile
 	cd packages && \
 		for rpmfile in `ls *.rpm`; do \
