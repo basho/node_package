@@ -8,11 +8,15 @@ PBIN_DIR         = $(BUILD_STAGE_DIR)/{{bin_or_sbin}}
 PETC_DIR         = $(BUILD_STAGE_DIR)/etc/{{package_install_name}}
 PLIB_DIR         = $(BUILD_STAGE_DIR)/lib/{{package_install_name}}
 # /var based dirs
-PDATA_DIR        = $(BUILD_STAGE_DIR)/db/
+PDATA_DIR        = $(BUILD_STAGE_DIR)/{{platform_data_dir}}
 PLOG_DIR         = $(BUILD_STAGE_DIR)/log/{{package_install_name}}
 
+# For scanning later, remove the leading slash
+# '/var/db/server' becomes 'var/db/server'
+PDATA_ROOT_DIR   = $(shell echo "{{platform_data_dir}}" | cut -d'/' -f 2-4)
+
 TARNAME = {{package_name}}-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tar
-PKGNAME = {{package_name}}-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tgz
+PKGNAME = {{package_name}}-$(PKG_VERSION)-$(OSNAME)-$(ARCH).tbz
 
 build: packing_list_files templates
 	@echo "Building package $(PKGNAME)"
@@ -24,7 +28,7 @@ build: packing_list_files templates
 	find {{bin_or_sbin}} -type f | tar -rf $(TARNAME) -T - && \
 	find lib -type f | tar -rf $(TARNAME) -T - && \
 	find etc -type f | tar -rf $(TARNAME) -T - && \
-	find db -type f | tar -rf $(TARNAME) -T - && \
+	find var -type f | tar -rf $(TARNAME) -T - && \
 	find log -type f | tar -rf $(TARNAME) -T -
 
 	cd $(BUILD_STAGE_DIR) && \
@@ -33,7 +37,7 @@ build: packing_list_files templates
 	mv $(TARNAME).gz ../../packages/$(PKGNAME)
 
 	cd ../packages && \
-		for tarfile in `ls *.tgz`; do \
+		for tarfile in `ls *.tbz`; do \
 		shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	; done
 
@@ -68,6 +72,16 @@ packing_list_files: $(BUILD_STAGE_DIR)
                                      ; fi && \
 		{{/package_commands}} echo -n; fi
 
+	@echo "Scanning data and log directories for empty directories to add"
+	$(eval DIRS_INSTALL = {{platform_log_dir}})
+	$(eval DIRS_INSTALL += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
+	for i in $(DIRS_INSTALL); \
+	    do                          \
+		echo "@exec mkdir -p $$i" >> plist; \
+                echo "@exec chown -R {{package_install_user}}:{{package_install_group}} $$i" >> plist; \
+		echo "@exec chmod 700 $$i" >> plist; \
+	    done
+
 	@echo "Copying staging package listing to +CONTENTS"
 	mv plist $(BUILD_STAGE_DIR)/+CONTENTS
 
@@ -78,18 +92,17 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	   echo "@group {{package_install_group}}" >> +CONTENTS && \
 	   echo "@mode 0755" >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
-	   find {{bin_or_sbin}} -type f >> +CONTENTS && \
-           find {{bin_or_sbin}} -d -type d -exec echo "@dirrm {}" \; >> +CONTENTS
+	   find {{bin_or_sbin}} -type f >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
 	   find lib -type f >> +CONTENTS && \
-	   find lib -d -type d -exec echo "@dirrm {}" \; >> +CONTENTS && \
+	   find lib -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
 	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@owner root" >> +CONTENTS && \
 	   echo "@group wheel" >> +CONTENTS && \
 	   echo "@mode 0644" >> +CONTENTS && \
 	   find etc -type f >> +CONTENTS && \
-	   find etc -d -type d -exec echo "@dirrm {}" \; >> +CONTENTS
+	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS
 
 	@echo "Packaging /var files"
 	cd $(BUILD_STAGE_DIR) && \
@@ -98,15 +111,9 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	   echo "@owner {{package_install_user}}" >> +CONTENTS && \
 	   echo "@group {{package_install_group}}" >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
-	   find db -type f >> +CONTENTS && \
-           find db -d -type d -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_data_dir}}" >> +CONTENTS && \
-	   echo "@exec chmod 700 {{platform_data_dir}}" >> +CONTENTS
+	   find var/db -type f >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
-	   find log -type f >> +CONTENTS && \
-           find log -d -type d -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_log_dir}}" >> +CONTENTS && \
-	   echo "@exec chmod 700 {{platform_log_dir}}" >> +CONTENTS
+	   find log -type f >> +CONTENTS
 
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@owner" >> +CONTENTS && \
@@ -126,8 +133,6 @@ templates: $(BUILD_STAGE_DIR)
 # package structure and move the directories into the right place
 # for the package, see the vars.config file for destination
 # directories
-# The data and log directories are by default empty, so create
-# an empty file in them so the file listing makes the directories
 $(BUILD_STAGE_DIR): buildrel
 	@echo "Copying rel directory to staging directory"
 	mkdir -p $@
@@ -141,9 +146,7 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/{{package_install_name}}/releases $(PLIB_DIR)
 	mkdir -p $(PDATA_DIR)
 	cp -R rel/{{package_install_name}}/data/* $(PDATA_DIR)
-	touch $(PDATA_DIR)/.empty
 	mkdir -p $(PLOG_DIR)
-	touch $(PLOG_DIR)/.empty
 
 
 # Build the release we need to package
