@@ -104,6 +104,8 @@ build: packing_list_files dirs_file
 # Write initial settings to a local plist then copy
 #   to the destination folder where we use 'find'
 #   to populate the files
+# SmartOS doesn't allow packages to modify /var
+#   in the +CONTENTS so that is all done in the +INSTALL instead
 packing_list_files: $(BUILD_STAGE_DIR) templates
 	@echo "Adding to packaging list $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)"
 	echo "@name $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)" >> plist
@@ -164,8 +166,8 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 # create directories not supported by the +CONTENTS file
 # such as log and data directories.
 # platform_log_dir and platform_data_dir are always added
-# This is black magic appending the directories to the
-# to a variable inside of the makefile target
+# This is black magic appending the directories to
+# a variable inside of the makefile target
 # and then using sed to insert that list into
 # the +INSTALL script.
 # I feel dirty now.
