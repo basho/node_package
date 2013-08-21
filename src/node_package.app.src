@@ -3,7 +3,7 @@
 
 {application, node_package,
  [{description, "RPM/Debian/Solaris packaging templates for Erlang Nodes"},
-  {vsn, "1.3.3"},
+  {vsn, git},
   {modules, []},
   {registered, []},
   {applications, [kernel, stdlib]}
