@@ -206,6 +206,7 @@ check_config() {
         exit 1
     fi
     echo "config is OK"
+    echo $CONFIG_FILE
 }
 
 # Function to check if ulimit is properly set
