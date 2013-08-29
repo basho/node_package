@@ -29,21 +29,9 @@ main(Args) ->
     %% any commands that don't need a running node
     case RestArgs of
         ["chkconfig", File] ->
-            case file:consult(File) of
-                {ok, _} ->
-                    io:format("ok\n"),
-                    halt(0);
-                {error, {Line, Mod, Term}} ->
-                    io:format(standard_error, 
-                              ["Error on line ", 
-                               file:format_error({Line, Mod, Term}), "\n"], []),
-                    halt(1);
-                {error, R} ->
-                    io:format(standard_error,
-                              ["Error reading config file: ", 
-                               file:format_error(R), "\n"], []),
-                    halt(1)
-            end;
+            chkconfig(File);
+        ["chkconfig", "-config", File|_] ->
+            chkconfig(File);
         _ ->
             ok
     end,
@@ -169,6 +157,23 @@ append_node_suffix(Name, Suffix) ->
             list_to_atom(lists:concat([Node, Suffix, os:getpid(), "@", Host]));
         [Node] ->
             list_to_atom(lists:concat([Node, Suffix, os:getpid()]))
+    end.
+
+chkconfig(File) ->
+    case file:consult(File) of
+        {ok, _} ->
+            io:format("ok\n"),
+            halt(0);
+        {error, {Line, Mod, Term}} ->
+            io:format(standard_error, 
+                      ["Error on line ", 
+                       file:format_error({Line, Mod, Term}), "\n"], []),
+            halt(1);
+        {error, R} ->
+            io:format(standard_error,
+                      ["Error reading config file: ", 
+                       file:format_error(R), "\n"], []),
+            halt(1)
     end.
 
 
