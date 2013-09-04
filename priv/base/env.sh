@@ -62,7 +62,7 @@ if [ -z "$NAME_ARG" ]; then
         echoerr "  -sname is not supported."
         exit 1
     else
-        NAME_ARG="-name $NODENAME"
+        NAME_ARG="-name ${NODENAME# *}"
     fi
 fi
 
