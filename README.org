@@ -35,6 +35,8 @@ application.
    (ex: app-5.4-1 <- the '1')
  - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang
    binary
+ - =DEPS_DIR= - (Default: deps) Sets the deps directory of the project, most
+   projects uses 'deps'.  Change this if something different is used.
 
 ** Package and Script Variables
 
