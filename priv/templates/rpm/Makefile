@@ -22,6 +22,6 @@ default:
 		--define "_tarname_base $(PKG_ID)" \
 		-ba $(PWD)/specfile
 	cd packages && \
-		for rpmfile in `ls *.rpm`; do \
+		for rpmfile in *.rpm; do \
 			sha256sum $${rpmfile} > $${rpmfile}.sha \
 		; done
