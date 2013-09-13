@@ -56,7 +56,7 @@ echoerr() { echo "$@" 1>&2; }
 # Extract the target node name from node.args
 NAME_ARG=`egrep '^\-name' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$NAME_ARG" ]; then
-    NODENAME=`egrep '^nodename\s?=\s?' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | cut -d = -f 2`
+    NODENAME=`egrep 'nodename[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | cut -d = -f 2`
     if [ -z "$NODENAME" ]; then
         echoerr "vm.args needs to have a -name parameter."
         echoerr "  -sname is not supported."
@@ -78,7 +78,7 @@ fi
 # Extract the target cookie
 COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$COOKIE_ARG" ]; then
-    COOKIE=`egrep '^distributed_cookie\s?=\s?' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | cut -d = -f 2`
+    COOKIE=`egrep 'distributed_cookie[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | cut -d = -f 2`
     if [ -z "$COOKIE" ]; then
         echoerr "vm.args needs to have a -setcookie parameter."
         exit 1
