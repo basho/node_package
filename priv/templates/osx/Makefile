@@ -10,7 +10,7 @@ default: buildrel
 		tar -czf ../packages/$(PKGNAME) \
 			 {{package_name}}-$(PKG_VERSION)
 	cd packages && \
-	   for tarfile in `ls *.gz`; do \
+	   for tarfile in *.gz; do \
 	       shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	   ; done
 

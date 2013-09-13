@@ -13,6 +13,6 @@ default:
 	mkdir -p ../packages
 	cd .. && mv *$(PKG_VERSION)-$(PKG_BUILD)_*.deb packages
 	cd ../packages && \
-		for debfile in `ls *.deb`; do \
+		for debfile in *.deb; do \
 			sha256sum $${debfile} > $${debfile}.sha \
 		; done

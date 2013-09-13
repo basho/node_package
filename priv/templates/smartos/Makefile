@@ -94,7 +94,7 @@ build: packing_list_files dirs_file
 	mv $(TARNAME).gz ../../packages/$(PKGNAME)
 
 	cd ../packages && \
-		for tarfile in `ls *.tgz`; do \
+		for tarfile in *.tgz; do \
 		shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	; done
 
