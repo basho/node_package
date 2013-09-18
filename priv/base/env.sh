@@ -15,8 +15,14 @@ if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
 fi
 unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as well
 
-RUNNER_SCRIPT_DIR={{runner_script_dir}}
-RUNNER_SCRIPT=${0##*/}
+# Pull environment for this install
+RUNNER_SCRIPT=${0}
+
+while [ -L $RUNNER_SCRIPT ]; do
+    RUNNER_BIN_DIR="$(dirname "$(readlink $RUNNER_SCRIPT)" )"
+    RUNNER_SCRIPT_DIR="$(cd $(dirname $RUNNER_SCRIPT) && cd $RUNNER_BIN_DIR && pwd)"
+    RUNNER_SCRIPT="$RUNNER_SCRIPT_DIR/$SCRIPT"
+done
 
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
@@ -170,7 +176,7 @@ check_user() {
             echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
             exit 1
         fi
-        exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $@
+        exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT $@
     fi
 }
 
