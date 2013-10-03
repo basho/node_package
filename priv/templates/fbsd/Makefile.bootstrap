@@ -7,6 +7,6 @@ export
 bootstrap:
 	mkdir -p $(PKG_ID)/fbsd
 	cd $(PKG_ID)/fbsd && $(REBAR) -v create \
-                              template_dir=../deps/node_package/priv/templates \
+                              template_dir=../$(DEPS_DIR)/node_package/priv/templates \
                               template_vars=../pkg.vars.config template=fbsd
 	$(MAKE) -C $(PKG_ID) -f fbsd/Makefile
