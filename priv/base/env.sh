@@ -88,15 +88,16 @@ if [ -z "$COOKIE_ARG" ]; then
 fi
 
 # Optionally specify a NUMA policy
-NUMACTL_ARG=""
+NUMACTL_ARG="{{numactl_arg}}"
 if [ -z "$NUMACTL_ARG" ]
 then
     NUMACTL=""
+# Confirms `numactl` is in the path and validates $NUMACTL_ARG
 elif which numactl > /dev/null 2>&1 && numactl $NUMACTL_ARG ls /dev/null > /dev/null 2>&1
 then
     NUMACTL="numactl $NUMACTL_ARG"
 else
-    echoerr "NUMACTL_ARG is specified in env.sh but numactl is not installed."
+    echoerr "NUMACTL_ARG is specified in env.sh but numactl is not installed or NUMACTL_ARG is invalid."
     exit 1
 fi
 
