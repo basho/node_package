@@ -87,6 +87,19 @@ if [ -z "$COOKIE_ARG" ]; then
     fi
 fi
 
+# Optionally specify a NUMA policy
+NUMACTL_ARG=""
+if [ -z "$NUMACTL_ARG" ]
+then
+    NUMACTL=""
+elif which numactl > /dev/null 2>&1 && numactl $NUMACTL_ARG ls /dev/null > /dev/null 2>&1
+then
+    NUMACTL="numactl $NUMACTL_ARG"
+else
+    echoerr "NUMACTL_ARG is specified in env.sh but numactl is not installed."
+    exit 1
+fi
+
 # Parse out release and erts info
 START_ERL=`cat $RUNNER_BASE_DIR/releases/start_erl.data`
 ERTS_VSN=${START_ERL% *}
