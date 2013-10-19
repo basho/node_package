@@ -329,7 +329,7 @@ case "$1" in
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
+        CMD="$NUMACTL $BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
              $CONFIG_ARGS \
             -pa $RUNNER_PATCH_DIR -- ${1+"$@"}"
         export EMU
