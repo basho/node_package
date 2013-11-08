@@ -21,6 +21,7 @@ build: buildrel depend pkginfo prototype
 	cd ../packages && echo "`digest -a sha256 $(PKGFILE).gz`  $(PKGFILE).gz" > $(PKGFILE).gz.sha
 
 # Build the release we need to package
+# Make sure to copy binaries to {{bin_or_sbin}}
 buildrel:
 	@# Make sure we set our EUID properly
 	@# Ye Olde Bourne Shell on Solaris means we have to do it old school
@@ -28,6 +29,8 @@ buildrel:
 	OVERLAY_VARS="overlay_vars=../solaris/vars.config" $(MAKE) deps rel
 	chmod 0755 rel/{{package_install_name}}/bin/* \
 		rel/{{package_install_name}}/erts-*/bin/*
+	if [ "{{bin_or_sbin}}" != "bin" ]; then \
+	   mv rel/{{package_install_name}}/bin rel/{{package_install_name}}/{{bin_or_sbin}}; fi
 
 depend:
 	cp $(PKGERDIR)/depend .

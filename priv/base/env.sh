@@ -48,7 +48,7 @@ CUTTLEFISH="{{cuttlefish}}"
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
 
-WHOAMI=$(whoami)
+WHOAMI=`whoami`
 
 # Echo to stderr on errors
 echoerr() { echo "$@" 1>&2; }
