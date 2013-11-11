@@ -23,7 +23,8 @@ Usage: $SCRIPT «command»
 where «command» is one of the following:
     { help | start | stop | restart | reboot | ping | console | attach
       attach-direct | ertspath | chkconfig | escript | version | getpid
-      top [-interval N] [-sort { reductions | memory | msg_q }] [-lines N] }
+      top [-interval N] [-sort { reductions | memory | msg_q }] [-lines N] } |
+      config { effective | describe VARIABLE }
 
 Run \`$SCRIPT help\` for more detailed information.
 
@@ -105,6 +106,21 @@ This is the primary script for controlling the $SCRIPT node.
 
     chkconfig
         Confirms whether the app.config is valid.
+
+    config { effective | describe VARIABLE}
+        prints configuration information for applications configured with
+        cuttlefish enabled.
+
+        effective
+            prints out the effective configuration in cuttlefish syntax
+            including defaults not specified in the .conf file. This is
+            for 'start-time' configuration only.
+
+        describe VARIABLE
+            for a given setting, prints any documentation and other useful
+            information, such as affected location in app.config, datatype
+            of the value, default value, and effective value.
+
 
 SCRIPTING COMMANDS
     ertspath
@@ -375,6 +391,19 @@ case "$1" in
         bootstrap $@
 
         check_config
+        ;;
+
+    config)
+        bootstrap $@
+
+        shift
+        if [ -z "$CUTTLEFISH" ]; then
+            echo "This application is not configured to use cuttlefish."
+            echo "$RUNNER_SCRIPT config is not available."
+            exit 1
+        else
+            printf '%s \n' "`$CUTTLEFISH_COMMAND_PREFIX $@`"
+        fi
         ;;
 
     escript)
