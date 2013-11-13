@@ -408,9 +408,9 @@ case "$1" in
                 effective) ## Great, pass through!
                     ;;
                 describe)
-                    if [ $# -lt 2]; then
+                    if [ $# -lt 2 ] || [ "$2" = "-l" ]; then
                         echo "$RUNNER_SCRIPT config describe requires a variable name to query"
-                        echo "  Try `$RUNNER_SCRIPT config describe setting.name`"
+                        echo "  Try \`$RUNNER_SCRIPT config describe setting.name\`"
                         exit 1
                     fi
                     ;;
