@@ -420,7 +420,6 @@ case "$1" in
                     echo "Valid commands for $RUNNER_SCRIPT config are:"
                     echo "  $RUNNER_SCRIPT config effective"
                     echo "  $RUNNER_SCRIPT config describe VARIABLE"
-                    echo "  $RUNNER_SCRIPT config generate"
                     exit 1
                     ;;
             esac
