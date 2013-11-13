@@ -107,7 +107,7 @@ This is the primary script for controlling the $SCRIPT node.
     chkconfig
         Confirms whether the app.config is valid.
 
-    config { effective | describe VARIABLE}
+    config { effective | describe VARIABLE }
         prints configuration information for applications configured with
         cuttlefish enabled.
 
@@ -402,6 +402,29 @@ case "$1" in
             echo "$RUNNER_SCRIPT config is not available."
             exit 1
         else
+            # Let's validate the output
+
+            case "$1" in
+                effective) ## Great, pass through!
+                    ;;
+                describe)
+                    if [ $# -lt 2]; then
+                        echo "$RUNNER_SCRIPT config describe requires a variable name to query"
+                        echo "  Try `$RUNNER_SCRIPT config describe setting.name`"
+                        exit 1
+                    fi
+                    ;;
+                generate) ## Great, pass through!
+                    ;;
+                *) 
+                    echo "Valid commands for $RUNNER_SCRIPT config are:"
+                    echo "  $RUNNER_SCRIPT config effective"
+                    echo "  $RUNNER_SCRIPT config describe VARIABLE"
+                    echo "  $RUNNER_SCRIPT config generate"
+                    exit 1
+                    ;;
+            esac
+
             printf '%s \n' "`$CUTTLEFISH_COMMAND_PREFIX $@`"
         fi
         ;;
