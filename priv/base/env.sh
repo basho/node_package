@@ -83,6 +83,17 @@ if [ -z "$COOKIE_ARG" ]; then
     fi
 fi
 
+# Extract the target net_ticktime
+NET_TICKTIME_ARG=`grep '^\-kernel net_ticktime' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
+if [ -z "$NET_TICKTIME_ARG" ]; then
+    NET_TICKTIME=`egrep '^[ \t]*erlang.distribution.net_ticktime[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -n 1 | cut -d = -f 2`
+    if [ -z "$NET_TICKTIME" ]; then
+        NET_TICKTIME_ARG=""
+    else
+        NET_TICKTIME_ARG="-kernel net_ticktime $NET_TICKTIME"
+    fi
+fi
+
 # Optionally specify a NUMA policy
 NUMACTL_ARG="{{numactl_arg}}"
 if [ -z "$NUMACTL_ARG" ]
@@ -106,7 +117,7 @@ APP_VSN=${START_ERL#* }
 ERTS_PATH=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
-NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
+NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG $NET_TICKTIME_ARG"
 NODETOOL_LITE="$ERTS_PATH/escript $ERTS_PATH/nodetool"
 
 
