@@ -20,6 +20,9 @@ DAEMON=/usr/{{bin_or_sbin}}/$NAME
 lockfile=/var/lock/subsys/$NAME
 pidfile=/var/run/$NAME/$NAME.pid
 
+# Read configuration variable file if it is present
+[ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
+
 # Check for script, config and data dirs
 [ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
 [ -d /etc/$NAME ] || exit 0
