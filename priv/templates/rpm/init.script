@@ -7,6 +7,7 @@
 # processname: beam
 # config: /etc/{{package_install_name}}/app.config
 # config: /etc/{{package_install_name}}/vm.args
+# config: /etc/sysconfig/{{package_install_name}}
 #
 
 # Source function library.
@@ -24,6 +25,9 @@ pidfile=/var/run/$NAME/$NAME.pid
 [ -x /usr/{{bin_or_sbin}}/$NAME ] || exit 0
 [ -d /etc/$NAME ] || exit 0
 [ -d /var/lib/$NAME ] || exit 0
+
+# Read configuration variable file if it is present and readable
+[ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
 
 status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
 running=$?
