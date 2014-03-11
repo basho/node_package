@@ -232,16 +232,17 @@ node_up_check() {
 # Function to check if the config file is valid
 check_config() {
     if [ -z "$CUTTLEFISH" ]; then
-        # Note: we have added a parameter '-vm_args' to this. It appears redundant
-        # but it is not! the erlang vm allows us to access all arguments to the erl
-        # command EXCEPT '-args_file', so in order to get access to this file location
-        # from within the vm, we need to pass it in twice.
+        # Note: we have added a parameter '-vm_args' to this. It
+        # appears redundant but it is not! the erlang vm allows us to
+        # access all arguments to the erl command EXCEPT '-args_file',
+        # so in order to get access to this file location from within
+        # the vm, we need to pass it in twice.
         CONFIG_ARGS=" -config $RUNNER_ETC_DIR/app.config -args_file $RUNNER_ETC_DIR/vm.args -vm_args $RUNNER_ETC_DIR/vm.args "
     else
-        
         CONFIG_ARGS=`$CUTTLEFISH_COMMAND_PREFIX generate`
         if [ "$?" -ne 0 ]; then
             echoerr "Error generating config with cuttlefish"
+            echoerr "  run \`$RUNNER_SCRIPT config generate -l debug\` for more information."
             exit 1
         fi
     fi

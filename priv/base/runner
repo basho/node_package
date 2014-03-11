@@ -24,7 +24,7 @@ where «command» is one of the following:
     { help | start | stop | restart | reboot | ping | console | attach
       attach-direct | ertspath | chkconfig | escript | version | getpid
       top [-interval N] [-sort { reductions | memory | msg_q }] [-lines N] } |
-      config { effective | describe VARIABLE }
+      config { generate | effective | describe VARIABLE } [-l debug]
 
 Run \`$SCRIPT help\` for more detailed information.
 
@@ -107,9 +107,19 @@ This is the primary script for controlling the $SCRIPT node.
     chkconfig
         Confirms whether the app.config is valid.
 
-    config { effective | describe VARIABLE }
+        For applications configured with cuttlefish, this includes a call
+        to `config generate` also
+
+    config { generate | effective | describe VARIABLE } [-l debug]
         prints configuration information for applications configured with
-        cuttlefish enabled.
+        cuttlefish enabled. `-l debug` outputs more information for
+        troubleshooting.
+
+        generate
+            generates the app.config and vm.args files from the .conf file.
+            This is effectively what happens before start, but you'll need
+            to use `config generate -l debug` to see the cuttlefish debug
+            output.
 
         effective
             prints out the effective configuration in cuttlefish syntax
@@ -416,7 +426,7 @@ case "$1" in
                     ;;
                 generate) ## Great, pass through!
                     ;;
-                *) 
+                *)
                     echo "Valid commands for $RUNNER_SCRIPT config are:"
                     echo "  $RUNNER_SCRIPT config effective"
                     echo "  $RUNNER_SCRIPT config describe VARIABLE"
