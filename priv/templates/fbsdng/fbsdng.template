@@ -1,0 +1,25 @@
+%% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
+%% ex: ft=erlang ts=4 sw=4 et
+%%
+{variables, [
+             {package_name, "package_name"},
+             {package_install_name, "package_install_name"},
+             {package_install_user, "package_install_user"},
+             {package_install_user_desc, "package_install_user_desc"},
+             {package_install_group, "package_install_group"},
+             {bin_or_sbin, "bin"},
+             {freebsd_package_category, "db"},
+
+             %% Platform-specific installation paths
+             {platform_bin_dir,  "/usr/local/{{bin_or_sbin}}"},
+             {platform_data_dir, "/usr/local/{{package_install_name}}"},
+             {platform_etc_dir,  "/usr/local/etc/{{package_install_name}}"},
+             {platform_base_dir, "/usr/local/lib/{{package_install_name}}"},
+             {platform_lib_dir,  "/usr/local/lib/{{package_install_name}}/lib"},
+             {platform_log_dir,  "/var/log/{{package_install_name}}"}
+            ]
+}.
+{template, "Makefile", "Makefile"}.
+{template, "vars.config", "vars.config"}.
+{template, "+MANIFEST", "+MANIFEST"}.
+{template, "rc.d", "rc.d"}.
