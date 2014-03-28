@@ -12,11 +12,11 @@
 <         check_ulimit
 ---
 >         # Make sure we have access to enough file descriptors
->         ULIMIT_S=$(prctl -n process.max-file-descriptor -t basic -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         ULIMIT_S=$(prctl -n process.max-file-descriptor -t system -P $$ | awk '/max-file-descriptor/ { print $3 }')
 >         ULIMIT_H=$(prctl -n process.max-file-descriptor -t priv -P $$ | awk '/max-file-descriptor/ { print $3 }')
 >         if [ ${ULIMIT_S} -lt ${ULIMIT_H} ]; then
 >             echo "Trying to raise the file descriptor limit to maximum allowed."
->             prctl -n process.max-file-descriptor -t basic -v ${ULIMIT_H} $$ || true
+>             prctl -n process.max-file-descriptor -t system -v ${ULIMIT_H} $$ || true
 >         fi
 116a129
 > 
@@ -32,9 +32,9 @@
 <         check_ulimit
 ---
 >         # Make sure we have access to enough file descriptors
->         ULIMIT_S=$(prctl -n process.max-file-descriptor -t basic -P $$ | awk '/max-file-descriptor/ { print $3 }')
+>         ULIMIT_S=$(prctl -n process.max-file-descriptor -t system -P $$ | awk '/max-file-descriptor/ { print $3 }')
 >         ULIMIT_H=$(prctl -n process.max-file-descriptor -t priv -P $$ | awk '/max-file-descriptor/ { print $3 }')
 >         if [ ${ULIMIT_S} -lt ${ULIMIT_H} ]; then
 >             echo "Trying to raise the file descriptor limit to maximum allowed."
->             prctl -n process.max-file-descriptor -t basic -v ${ULIMIT_H} $$ || true
+>             prctl -n process.max-file-descriptor -t system -v ${ULIMIT_H} $$ || true
 >         fi
