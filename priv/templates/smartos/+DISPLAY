@@ -10,7 +10,7 @@ The primary directories are:
     {platform_lib_dir, "{{platform_lib_dir}}"}
     {platform_log_dir, "{{platform_log_dir}}"}
 
-These can be configured and changed in the {{platform_etc_dir}}/app.config.
+These can be configured and changed in the configuration files in {{platform_etc_dir}}
 
 Add {{platform_bin_dir}} to your path to run the {{#package_commands}}{{name}} {{/package_commands}} directly.
 
