@@ -32,4 +32,3 @@
 {template, "manifest131.xml", "manifest131.xml"}.
 {template, "epmd", "epmd"}.
 {template, "runner.patch", "runner.patch"}.
-{template, "env.patch", "env.patch"}.
