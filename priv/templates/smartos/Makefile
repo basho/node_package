@@ -131,10 +131,7 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 	   echo "@cwd /opt/local" >> +CONTENTS && \
 	   echo "@owner root" >> +CONTENTS && \
 	   echo "@group {{package_install_user}}" >> +CONTENTS && \
-	   find etc -type f >> +CONTENTS && \
-	   echo "@exec chmod o-r {{platform_etc_dir}}/vm.args" >> +CONTENTS && \
-	   echo "@exec chown -R root:{{package_install_group}} {{platform_etc_dir}}" >> +CONTENTS && \
-	   echo "@exec chmod -R g+r+X {{platform_etc_dir}}" >> +CONTENTS
+	   find etc -type f >> +CONTENTS
 
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@comment Packing lib files" >> +CONTENTS && \
