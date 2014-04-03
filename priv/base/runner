@@ -154,6 +154,9 @@ EOF
 
 # Call bootstrapd for daemon commands like start/stop/console
 bootstrapd() {
+    # Fail fast if they have no rights to mess around with pids
+    check_user_internal
+
     # Create PID directory if it does not exist before dropping permissiongs
     # to the runner user
     create_pid_dir

@@ -38,8 +38,13 @@ endif
 ifeq ($(OS),FreeBSD)
 OSNAME        = FreeBSD
 ARCH          = $(shell uname -m)
-PKGERDIR      = fbsd
 BUILDDIR      = fbsdbuild
+PKGNG         = $(shell uname -r | awk -F. '{ print ($$1 > 9) ? "true" : "false" }')
+ifeq ($(PKGNG),true)        # FreeBSD 10.0 or greater
+PKGERDIR      = fbsdng
+else                        # Older FreeBSD pkg_add 
+PKGERDIR      = fbsd
+endif
 endif
 
 ifeq ($(OS),SunOS)         # Solaris flavors

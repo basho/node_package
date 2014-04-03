@@ -197,17 +197,27 @@ create_pid_file() {
     fi
 }
 
-# Function to su into correct user
-check_user() {
+
+# Simple way to check the correct user and fail early
+check_user_internal() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        if [ "x$WHOAMI" = "xroot" ]; then
-            exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $*"
-        else
+        if [ "x$WHOAMI" != "xroot" ]; then
             echo "You need to be root or use sudo to run this command"
             exit 1
         fi
+    fi
+}
+
+# Function to su into correct user that is poorly named for historical
+# reasons (excuses)
+check_user() {
+    check_user_internal
+
+    # do not su again if we are already the runner user
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
+        exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $*"
     fi
 }
 
