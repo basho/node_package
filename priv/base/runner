@@ -151,18 +151,8 @@ EOF
 
 }
 
-# All commands must either call bootstrap or bootstrapd
-# Call bootstrap for non-daemon commands like ping or chkconfig
-# Call bootstrapd for daemon commands like start/stop/console
-bootstrap() {
-    # Make sure the user running this script is the owner and/or su to that user
-    check_user $@
-    ES=$?
-    if [ "$ES" -ne 0 ]; then
-        exit $ES
-    fi
-}
 
+# Call bootstrapd for daemon commands like start/stop/console
 bootstrapd() {
     # Create PID directory if it does not exist before dropping permissiongs
     # to the runner user
@@ -173,8 +163,12 @@ bootstrapd() {
         exit 1
     fi
 
-    # Now call bootstrap to drop to $RUNNER_USER
-    bootstrap $@
+    # Make sure the user running this script is the owner and/or su to that user
+    check_user $@
+    ES=$?
+    if [ "$ES" -ne 0 ]; then
+        exit $ES
+    fi
 }
 
 # Check the first argument for instructions
@@ -286,9 +280,6 @@ case "$1" in
         ;;
 
     ping)
-        # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap $@
-
         ## See if the VM is alive
         ping_node
         ES=$?
@@ -375,9 +366,6 @@ case "$1" in
         ;;
 
     top)
-        # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap $@
-
         # Make sure the local node IS running
         node_up_check
 
@@ -397,15 +385,12 @@ case "$1" in
         ;;
 
     chkconfig)
-        # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap $@
+        bootstrapd $@
 
         check_config
         ;;
 
     config)
-        bootstrap $@
-
         shift
         if [ -z "$CUTTLEFISH" ]; then
             echo "This application is not configured to use cuttlefish."
@@ -439,9 +424,6 @@ case "$1" in
         ;;
 
     escript)
-        # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap $@
-
         shift
         $ERTS_PATH/escript "$@"
         ES=$?
@@ -455,9 +437,6 @@ case "$1" in
         ;;
 
     getpid)
-        # Bootstrap command (simply drop to $RUNNER_USER)
-        bootstrap $@
-
         # Get the PID from nodetool
         get_pid
         ES=$?

@@ -52,7 +52,7 @@ echoerr() { echo "$@" 1>&2; }
 # Extract the target node name from node.args
 NAME_ARG=`egrep '^\-name' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$NAME_ARG" ]; then
-    NODENAME=`egrep '^[ \t]*nodename[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -n 1 | cut -d = -f 2`
+    NODENAME=`egrep '^[ \t]*nodename[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
     if [ -z "$NODENAME" ]; then
         echoerr "vm.args needs to have a -name parameter."
         echoerr "  -sname is not supported."
@@ -74,7 +74,7 @@ fi
 # Extract the target cookie
 COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$COOKIE_ARG" ]; then
-    COOKIE=`egrep '^[ \t]*distributed_cookie[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -n 1 | cut -d = -f 2`
+    COOKIE=`egrep '^[ \t]*distributed_cookie[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
     if [ -z "$COOKIE" ]; then
         echoerr "vm.args needs to have a -setcookie parameter."
         exit 1
@@ -86,7 +86,7 @@ fi
 # Extract the target net_ticktime
 NET_TICKTIME_ARG=`grep '^\-kernel net_ticktime' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$NET_TICKTIME_ARG" ]; then
-    NET_TICKTIME=`egrep '^[ \t]*erlang.distribution.net_ticktime[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -n 1 | cut -d = -f 2`
+    NET_TICKTIME=`egrep '^[ \t]*erlang.distribution.net_ticktime[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
     if [ -z "$NET_TICKTIME" ]; then
         NET_TICKTIME_ARG=""
     else
@@ -141,7 +141,7 @@ ping_node() {
 # read/write/delete .pid files during startup/shutdown
 create_pid_dir() {
     # Validate RUNNER_USER is set and they have permissions to write to /var/run
-    # Don't continue if we've already sudo'd to RUNNER_USER
+    # Don't continue if we've already su'd to RUNNER_USER
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         if [ -w $RUN_DIR ]; then
             mkdir -p $PID_DIR
@@ -202,12 +202,12 @@ check_user() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        type sudo > /dev/null 2>&1
-        if [ "$?" -ne 0 ]; then
-            echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
+        if [ "x$WHOAMI" = "xroot" ]; then
+            exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $*"
+        else
+            echo "You need to be root or use sudo to run this command"
             exit 1
         fi
-        exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT "$@"
     fi
 }
 

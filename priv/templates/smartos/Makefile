@@ -15,8 +15,6 @@ BUILD_STAGE_DIR = $(BUILDDIR)/$(PACKAGE_NAME_CLEAN)
 ##   1.6          0.9.8knb1      5.4nb1
 ##   1.8          0.9.8knb1      5.4nb1
 ##  13.1          1.0.1c         5.4nb1
-## ## Additional Deps for runner
-## sudo (same for all versions)
 ##
 ## ## SMF Manifest Mapping
 ##   SmartOS     Manifest File
@@ -110,7 +108,6 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 	@echo "Adding to packaging list $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)"
 	echo "@name $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)" >> plist
 	echo "@pkgcfl $(PACKAGE_NAME_CLEAN)-*" >> plist
-	echo "@pkgdep sudo-[0-9]*" >> plist
 	echo "@pkgdep $(OPENSSL_DEP)" >> plist
 	echo "@pkgdep $(NCURSES_DEP)" >> plist
 	echo "@pkgdep $(GCC_DEP)" >> plist
@@ -237,13 +234,9 @@ smartos_check:
 # Patch the runner script with SmartOS modifications
 patch_runner: buildrel
 	cp $(PKGERDIR)/runner.patch $(BUILDDIR)/rel/{{package_install_name}}/bin/
-	cp $(PKGERDIR)/env.patch $(BUILDDIR)/rel/{{package_install_name}}/lib/
 	cd $(BUILDDIR)/rel/{{package_install_name}}/bin && \
 	   patch -p0 {{package_install_name}} runner.patch
 	rm $(BUILDDIR)/rel/{{package_install_name}}/bin/runner.patch
-	cd $(BUILDDIR)/rel/{{package_install_name}}/lib && \
-	patch -p0 env.sh env.patch
-	rm $(BUILDDIR)/rel/{{package_install_name}}/lib/env.patch
 
 
 # Build the release we need to package
