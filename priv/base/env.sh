@@ -217,7 +217,21 @@ check_user() {
 
     # do not su again if we are already the runner user
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $*"
+        # Escape any double quotes that might be in the command line
+        # args. Without this, passing something like JSON on the command
+        # line will get stripped.
+        #  Ex:
+        #     riak-admin bucket-type create mytype '{"props": {"n_val": 4}}'
+        #  would become
+        #     riak-admin bucket-type create mytype {props: {n_val: 4}}
+        #  after the arguments were passed into the new shell during exec su
+        #
+        # So this regex finds any '"' and replaces with '\"'
+        ESCAPED_ARGS=`echo "$@" | sed -e 's/\("\)/\\\\\1/g'`
+
+        # This will drop priviledges into the runner user
+        # It exec's in a new shell and the current shell will exit
+        exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $ESCAPED_ARGS"
     fi
 }
 
