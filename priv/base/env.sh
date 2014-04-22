@@ -226,8 +226,8 @@ check_user() {
         #     riak-admin bucket-type create mytype {props: {n_val: 4}}
         #  after the arguments were passed into the new shell during exec su
         #
-        # So this regex finds any '"' and replaces with '\"'
-        ESCAPED_ARGS=`echo "$@" | sed -e 's/\("\)/\\\\\1/g'`
+        # So this regex finds any '"', '{', or '}' and prepends with a '\'
+        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([{}"]\)/\\\\\1/g'`
 
         # This will drop priviledges into the runner user
         # It exec's in a new shell and the current shell will exit
