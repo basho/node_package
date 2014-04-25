@@ -29,6 +29,13 @@ pidfile=/var/run/$NAME/$NAME.pid
 # Read configuration variable file if it is present and readable
 [ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
 
+# `service` strips all environmental VARS so
+# if no HOME was set in /etc/default/$NAME then set one here
+# to the data directory for erlexec's sake
+if [ -z "$HOME" ]; then
+    export HOME={{platform_data_dir}}
+fi
+
 status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
 running=$?
 
