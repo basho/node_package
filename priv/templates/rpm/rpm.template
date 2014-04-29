@@ -17,4 +17,5 @@
 }.
 {template, "Makefile", "Makefile"}.
 {template, "specfile", "specfile"}.
-{template, "init.script", "init.script"}.
+{template, "rhel.init.script", "rhel.init.script"}.
+{template, "suse.init.script", "suse.init.script"}.

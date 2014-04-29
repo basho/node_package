@@ -2,16 +2,18 @@
 #
 # {{package_name}}
 #
-# chkconfig: 2345 80 30
-# description: {{package_shortdesc}}
-# processname: beam
-# config: /etc/{{package_install_name}}/app.config
-# config: /etc/{{package_install_name}}/vm.args
-# config: /etc/sysconfig/{{package_install_name}}
-#
+### BEGIN INIT INFO
+# Provides:          {{package_name}}
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: {{package_shortdesc}}
+# Description:       {{package_desc}}
+### END INIT INFO
 
-# Source function library.
-. /etc/rc.d/init.d/functions
+# Source the LSB function library.
+. /lib/lsb/init-functions
 
 RETVAL=0
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
@@ -30,14 +32,16 @@ pidfile=/var/run/$NAME/$NAME.pid
 [ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
 
 # `service` strips all environmental VARS so
-# if no HOME was set in /etc/default/$NAME then set one here
+# if no HOME was set in /etc/sysconfig/$NAME then set one here
 # to the data directory for erlexec's sake
 if [ -z "$HOME" ]; then
     export HOME={{platform_data_dir}}
 fi
 
-status -p $pidfile -l $(basename $lockfile) $NAME >/dev/null 2>&1
-running=$?
+# Checks the status of a node
+do_status() {
+    $DAEMON ping >/dev/null 2>&1 && return 0 || return 3
+}
 
 check_pid_status() {
     pid=$(ps ax | grep beam.smp | grep "\-progname $NAME" | awk '{print $1}')
@@ -50,22 +54,22 @@ check_pid_status() {
     fi
 }
 
-start() {
+do_start() {
     # Start daemons.
     echo -n $"Starting {{package_install_name}}: "
     $DAEMON start
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
         touch $lockfile
-        success
+        log_success_msg
     else
-        failure $"$NAME start"
+        log_failure_msg $"$NAME start"
     fi
     echo
     return $RETVAL
 }
 
-stop() {
+do_stop() {
     # Stop daemon.
     echo -n $"Shutting down {{package_install_name}}: "
     $DAEMON stop 2>/dev/null
@@ -79,15 +83,15 @@ stop() {
     done
     if [ $RETVAL -eq 1 ]; then
         rm -f $lockfile $pidfile
-        success
+        log_success_msg
         echo && return 0
     else
-        failure $"$NAME stop"
+        log_failure_msg $"$NAME stop"
         echo && return 1
     fi
 }
 
-hardstop() {
+do_hardstop() {
     echo -n $"Shutting down $NAME: "
     su - {{package_install_user}} -c "ps -ef | grep beam.smp | grep '\-progname $NAME ' | grep -v grep | awk '{print \$2}' | xargs kill -9"
     for n in $(seq 1 10); do
@@ -100,10 +104,10 @@ hardstop() {
     done
     if [ $RETVAL -eq 1 ]; then
         rm -f $lockfile $pidfile
-        success
+        log_success_msg
         echo && return 0
     else
-        failure $"$NAME hardstop"
+        log_failure_msg $"$NAME hardstop"
         echo && return 1
     fi
 }
@@ -111,12 +115,12 @@ hardstop() {
 # See how we were called.
 case "$1" in
     start)
-        [ $running -eq 0 ] && exit 0
-        start
+        do_status && exit 0
+        do_start
         ;;
     stop)
-        if [ $running -eq 0 ]; then
-            stop
+        if do_status; then
+            do_stop
         else
             check_pid_status
             RETVAL=$?
@@ -126,26 +130,26 @@ case "$1" in
             exit 0
         fi
         ;;
-    restart|force-reload)
-        [ $running -eq 0 ] && stop
-        start
+    restart|reload|force-reload)
+        do_status && do_stop
+        do_start
         ;;
     hardstop)
-        [ $running -eq 0 ] || exit 0
-        hardstop
+        do_status || exit 0
+        do_hardstop
         ;;
     condrestart|try-restart)
-        [ $running -eq 0 ] || exit 0
-        restart
+        do_status && do_stop || exit 0
+        do_start
         ;;
     status)
-        status -p $pidfile -l $(basename $lockfile) $NAME
+        do_status && echo $"$NAME is running" && exit 0 || echo $"$NAME is stopped" && exit 3
         ;;
     ping)
         $DAEMON ping || exit $?
         ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|force-reload|hardstop|condrestart|try-restart|status|ping}"
+        echo $"Usage: $0 {start|stop|restart|reload|force-reload|hardstop|condrestart|try-restart|status|ping}"
         exit 1
 esac
 
