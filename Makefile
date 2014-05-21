@@ -14,8 +14,9 @@ ifeq ($(OS),Linux)
 ARCH          = $(shell uname -m)
 ISRPM         = $(shell cat /etc/redhat-release 2> /dev/null)
 ISDEB         = $(shell cat /etc/debian_version 2> /dev/null)
+ISSLES        = $(shell cat /etc/SuSE-release 2> /dev/null)
 ifneq ($(ISRPM),)
-OSNAME= RedHat
+OSNAME        = RedHat
 PKGERDIR      = rpm
 BUILDDIR      = rpmbuild
 else
@@ -23,6 +24,12 @@ ifneq ($(ISDEB),)
 OSNAME        = Debian
 PKGERDIR      = deb
 BUILDDIR      = debuild
+else
+ifneq ($(ISSLES),)
+OSNAME        = SLES
+PKGERDIR      = rpm
+BUILDDIR      = rpmbuild
+endif  # SLES
 endif  # deb
 endif  # rpm
 endif  # linux
@@ -42,7 +49,7 @@ BUILDDIR      = fbsdbuild
 PKGNG         = $(shell uname -r | awk -F. '{ print ($$1 > 9) ? "true" : "false" }')
 ifeq ($(PKGNG),true)        # FreeBSD 10.0 or greater
 PKGERDIR      = fbsdng
-else                        # Older FreeBSD pkg_add 
+else                        # Older FreeBSD pkg_add
 PKGERDIR      = fbsd
 endif
 endif
