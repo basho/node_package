@@ -133,6 +133,10 @@ fi
 
 # Ping node without stealing stdin
 ping_node() {
+    if [ "x$WHOAMI" = "xroot" ]; then
+        export HOME=/root
+    fi
+
     $NODETOOL ping < /dev/null
 }
 
