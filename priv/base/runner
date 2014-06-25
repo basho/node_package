@@ -266,6 +266,8 @@ case "$1" in
         ;;
 
     ping)
+        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
+        bootstrapd $@
         ## See if the VM is alive
         ping_node
         ES=$?
