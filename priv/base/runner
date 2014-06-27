@@ -99,7 +99,8 @@ This is the primary script for controlling the $SCRIPT node.
         cannot be reached. Exit \`$SCRIPT attach-direct\` by pressing Ctrl-D.
 
     chkconfig
-        Confirms whether the app.config is valid.
+        Confirms whether the {{package_name}}.conf and advanced.config is
+        valid.
 
         For applications configured with cuttlefish, this includes a call
         to \`config generate\` also.
