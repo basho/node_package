@@ -212,8 +212,13 @@ check_user_internal() {
 
 # Function to su into correct user that is poorly named for historical
 # reasons (excuses)
+# This also serves as an entry point to most functions
 check_user() {
     check_user_internal
+
+    # This call must be before the su call, when the user is dropped
+    # optional config will be brought in if available
+    load_default_os_config
 
     # do not su again if we are already the runner user
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
@@ -232,6 +237,18 @@ check_user() {
         # This will drop priviledges into the runner user
         # It exec's in a new shell and the current shell will exit
         exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $ESCAPED_ARGS"
+    fi
+}
+
+# Function to load default config files based on OS
+load_default_os_config() {
+    # Only run this if we already dropped to the runner user
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" = "x$RUNNER_USER" ]); then
+        # Common config file on Debian-like systems
+        [ -r /etc/default/$RUNNER_SCRIPT ] && . /etc/default/$RUNNER_SCRIPT
+
+        # Common config file on RPM-like systems
+        [ -r /etc/sysconfig/$RUNNER_SCRIPT ] && . /etc/sysconfig/$RUNNER_SCRIPT
     fi
 }
 
