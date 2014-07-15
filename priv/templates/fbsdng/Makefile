@@ -56,7 +56,7 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	find usr -type f | while read file ; do \
 	    mode=$$(stat -f%p "$$file" | cut -c 3-) && \
 	    sum=$$(sha256 -q $$file) && \
-	    echo "  /$$file: { sum: $$sum, perm: $$mode, uname: root, gname: wheel }" >> +MANIFEST; done
+	    echo "  /$$file: { sum: $$sum, perm: $$mode, uname: {{package_install_user}}, gname: {{package_install_group}}" >> +MANIFEST; done
 
 	@cd $(BUILD_STAGE_DIR) && \
 		echo "directories:" >> +MANIFEST && \
