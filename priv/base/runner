@@ -222,6 +222,9 @@ do_start() {
 }
 
 do_stop() {
+    # Note: We don't ship with a -shutdown_time vm argument in release
+    #       packages, so there's no hard ceiling.
+    echo "Gracefully stopping may take a few minutes."
     get_pid
     ES=$?
     if [ "$ES" -ne 0 ] || [ -z $PID ]; then
