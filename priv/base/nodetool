@@ -63,30 +63,9 @@ main(Args) ->
             io:format("~p\n", [rpc:call(TargetNode, init, restart, [], RpcTimeout)]);
         ["reboot"] ->
             io:format("~p\n", [rpc:call(TargetNode, init, reboot, [], RpcTimeout)]);
-        ["rpc", Module, Function] ->
-            case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
-                          [], RpcTimeout) of
-                ok ->
-                    ok;
-                {badrpc, Reason} ->
-                    io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
-                    halt(1);
-                _ ->
-                    halt(1)
-            end;
         ["rpc", Module, Function | RpcArgs] ->
             case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
                           [RpcArgs], RpcTimeout) of
-                ok ->
-                    ok;
-                {badrpc, Reason} ->
-                    io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
-                    halt(1);
-                _ ->
-                    halt(1)
-            end;
-        ["rpc_infinity", Module, Function] ->
-            case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function), [], infinity) of
                 ok ->
                     ok;
                 {badrpc, Reason} ->
@@ -188,13 +167,13 @@ chkconfig(File) ->
             io:format("ok\n"),
             halt(0);
         {error, {Line, Mod, Term}} ->
-            io:format(standard_error,
-                      ["Error on line ",
+            io:format(standard_error, 
+                      ["Error on line ", 
                        file:format_error({Line, Mod, Term}), "\n"], []),
             halt(1);
         {error, R} ->
             io:format(standard_error,
-                      ["Error reading config file: ",
+                      ["Error reading config file: ", 
                        file:format_error(R), "\n"], []),
             halt(1)
     end.
