@@ -92,7 +92,7 @@ your application's =vars.config=.
 **** Optional Variables
  - =runner_ulimit_warn= - The runner script will warn if `ulimit -n` is less than
    this value.  This defaults to 4096 in all packages.
- - =platform_patch_dir= - Directory to include in erlang's load path to allow for
+ - =package_patch_dir= - Directory to include in erlang's load path to allow for
    patches to be hotloaded.  By default this will be in the =platform_lib_dir=
    (ex: "basho-patches")
  - =runner_user= - The username to run the application as
