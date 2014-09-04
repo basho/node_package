@@ -3,6 +3,9 @@
 # Variable that will get replaced by the Makefile dirs_create target
 CREATE_DIRS="%DIRS_CREATE%"
 
+# Config files that could possibly be installed
+CONFIG_FILES="vm.args app.config advanced.config {{cuttlefish_conf}}"
+
 if [ "$2" = "PRE-INSTALL" ]; then
     if ! getent group "{{package_install_group}}" 2>/dev/null 1>&2; then
         groupadd {{package_install_group}}
@@ -26,16 +29,13 @@ if [ "$2" = "PRE-INSTALL" ]; then
     done
 
     # Backup config files if they already exist
-    if [ -f {{platform_etc_dir}}/vm.args ]; then
-        echo "Config file exists: backing up {{platform_etc_dir}}/vm.args to {{platform_etc_dir}}/vm.args.bak"
-        cp {{platform_etc_dir}}/vm.args {{platform_etc_dir}}/vm.args.bak
-    fi
-
-    if [ -f {{platform_etc_dir}}/app.config ]; then
-        echo "Config file exists: backing up {{platform_etc_dir}}/app.config to {{platform_etc_dir}}/app.config.bak"
-        cp {{platform_etc_dir}}/app.config {{platform_etc_dir}}/app.config.bak
-    fi
-
+    # These will be moved back to their proper names in the post-install
+    for i in $CONFIG_FILES; do
+        if [ -f {{platform_etc_dir}}/$i ]; then
+            echo "Config file exists: backing up {{platform_etc_dir}}/$i to {{platform_etc_dir}}/$i.bak"
+            mv {{platform_etc_dir}}/$i {{platform_etc_dir}}/$i.bak
+        fi
+    done
 fi
 
 if [ "$2" = "POST-INSTALL" ]; then
@@ -49,14 +49,36 @@ if [ "$2" = "POST-INSTALL" ]; then
     # Ensure proper ownership of lib directory
     chown -R {{package_install_user}}:{{package_install_group}} {{platform_lib_dir}}
 
+    # Treat new configuration files as new if old ones already exist
+    # if FILE and FILE.bak both exist, move FILE to FILE.new and FILE.bak to FILE
+    # If there is just a FILE.bak and no newer file, copy the .bak file back to FILE
+    # this supports the changing of configuration file names on upgrades
+    for i in $CONFIG_FILES; do
+        if [ -f {{platform_etc_dir}}/$i -a -f {{platform_etc_dir}}/$i.bak ]; then
+            echo "Config file already exists, creating new configuration file as {{platform_etc_dir}}/$i.new"
+            mv {{platform_etc_dir}}/$i {{platform_etc_dir}}/$i.new
+            mv {{platform_etc_dir}}/$i.bak {{platform_etc_dir}}/$i
+        elif [ -f {{platform_etc_dir}}/$i.bak -a ! -f {{platform_etc_dir}}/$i ]; then
+            mv {{platform_etc_dir}}/$i.bak {{platform_etc_dir}}/$i
+        fi
+    done
+
     # Ensure proper ownership of etc directory
     # This shouldn't have to happen in the post-install, but
     # there is some non-deterministic stuff happening during
     # install on SmartOS that causes wrong ownership.
     chown -R root:{{package_install_group}} {{platform_etc_dir}}
+
+    for i in $CONFIG_FILES; do
+        if [ -f {{platform_etc_dir}}/$i ]; then
+            chmod 640 {{platform_etc_dir}}/$i
+        fi
+    done
+
     chmod -R g+r+X {{platform_etc_dir}}
 
-    # Create {{package_install_name}} project
+
+    # Create {{package_install_name}} project to handle custom system settings
     if ! projects -l {{package_install_name}}  >/dev/null 2>&1; then
         projadd -U {{package_install_user}} -G {{package_install_group}} \
         -K "process.max-file-descriptor=(priv,262140,deny)" \

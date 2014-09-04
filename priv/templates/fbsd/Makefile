@@ -37,7 +37,7 @@ build: packing_list_files templates
 	mv $(TARNAME).gz ../../packages/$(PKGNAME)
 
 	cd ../packages && \
-		for tarfile in `ls *.tbz`; do \
+		for tarfile in *.tbz; do \
 		shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	; done
 

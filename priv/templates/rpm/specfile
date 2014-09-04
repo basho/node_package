@@ -1,8 +1,22 @@
-# _revision, _release, and _version should be defined on the rpmbuild command
-# line like so:
-#
-# --define "_version 0.9.1.19.abcdef" --define "_release 7" \
-# --define "_revision 0.9.1-19-abcdef"
+## -------------------------------------------------------------------
+##
+## Copyright (c) 2014 Basho Technologies, Inc.
+##
+## This file is provided to you under the Apache License,
+## Version 2.0 (the "License"); you may not use this file
+## except in compliance with the License.  You may obtain
+## a copy of the License at
+##
+##   http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing,
+## software distributed under the License is distributed on an
+## "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+## KIND, either express or implied.  See the License for the
+## specific language governing permissions and limitations
+## under the License.
+##
+## -------------------------------------------------------------------
 
 Name: {{package_name}}
 Version: %{_version}
@@ -102,13 +116,13 @@ cp -R %{relpath}/data/* \
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
 install -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
 
-
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
 export QA_RPATHS=3
 
 
 %pre
+# Pre-install script
 if ! getent group {{package_install_group}} >/dev/null 2>&1; then
    groupadd -r {{package_install_group}}
 fi
@@ -119,15 +133,37 @@ else
    useradd -r -g {{package_install_group}} \
            --home %{_localstatedir}/lib/{{package_install_name}} \
            --comment "{{package_install_user_desc}}" \
+           --shell /bin/bash \
            {{package_install_user}}
 fi
 
+
 %post
-# Fixup perms for SELinux (if it is enabled)
-selinuxenabled && find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
+# Post Installation Script
+
+# For distros with SELinux (RHEL/Fedora)
+if [ `which selinuxenabled > /dev/null 2>&1` ] ; then
+   # Fixup perms for SELinux (if it is enabled)
+   selinuxenabled && find %{_localstatedir}/lib/{{package_install_name}} -name "*.so" -exec chcon -t textrel_shlib_t {} \;
+fi
 
 # Make sure shell library file is readable
 chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
+
+# Add application to chkconfig, but default to "off"
+/sbin/chkconfig --add {{package_install_name}}
+/sbin/chkconfig {{package_install_name}} off
+
+
+%preun
+# Pre-uninstall script
+
+# Only on uninstall, not upgrades
+if [ "$1" = 0 ] ; then
+   /sbin/service {{package_install_name}} stop > /dev/null 2>&1
+   /sbin/chkconfig --del {{package_install_name}}
+fi
+exit 0
 
 
 # Man pages are optional and might be missing, read from file

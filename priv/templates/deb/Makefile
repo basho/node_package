@@ -9,10 +9,11 @@ default:
 		-e REVISION=$(PKG_VERSION) \
 		-e RELEASE=$(PKG_BUILD) \
                 -e REBAR=$(REBAR) \
+		{{debuild_extra_options}} \
 		-uc -us
 	mkdir -p ../packages
 	cd .. && mv *$(PKG_VERSION)-$(PKG_BUILD)_*.deb packages
 	cd ../packages && \
-		for debfile in `ls *.deb`; do \
+		for debfile in *.deb; do \
 			sha256sum $${debfile} > $${debfile}.sha \
 		; done

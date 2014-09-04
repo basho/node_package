@@ -41,44 +41,70 @@ if [ -z "$ULIMIT_WARN" ]; then
     ULIMIT_WARN=4096
 fi
 
-## Are we using cuttlefish (http://github.com/basho/cuttlefish)
-## for configuration
-CUTTLEFISH="{{cuttlefish}}"
-
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
 
-WHOAMI=$(whoami)
+WHOAMI=`whoami`
 
 # Echo to stderr on errors
 echoerr() { echo "$@" 1>&2; }
 
 # Extract the target node name from node.args
-NAME_ARG=`egrep '^\-s?name' $RUNNER_ETC_DIR/vm.args`
+NAME_ARG=`egrep '^\-name' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$NAME_ARG" ]; then
-    echoerr "vm.args needs to have either -name or -sname parameter."
-    exit 1
-fi
-
-# Learn how to specify node name for connection from remote nodes
-echo "$NAME_ARG" | grep '^-sname' > /dev/null 2>&1
-if [ "X$?" = "X0" ]; then
-    NAME_PARAM="-sname"
-    NAME_HOST=""
-else
-    NAME_PARAM="-name"
-    echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
-    if [ "X$?" = "X0" ]; then
-        NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
+    NODENAME=`egrep '^[ \t]*nodename[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
+    if [ -z "$NODENAME" ]; then
+        echoerr "vm.args needs to have a -name parameter."
+        echoerr "  -sname is not supported."
+        exit 1
     else
-        NAME_HOST=""
+        NAME_ARG="-name ${NODENAME# *}"
     fi
 fi
 
+# Learn how to specify node name for connection from remote nodes
+NAME_PARAM="-name"
+echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
+if [ "X$?" = "X0" ]; then
+    NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
+else
+    NAME_HOST=""
+fi
+
 # Extract the target cookie
-COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args`
+COOKIE_ARG=`grep '^\-setcookie' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$COOKIE_ARG" ]; then
-    echoerr "vm.args needs to have a -setcookie parameter."
+    COOKIE=`egrep '^[ \t]*distributed_cookie[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
+    if [ -z "$COOKIE" ]; then
+        echoerr "vm.args needs to have a -setcookie parameter."
+        exit 1
+    else
+        COOKIE_ARG="-setcookie $COOKIE"
+    fi
+fi
+
+# Extract the target net_ticktime
+NET_TICKTIME_ARG=`grep '^\-kernel net_ticktime' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
+if [ -z "$NET_TICKTIME_ARG" ]; then
+    NET_TICKTIME=`egrep '^[ \t]*erlang.distribution.net_ticktime[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
+    if [ -z "$NET_TICKTIME" ]; then
+        NET_TICKTIME_ARG=""
+    else
+        NET_TICKTIME_ARG="-kernel net_ticktime $NET_TICKTIME"
+    fi
+fi
+
+# Optionally specify a NUMA policy
+NUMACTL_ARG="{{numactl_arg}}"
+if [ -z "$NUMACTL_ARG" ]
+then
+    NUMACTL=""
+# Confirms `numactl` is in the path and validates $NUMACTL_ARG
+elif which numactl > /dev/null 2>&1 && numactl $NUMACTL_ARG ls /dev/null > /dev/null 2>&1
+then
+    NUMACTL="numactl $NUMACTL_ARG"
+else
+    echoerr "NUMACTL_ARG is specified in env.sh but numactl is not installed or NUMACTL_ARG is invalid."
     exit 1
 fi
 
@@ -91,8 +117,19 @@ APP_VSN=${START_ERL#* }
 ERTS_PATH=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
-NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG"
+NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NAME_ARG $COOKIE_ARG $NET_TICKTIME_ARG"
 NODETOOL_LITE="$ERTS_PATH/escript $ERTS_PATH/nodetool"
+
+
+## Are we using cuttlefish (http://github.com/basho/cuttlefish)
+## for configuration. This needs to come after the $ERTS_PATH
+## definition
+CUTTLEFISH="{{cuttlefish}}"
+if [ -z "$CUTTLEFISH" ]; then
+    CUTTLEFISH_COMMAND_PREFIX=""
+else
+    CUTTLEFISH_COMMAND_PREFIX="$ERTS_PATH/escript $ERTS_PATH/cuttlefish -e $RUNNER_ETC_DIR -s $RUNNER_LIB_DIR -d {{platform_data_dir}}/generated.configs -c $RUNNER_ETC_DIR/{{cuttlefish_conf}}"
+fi
 
 # Ping node without stealing stdin
 ping_node() {
@@ -104,7 +141,7 @@ ping_node() {
 # read/write/delete .pid files during startup/shutdown
 create_pid_dir() {
     # Validate RUNNER_USER is set and they have permissions to write to /var/run
-    # Don't continue if we've already sudo'd to RUNNER_USER
+    # Don't continue if we've already su'd to RUNNER_USER
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
         if [ -w $RUN_DIR ]; then
             mkdir -p $PID_DIR
@@ -160,17 +197,58 @@ create_pid_file() {
     fi
 }
 
-# Function to su into correct user
-check_user() {
+
+# Simple way to check the correct user and fail early
+check_user_internal() {
     # Validate that the user running the script is the owner of the
     # RUN_DIR.
     if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        type sudo > /dev/null 2>&1
-        if [ "$?" -ne 0 ]; then
-            echoerr "sudo doesn't appear to be installed and your EUID isn't $RUNNER_USER" 1>&2
+        if [ "x$WHOAMI" != "xroot" ]; then
+            echo "You need to be root or use sudo to run this command"
             exit 1
         fi
-        exec sudo -H -u $RUNNER_USER -i $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $@
+    fi
+}
+
+# Function to su into correct user that is poorly named for historical
+# reasons (excuses)
+# This also serves as an entry point to most functions
+check_user() {
+    check_user_internal
+
+    # This call must be before the su call, when the user is dropped
+    # optional config will be brought in if available
+    load_default_os_config
+
+    # do not su again if we are already the runner user
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
+        # Escape any double quotes that might be in the command line
+        # args. Without this, passing something like JSON on the command
+        # line will get stripped.
+        #  Ex:
+        #     riak-admin bucket-type create mytype '{"props": {"n_val": 4}}'
+        #  would become
+        #     riak-admin bucket-type create mytype {props: {n_val: 4}}
+        #  after the arguments were passed into the new shell during exec su
+        #
+        # So this regex finds any '"', '{', or '}' and prepends with a '\'
+        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([{}"]\)/\\\\\1/g'`
+
+        # This will drop priviledges into the runner user
+        # It exec's in a new shell and the current shell will exit
+        exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $ESCAPED_ARGS"
+    fi
+}
+
+# Function to load default config files based on OS
+load_default_os_config() {
+    # Only run this if we already dropped to the runner user
+    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" = "x$RUNNER_USER" ]); then
+        # Common config file on Debian-like systems
+        [ -r /etc/default/$RUNNER_SCRIPT ] && . /etc/default/$RUNNER_SCRIPT
+
+        # Common config file on RPM-like systems
+        [ -r /etc/sysconfig/$RUNNER_SCRIPT ] && . /etc/sysconfig/$RUNNER_SCRIPT
     fi
 }
 
@@ -195,17 +273,28 @@ node_up_check() {
 # Function to check if the config file is valid
 check_config() {
     if [ -z "$CUTTLEFISH" ]; then
-        CONFIG_FILE="$RUNNER_ETC_DIR/app.config"
+        # Note: we have added a parameter '-vm_args' to this. It
+        # appears redundant but it is not! the erlang vm allows us to
+        # access all arguments to the erl command EXCEPT '-args_file',
+        # so in order to get access to this file location from within
+        # the vm, we need to pass it in twice.
+        CONFIG_ARGS=" -config $RUNNER_ETC_DIR/app.config -args_file $RUNNER_ETC_DIR/vm.args -vm_args $RUNNER_ETC_DIR/vm.args "
     else
-        cuttlefish
+        CONFIG_ARGS=`$CUTTLEFISH_COMMAND_PREFIX generate`
+        if [ "$?" -ne 0 ]; then
+            echoerr "Error generating config with cuttlefish"
+            echoerr "  run \`$RUNNER_SCRIPT config generate -l debug\` for more information."
+            exit 1
+        fi
     fi
 
-    MUTE=`$NODETOOL_LITE chkconfig $CONFIG_FILE`
+    MUTE=`$NODETOOL_LITE chkconfig $CONFIG_ARGS`
     if [ "$?" -ne 0 ]; then
-        echoerr "Error reading $CONFIG_FILE"
+        echoerr "Error reading $CONFIG_ARGS"
         exit 1
     fi
     echo "config is OK"
+    echo $CONFIG_ARGS
 }
 
 # Function to check if ulimit is properly set
@@ -236,14 +325,4 @@ get_pid() {
     fi
 
     return 0
-}
-
-# This guy sets $CONFIG_FILE to the absolute filename to the app.config
-# generated by cuttlefish
-cuttlefish() {
-    CONFIG_FILE=`$ERTS_PATH/cuttlefish -e $RUNNER_ETC_DIR -s $RUNNER_LIB_DIR -c $RUNNER_ETC_DIR/{{cuttlefish_conf}}`
-    if [ "$?" -ne 0 ]; then
-        echoerr "Error generating config with cuttlefish, there should be logs"
-        exit 1
-    fi
 }

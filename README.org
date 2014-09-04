@@ -35,6 +35,8 @@ application.
    (ex: app-5.4-1 <- the '1')
  - =ERLANG_BIN= - (Default: `which erl`) Sets the path of the current erlang
    binary
+ - =DEPS_DIR= - (Default: deps) Sets the deps directory of the project, most
+   projects uses 'deps'.  Change this if something different is used.
 
 ** Package and Script Variables
 
@@ -78,6 +80,9 @@ The following variables describe a package and should be put in the
  - =freebsd_package_category= - The subsection the package is filed under in FreeBSD
    (ex: in this line, "ORIGIN: db/riak" 'db' would be the package_category)
    This defaults to 'db' if not specified for lack of a better default.
+ - =debuild_extra_options= - This is added to pass extra flags to debuild
+ - =cuttlefish_conf= - If your app uses cuttlefish for configuration, this
+   is the filename you are using for configuration (ex: "riak.conf")
 
 *** Script Variables
 The following variables are used in the =env.sh= and =runner= scripts which can
@@ -93,6 +98,10 @@ your application's =vars.config=.
  - =runner_user= - The username to run the application as
  - =runner_wait_process= - Registered process to wait for to consider start a
    success
+ - =cuttlefish_conf= - This is a rare case of a repeated variable since it is
+   used in packaging and the main runner scripts, you should have this set
+   in both the vars.config and pkg.vars.config (sadly this was the cleanest
+   solution).
 
 *** Templating Order
 There are several templating steps done in node_package:

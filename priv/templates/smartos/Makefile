@@ -15,8 +15,6 @@ BUILD_STAGE_DIR = $(BUILDDIR)/$(PACKAGE_NAME_CLEAN)
 ##   1.6          0.9.8knb1      5.4nb1
 ##   1.8          0.9.8knb1      5.4nb1
 ##  13.1          1.0.1c         5.4nb1
-## ## Additional Deps for runner
-## sudo (same for all versions)
 ##
 ## ## SMF Manifest Mapping
 ##   SmartOS     Manifest File
@@ -94,7 +92,7 @@ build: packing_list_files dirs_file
 	mv $(TARNAME).gz ../../packages/$(PKGNAME)
 
 	cd ../packages && \
-		for tarfile in `ls *.tgz`; do \
+		for tarfile in *.tgz; do \
 		shasum -a 256 $${tarfile} > $${tarfile}.sha \
 	; done
 
@@ -110,7 +108,6 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 	@echo "Adding to packaging list $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)"
 	echo "@name $(PACKAGE_NAME_CLEAN)-$(PKG_VERSION)" >> plist
 	echo "@pkgcfl $(PACKAGE_NAME_CLEAN)-*" >> plist
-	echo "@pkgdep sudo-[0-9]*" >> plist
 	echo "@pkgdep $(OPENSSL_DEP)" >> plist
 	echo "@pkgdep $(NCURSES_DEP)" >> plist
 	echo "@pkgdep $(GCC_DEP)" >> plist
@@ -131,10 +128,7 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 	   echo "@cwd /opt/local" >> +CONTENTS && \
 	   echo "@owner root" >> +CONTENTS && \
 	   echo "@group {{package_install_user}}" >> +CONTENTS && \
-	   find etc -type f >> +CONTENTS && \
-	   echo "@exec chmod o-r {{platform_etc_dir}}/vm.args" >> +CONTENTS && \
-	   echo "@exec chown -R root:{{package_install_group}} {{platform_etc_dir}}" >> +CONTENTS && \
-	   echo "@exec chmod -R g+r+X {{platform_etc_dir}}" >> +CONTENTS
+	   find etc -type f >> +CONTENTS
 
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@comment Packing lib files" >> +CONTENTS && \
@@ -240,13 +234,9 @@ smartos_check:
 # Patch the runner script with SmartOS modifications
 patch_runner: buildrel
 	cp $(PKGERDIR)/runner.patch $(BUILDDIR)/rel/{{package_install_name}}/bin/
-	cp $(PKGERDIR)/env.patch $(BUILDDIR)/rel/{{package_install_name}}/lib/
 	cd $(BUILDDIR)/rel/{{package_install_name}}/bin && \
 	   patch -p0 {{package_install_name}} runner.patch
 	rm $(BUILDDIR)/rel/{{package_install_name}}/bin/runner.patch
-	cd $(BUILDDIR)/rel/{{package_install_name}}/lib && \
-	patch -p0 env.sh env.patch
-	rm $(BUILDDIR)/rel/{{package_install_name}}/lib/env.patch
 
 
 # Build the release we need to package

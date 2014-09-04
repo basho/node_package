@@ -8,7 +8,6 @@ Homepage: {{vendor_url}}
 
 Package: {{package_name}}
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, adduser, logrotate, sudo, {{deb_depends}}
+Depends: ${misc:Depends}, ${shlibs:Depends}, adduser, logrotate, {{deb_depends}}
 Description: {{package_shortdesc}}
   {{package_desc}}
-

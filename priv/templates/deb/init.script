@@ -9,7 +9,6 @@
 # Description:       {{package_desc}}
 ### END INIT INFO
 
-DESC="{{package_shortdesc}}"
 NAME={{package_install_name}}
 DAEMON=/usr/{{bin_or_sbin}}/$NAME
 SCRIPTNAME=/etc/init.d/$NAME
@@ -20,6 +19,13 @@ SCRIPTNAME=/etc/init.d/$NAME
 # Load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
 . /lib/lsb/init-functions
+
+# `service` strips all environmental VARS so
+# if no HOME was set in /etc/default/$NAME then set one here
+# to the data directory for erlexec's sake
+if [ -z "$HOME" ]; then
+    export HOME={{platform_data_dir}}
+fi
 
 #
 # Function that starts the daemon/service
@@ -80,8 +86,8 @@ do_status() {
 
 case "$1" in
     start)
-        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
-        $DAEMON ping 2>&1>/dev/null && echo $"$NAME is already running" && exit 0
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $NAME"
+        $DAEMON ping >/dev/null 2>&1 && echo $"$NAME is already running" && exit 0
         do_start
         case "$?" in
             0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -91,7 +97,7 @@ case "$1" in
         esac
         ;;
     stop)
-        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $NAME"
         do_stop
         case "$?" in
             0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
@@ -105,14 +111,14 @@ case "$1" in
         $DAEMON ping || exit $?
         ;;
     reload|force-reload)
-        log_daemon_msg "Reloading $DESC" "$NAME"
+        log_daemon_msg "Reloading $NAME"
         do_reload
         ES=$?
         log_end_msg $ES
         exit $ES
         ;;
     restart)
-        log_daemon_msg "Restarting $DESC" "$NAME"
+        log_daemon_msg "Restarting $NAME"
         do_stop
         case "$?" in
             0|1)
