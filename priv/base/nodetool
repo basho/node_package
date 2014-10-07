@@ -71,6 +71,11 @@ main(Args) ->
                 {badrpc, Reason} ->
                     io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
+                {error, Code} when is_integer(Code) ->
+                    halt(Code);
+                {error, Code, Reason} when is_integer(Code) ->
+                    io:format(standard_error, "ERROR: ~p\n", [Reason]),
+                    halt(Code);
                 _ ->
                     halt(1)
             end;
@@ -81,6 +86,11 @@ main(Args) ->
                 {badrpc, Reason} ->
                     io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
+                {error, Code} when is_integer(Code) ->
+                    halt(Code);
+                {error, Code, Reason} when is_integer(Code) ->
+                    io:format(standard_error, "ERROR: ~p\n", [Reason]),
+                    halt(Code);
                 _ ->
                     halt(1)
             end;
@@ -90,6 +100,11 @@ main(Args) ->
                 {badrpc, Reason} ->
                     io:format(standard_error, "RPC to ~p failed: ~p\n", [TargetNode, Reason]),
                     halt(1);
+                {error, Code} when is_integer(Code) ->
+                    halt(Code);
+                {error, Code, Reason} when is_integer(Code) ->
+                    io:format(standard_error, "ERROR: ~p\n", [Reason]),
+                    halt(Code);
                 Other ->
                     io:format("~p\n", [Other])
             end;
