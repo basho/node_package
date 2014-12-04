@@ -11,4 +11,4 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, adduser, logrotate, sudo, {{deb_depends}}
 Description: {{package_shortdesc}}
   {{package_desc}}
-
+{{replace_riak_line}}
