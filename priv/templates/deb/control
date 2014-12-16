@@ -5,10 +5,10 @@ Maintainer: {{vendor_contact_name}} <{{vendor_contact_email}}>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.9.3
 Homepage: {{vendor_url}}
+{{package_replacement_line}}
 
 Package: {{package_name}}
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, adduser, logrotate, sudo, {{deb_depends}}
 Description: {{package_shortdesc}}
   {{package_desc}}
-{{replace_riak_line}}
