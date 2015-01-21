@@ -50,7 +50,7 @@ WHOAMI=`whoami`
 echoerr() { echo "$@" 1>&2; }
 
 # Extract the target node name from node.args
-NAME_ARG=`egrep '^\-name' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
+NAME_ARG=`egrep '^\-s?name' $RUNNER_ETC_DIR/vm.args 2> /dev/null`
 if [ -z "$NAME_ARG" ]; then
     NODENAME=`egrep '^[ \t]*nodename[ \t]*=[ \t]*' $RUNNER_ETC_DIR/{{cuttlefish_conf}} 2> /dev/null | tail -1 | cut -d = -f 2`
     if [ -z "$NODENAME" ]; then
@@ -63,12 +63,18 @@ if [ -z "$NAME_ARG" ]; then
 fi
 
 # Learn how to specify node name for connection from remote nodes
-NAME_PARAM="-name"
-echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
+echo "$NAME_ARG" | grep '^-sname' > /dev/null 2>&1
 if [ "X$?" = "X0" ]; then
-    NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
-else
+    NAME_PARAM="-sname"
     NAME_HOST=""
+else
+    NAME_PARAM="-name"
+    echo "$NAME_ARG" | grep '@.*' > /dev/null 2>&1
+    if [ "X$?" = "X0" ]; then
+        NAME_HOST=`echo "${NAME_ARG}" | sed -e 's/.*\(@.*\)$/\1/'`
+    else
+        NAME_HOST=""
+    fi
 fi
 
 # Extract the target cookie
