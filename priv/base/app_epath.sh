@@ -81,8 +81,8 @@ make_app_epaths () {
 
     STACK=
     INQUOTE=0
-    # The awk puts each char, spaces included, on their own line for parsing.
-    echo "$appconfig" | awk '{gsub(//,"\n");print}' | while read i; do
+    # The sed puts each char, spaces included, on their own line for parsing.
+    echo "$appconfig" | sed 's/\(.\)/\1\'$'\n/g' | while read i; do
         case "x${i}x" in
             "x\"x")
                 # Flip the INQUOTE state and echo the quote
@@ -125,7 +125,7 @@ make_app_epaths () {
                     # We're only interested in printing leaves, not
                     # intermediates like 'riak_core http', which contain lists.
                     # See if the current stack ends with ] (end of list).
-                    echo $STACK | grep -E "__EBRACKET__$" >/dev/null 2>&1
+                    echo $STACK | sed 's/ /\'$'\n/g' | tail -1 | grep "__EBRACKET__" > /dev/null 2>&1
                     if [ 1 -eq $? ]; then
                         # If not, print the stack without all of the mess.
                         echo "$STACK" | \
