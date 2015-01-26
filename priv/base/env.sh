@@ -31,6 +31,9 @@ APP_VERSION={{app_version}}
 # PID directory and pid file name of this app
 # ex: /var/run/riak & /var/run/riak/riak.pid
 RUN_DIR="{{platform_run_dir}}"
+if [ -z "$RUN_DIR" ]; then
+    RUN_DIR=/var/run
+fi
 PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 
