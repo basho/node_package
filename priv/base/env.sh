@@ -30,7 +30,10 @@ APP_VERSION={{app_version}}
 # Variables needed to support creation of .pid files
 # PID directory and pid file name of this app
 # ex: /var/run/riak & /var/run/riak/riak.pid
-RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
+RUN_DIR="{{platform_run_dir}}"
+if [ -z "$RUN_DIR" ]; then
+    RUN_DIR=/var/run
+fi
 PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 

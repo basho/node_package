@@ -3,6 +3,7 @@ etc/{{package_install_name}}
 etc/logrotate.d
 usr/lib/{{package_install_name}}
 usr/{{bin_or_sbin}}
+usr/share/{{package_install_name}}
 usr/share/man/man1
 var/run/{{package_install_name}}
 var/lib/{{package_install_name}}

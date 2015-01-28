@@ -21,7 +21,8 @@
              {platform_etc_dir,  "/etc/{{package_install_name}}"},
              {platform_base_dir, "/usr/lib/{{package_install_name}}"},
              {platform_lib_dir,  "/usr/lib/{{package_install_name}}/lib"},
-             {platform_log_dir,  "/var/log/{{package_install_name}}"}
+             {platform_log_dir,  "/var/log/{{package_install_name}}"},
+             {platform_share_dir, "/usr/share/{{package_install_name}}"}
             ]
 }.
 {template, "Makefile", "Makefile"}.

@@ -7,6 +7,7 @@ PMAN_DIR         = $(BUILD_STAGE_DIR)/man
 PBIN_DIR         = $(BUILD_STAGE_DIR)/{{bin_or_sbin}}
 PETC_DIR         = $(BUILD_STAGE_DIR)/etc/{{package_install_name}}
 PLIB_DIR         = $(BUILD_STAGE_DIR)/lib/{{package_install_name}}
+PSHARE_DIR       = $(BUILD_STAGE_DIR)/share/{{package_install_name}}
 # /var based dirs
 PDATA_DIR        = $(BUILD_STAGE_DIR)/{{platform_data_dir}}
 PLOG_DIR         = $(BUILD_STAGE_DIR)/log/{{package_install_name}}
@@ -28,6 +29,7 @@ build: packing_list_files templates
 	find {{bin_or_sbin}} -type f | tar -rf $(TARNAME) -T - && \
 	find lib -type f | tar -rf $(TARNAME) -T - && \
 	find etc -type f | tar -rf $(TARNAME) -T - && \
+	find share -type f | tar -rf $(TARNAME) -T && \
 	find var -type f | tar -rf $(TARNAME) -T - && \
 	find log -type f | tar -rf $(TARNAME) -T -
 
@@ -98,6 +100,10 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	   find lib -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
 	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
+	   find share -type f >> +CONTENTS && \
+	   find share -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
+	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
+	cd $(BUILD_STAGE_DIR) && \
 	   echo "@owner root" >> +CONTENTS && \
 	   echo "@group wheel" >> +CONTENTS && \
 	   echo "@mode 0644" >> +CONTENTS && \
@@ -144,6 +150,8 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/{{package_install_name}}/lib $(PLIB_DIR)
 	cp -R rel/{{package_install_name}}/erts-* $(PLIB_DIR)
 	cp -R rel/{{package_install_name}}/releases $(PLIB_DIR)
+	mkdir -p $(PSHARE_DIR)
+	cp -R rel/{{package_install_name}}/share $(PSHARE_DIR)
 	mkdir -p $(PDATA_DIR)
 	cp -R rel/{{package_install_name}}/data/* $(PDATA_DIR)
 	mkdir -p $(PLOG_DIR)
