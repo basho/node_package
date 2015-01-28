@@ -42,7 +42,7 @@ install: build
 	cp -R rel/{{package_install_name}}/releases \
               debian/{{package_name}}/usr/lib/{{package_install_name}}
 
-	cp -R rel/{{package_install_name}}/share \
+	cp -R rel/{{package_install_name}}/share/* \
               debian/{{package_name}}/usr/share/{{package_install_name}}
 
 ## executables
