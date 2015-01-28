@@ -44,7 +44,7 @@ Obsoletes: {{package_name}}
 %define platform_base_dir %{_libdir}/{{package_install_name}}
 %define platform_lib_dir %{platform_base_dir}/lib
 %define platform_log_dir %{_localstatedir}/log/{{package_install_name}}
-
+%define platform_share_dir %{_datarootdir}/{{package_install_name}}
 
 %prep
 %setup -q -n %{_tarname_base}
@@ -58,6 +58,7 @@ cat > rpm.vars.config <<EOF
 {platform_base_dir, "%{platform_base_dir}"}.
 {platform_lib_dir,  "%{platform_lib_dir}"}.
 {platform_log_dir,  "%{platform_log_dir}"}.
+{platform_share_dir, "%{platform_share_dir}"}.
 
 {runner_script_dir, "%{platform_bin_dir}"}.
 {runner_base_dir,   "%{platform_base_dir}"}.
@@ -80,6 +81,7 @@ OVERLAY_VARS="overlay_vars=../rpm.vars.config" make rel
 
 mkdir -p %{buildroot_etc}
 mkdir -p %{buildroot_lib}
+mkdir -p %{buildroot}%{_datarootdir}/{{package_install_name}}
 mkdir -p %{buildroot}%{_localstatedir}/lib/{{package_install_name}}
 mkdir -p %{buildroot}%{_localstatedir}/log/{{package_install_name}}
 mkdir -p %{buildroot}%{_localstatedir}/run/{{package_install_name}}
@@ -87,6 +89,8 @@ mkdir -p %{buildroot}%{_localstatedir}/run/{{package_install_name}}
 cp -R %{relpath}/lib       %{buildroot_lib}
 cp -R %{relpath}/erts-*    %{buildroot_lib}
 cp -R %{relpath}/releases  %{buildroot_lib}
+
+cp -R %{relpath}/share/* %{buildroot}%{_datarootdir}/{{package_install_name}}
 
 mkdir -p %{buildroot}%{_{{bin_or_sbin}}dir}
 if [ -d %{relpath}/bin ]; then \
@@ -173,6 +177,7 @@ exit 0
 %dir %{_sysconfdir}/{{package_install_name}}
 %config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
 %{_{{bin_or_sbin}}dir}/*
+%{_datarootdir}/{{package_install_name}}/*
 %{_localstatedir}/lib/{{package_install_name}}
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}

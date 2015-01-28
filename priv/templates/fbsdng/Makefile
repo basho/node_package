@@ -7,6 +7,8 @@ PMAN_DIR         = $(BUILD_STAGE_DIR)/usr/local/man
 PBIN_DIR         = $(BUILD_STAGE_DIR)/{{platform_bin_dir}}
 PETC_DIR         = $(BUILD_STAGE_DIR)/{{platform_etc_dir}}
 PLIB_DIR         = $(BUILD_STAGE_DIR)/{{platform_base_dir}}
+PSHARE_DIR       = $(BUILD_STAGE_DIR)/{{platform_share_dir}}
+
 # /var based dirs
 PDATA_DIR        = $(BUILD_STAGE_DIR)/{{platform_data_dir}}
 PLOG_DIR         = $(BUILD_STAGE_DIR)/var/log/{{package_install_name}}
@@ -79,6 +81,8 @@ $(BUILD_STAGE_DIR): buildrel
 	cp -R rel/{{package_install_name}}/lib $(PLIB_DIR)
 	cp -R rel/{{package_install_name}}/erts-* $(PLIB_DIR)
 	cp -R rel/{{package_install_name}}/releases $(PLIB_DIR)
+	mkdir -p $(PSHARE_DIR)
+	cp -R rel/{{package_install_name}}/share $(PSHARE_DIR)
 	mkdir -p $(PDATA_DIR)
 	cp -R rel/{{package_install_name}}/data/* $(PDATA_DIR)
 	mkdir -p ${BUILD_STAGE_DIR}/usr/local/etc/rc.d
