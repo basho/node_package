@@ -119,6 +119,9 @@ process_args(["-rpctimeout", TimeoutStr | Rest], Acc, TargetNode) ->
               end,
     erlang:put(rpctimeout, Timeout),
     process_args(Rest, Acc, TargetNode);
+process_args(["-kernel", "net_ticktime", NetTickTime | Rest], Acc, TargetNode) ->
+    _ = net_kernel:set_net_ticktime(list_to_integer(NetTickTime), 0),
+    process_args(Rest, Acc, TargetNode);
 process_args([Arg | Rest], Acc, Opts) ->
     process_args(Rest, [Arg | Acc], Opts).
 
