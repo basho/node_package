@@ -1,18 +1,16 @@
-name: {{package_name}}
-origin: {{freebsd_package_category}}
-comment: {{package_shortdesc}}
-licenses: [{{license_type}}]
-licenselogic: single
-arch: freebsd:10:x86:64
-www: {{vendor_url}}
-maintainer: {{vendor_contact_email}}
-users: [{{package_install_user}}]
-groups: [{{package_install_group}}]
-prefix: /usr/local
-categories: [{{freebsd_package_category}}]
+name: "{{package_name}}"
+origin: "{{freebsd_package_category}}"
+comment: "{{package_shortdesc}}"
+licenses: ["{{license_type}}"]
+licenselogic: "single"
+arch: "freebsd:10:x86:64"
+www: "{{vendor_url}}"
+maintainer: "{{vendor_contact_email}}"
+users: ["{{package_install_user}}"]
+groups: ["{{package_install_group}}"]
+prefix: "/usr/local"
+categories: ["{{freebsd_package_category}}"]
 desc: "{{package_desc}}"
-scripts:
-  pre-install: |-
-    if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi
-    if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_data_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi
-    if [ ! -d /var/log/{{package_install_name}} ]; then mkdir /var/log/{{package_install_name}} && chown {{package_install_user}}:{{package_install_group}} /var/log/{{package_install_name}}; fi
+scripts: {
+  pre-install: "if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi \n if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_data_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi \n if [ ! -d /var/log/{{package_install_name}} ]; then mkdir /var/log/{{package_install_name}} && chown {{package_install_user}}:{{package_install_group}} /var/log/{{package_install_name}}; fi"
+  }

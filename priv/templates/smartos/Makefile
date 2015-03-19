@@ -243,7 +243,7 @@ patch_runner: buildrel
 #  * Ensure all binaries are executable
 #  * copy the vars.config over for build config
 buildrel: $(BUILDDIR) smartos_check
-	OVERLAY_VARS="overlay_vars=../smartos/vars.config" $(MAKE) deps rel
+	OVERLAY_VARS="overlay_vars=../smartos/vars.config" $(MAKE) rel
 	chmod 0755 $(BUILDDIR)/rel/{{package_install_name}}/bin/* $(BUILDDIR)/rel/{{package_install_name}}/erts-*/bin/*
 
 $(BUILDDIR):
