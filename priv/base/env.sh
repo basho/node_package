@@ -17,6 +17,10 @@ unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as w
 
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 RUNNER_SCRIPT=${0##*/}
+RUNNER_RELEASE={{runner_release}}
+if [ -z "$RUNNER_RELEASE" ]; then
+    RUNNER_RELEASE=$RUNNER_SCRIPT
+fi
 
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
