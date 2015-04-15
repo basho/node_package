@@ -117,8 +117,12 @@ APP_VSN=${START_ERL#* }
 ERTS_PATH=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
-NODETOOL="$ERTS_PATH/escript $ERTS_PATH/nodetool $NET_TICKTIME_ARG $NAME_ARG $COOKIE_ARG"
-NODETOOL_LITE="$ERTS_PATH/escript $ERTS_PATH/nodetool"
+if [ -f $RUNNER_ETC_DIR/vm.args ]; then
+    SSL_ARGS=$(grep -e '^\-ssl_dist_opt' -e '^\-proto_dist' $RUNNER_ETC_DIR/vm.args | tr '\n' ' ')
+    ERL_FLAGS="$ERL_FLAGS $SSL_ARGS"
+fi
+alias NODETOOL="ERL_FLAGS=\"$ERL_FLAGS\" $ERTS_PATH/escript $ERTS_PATH/nodetool $NET_TICKTIME_ARG $NAME_ARG $COOKIE_ARG"
+alias NODETOOL_LITE="ERL_FLAGS=\"$ERL_FLAGS\" $ERTS_PATH/escript $ERTS_PATH/nodetool"
 
 
 ## Are we using cuttlefish (http://github.com/basho/cuttlefish)
@@ -133,7 +137,7 @@ fi
 
 # Ping node without stealing stdin
 ping_node() {
-    $NODETOOL ping < /dev/null
+    NODETOOL ping < /dev/null
 }
 
 # Attempts to create a pid directory like /var/run/APPNAME and then
@@ -288,7 +292,7 @@ check_config() {
         fi
     fi
 
-    MUTE=`$NODETOOL_LITE chkconfig $CONFIG_ARGS`
+    MUTE=`NODETOOL_LITE chkconfig $CONFIG_ARGS`
     if [ "$?" -ne 0 ]; then
         echoerr "Error reading $CONFIG_ARGS"
         exit 1
@@ -313,7 +317,7 @@ check_ulimit() {
 
 # Set the PID global variable, return 1 on error
 get_pid() {
-    PID=`$NODETOOL getpid < /dev/null`
+    PID=`NODETOOL getpid < /dev/null`
     if [ "$?" -ne 0 ]; then
         echo "Node is not running!"
         return 1
