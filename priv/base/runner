@@ -205,7 +205,7 @@ do_start() {
             if [ "$?" -ne 0 ]; then
                 continue
             fi
-            PROCESS=`$NODETOOL rpcterms erlang whereis "'${WAIT_FOR_PROCESS}'."`
+            PROCESS=`NODETOOL rpcterms erlang whereis "'${WAIT_FOR_PROCESS}'."`
             if [ "$PROCESS" != "undefined" ]; then
                 # Attempt to create a .pid file for the process
                 create_pid_file
@@ -231,7 +231,7 @@ do_stop() {
     fi
 
     # Tell nodetool to stop
-    $NODETOOL stop
+    NODETOOL stop
     ES=$?
     if [ "$ES" -ne 0 ]; then
         exit $ES
