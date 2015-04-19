@@ -42,8 +42,8 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	chmod -w ${BUILD_STAGE_DIR}/usr/local/etc/rc.d/{{package_install_name}}
 	chmod +x ${BUILD_STAGE_DIR}/usr/local/etc/rc.d/{{package_install_name}}
 	@cd $(BUILD_STAGE_DIR) && \
-		echo "version: ${PKG_VERSION}" >> +MANIFEST && \
-		echo "files:" >> +MANIFEST
+		echo "version: \"${PKG_VERSION}\"" >> +MANIFEST && \
+		echo "files: {" >> +MANIFEST
 
 	@echo "Copying Man pages to staging directory"
 	@cd $(BUILDDIR) && \
@@ -51,18 +51,24 @@ packing_list_files: $(BUILD_STAGE_DIR)
 		mkdir -p $(PMAN_DIR) && \
 		cp -R doc/man/man1 $(PMAN_DIR); fi
 
+
 	@echo "Packaging /usr/local files"
 	@cd $(BUILD_STAGE_DIR) && \
 	find usr -type f | while read file ; do \
 	    mode=$$(stat -f%p "$$file" | cut -c 3-) && \
 	    sum=$$(sha256 -q $$file) && \
-	    echo "  /$$file: { sum: $$sum, perm: $$mode, uname: root, gname: wheel }" >> +MANIFEST; done
+			echo "  /$$file: { sum: \"$$sum\", perm: \"$$mode\", uname: \"root\", gname: \"wheel\" }," >> +MANIFEST; done && \
+		sed -i .bak '$$s/,$$//' +MANIFEST && \
+		rm -- +MANIFEST.bak && \
+		echo " }" >> +MANIFEST
 
+	
 	@cd $(BUILD_STAGE_DIR) && \
-		echo "directories:" >> +MANIFEST && \
-		echo "  {{platform_base_dir}}: {}" >> +MANIFEST && \
-		echo "  {{platform_data_dir}}: {uname: {{package_install_user}}, gname: {{package_install_group}}, perm: 0700 }" >> +MANIFEST && \
-		echo "  {{platform_etc_dir}}: {}" >> +MANIFEST
+		echo "directories: {" >> +MANIFEST && \
+		echo "  {{platform_base_dir}}: \"y\"," >> +MANIFEST && \
+		echo "  {{platform_data_dir}}: {uname: \"{{package_install_user}}\", gname: \"{{package_install_group}}\", perm: \"0700\" }," >> +MANIFEST && \
+		echo "  {{platform_etc_dir}}: \"y\"" >> +MANIFEST && \
+		echo " }" >> +MANIFEST
 
 # Copy the app rel directory to the staging directory to build our
 # package structure and move the directories into the right place
@@ -88,7 +94,7 @@ $(BUILD_STAGE_DIR): buildrel
 #  * Ensure all binaries are executable
 #  * copy the vars.config over for build config
 buildrel:
-	OVERLAY_VARS="overlay_vars=../fbsdng/vars.config" $(MAKE) deps rel
+	OVERLAY_VARS="overlay_vars=../fbsdng/vars.config" $(MAKE) rel
 	chmod 0755 rel/{{package_install_name}}/bin/* rel/{{package_install_name}}/erts-*/bin/*
 
 $(BUILDDIR):

@@ -48,6 +48,7 @@ if [ "$2" = "POST-INSTALL" ]; then
 
     # Ensure proper ownership of lib directory
     chown -R {{package_install_user}}:{{package_install_group}} {{platform_lib_dir}}
+    chmod -R g+r {{platform_lib_dir}}
 
     # Treat new configuration files as new if old ones already exist
     # if FILE and FILE.bak both exist, move FILE to FILE.new and FILE.bak to FILE
