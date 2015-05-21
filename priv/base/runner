@@ -5,7 +5,7 @@
 # installed by node_package (github.com/basho/node_package)
 
 # Pull environment for this install
-. "{{runner_base_dir}}/lib/env.sh"
+. "{{abs_node_root}}/bin/env.sh"
 
 
 # Keep track of where script was invoked
@@ -234,8 +234,8 @@ case "$1" in
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_RELEASE \
-             -config $RUNNER_ETC_DIR/app.config \
+        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/start.boot \
+            -config $RUNNER_BASE_DIR/releases/$APP_VSN/sys.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
@@ -296,7 +296,7 @@ case "$1" in
         ;;
 
     version)
-        echo $APP_VERSION
+        echo $APP_VSN
         ;;
 
     getpid)
