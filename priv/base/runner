@@ -234,8 +234,8 @@ case "$1" in
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/start.boot \
-            -config $RUNNER_BASE_DIR/releases/$APP_VSN/sys.config \
+        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_RELEASE.boot \
+            -config $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_RELEASE.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
