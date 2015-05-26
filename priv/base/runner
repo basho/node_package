@@ -5,7 +5,7 @@
 # installed by node_package (github.com/basho/node_package)
 
 # Pull environment for this install
-. "{{runner_base_dir}}/lib/env.sh"
+. "{{abs_node_root}}/bin/env.sh"
 
 
 # Keep track of where script was invoked
@@ -36,7 +36,7 @@ bootstrap() {
 }
 
 bootstrapd() {
-    # Create PID directory if it does not exist before dropping permissiongs
+    # Create PID directory if it does not exist before dropping permissions
     # to the runner user
     create_pid_dir
     ES=$?
@@ -188,7 +188,7 @@ case "$1" in
           node_up_check
         fi
 
-        echo "Direct Shell: Use \"Ctrl-D\" to quit. \"Ctrl-C\" will terminate the $SCRIPT node."
+        echo "Direct Shell: Use \"Ctrl-D\" to quit. \"Ctrl-C\" will terminate the $RUNNER_RELEASE node."
         shift
         exec $ERTS_PATH/to_erl $PIPE_DIR
         ;;
@@ -200,10 +200,10 @@ case "$1" in
         # Make sure a node is running
         node_up_check
 
-        echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
+        echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $RUNNER_RELEASE node."
         shift
         NODE_NAME=${NAME_ARG#* }
-        exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
+        exec $ERTS_PATH/erl $NAME_PARAM c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG
         ;;
 
     console)
@@ -234,8 +234,8 @@ case "$1" in
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
         EMU=beam
         PROGNAME=`echo $0 | sed 's/.*\///'`
-        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_SCRIPT \
-             -config $RUNNER_ETC_DIR/app.config \
+        CMD="$BINDIR/erlexec -boot $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_RELEASE.boot \
+            -config $RUNNER_BASE_DIR/releases/$APP_VSN/$RUNNER_RELEASE.config \
             -pa $RUNNER_PATCH_DIR \
             -args_file $RUNNER_ETC_DIR/vm.args -- ${1+"$@"}"
         export EMU
@@ -296,7 +296,7 @@ case "$1" in
         ;;
 
     version)
-        echo $APP_VERSION
+        echo $APP_VSN
         ;;
 
     getpid)
