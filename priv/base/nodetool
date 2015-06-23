@@ -58,11 +58,23 @@ main(Args) ->
             %% a "pong"
             io:format("pong\n");
         ["stop"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, stop, [], RpcTimeout)]);
+            io:format("~p\n", [rpc:call(TargetNode, erlang, apply,
+                                        [fun() ->
+                                                 catch error_logger:info_msg("Administrative stop\n"),
+                                                 init:stop()
+                                         end, []], RpcTimeout)]);
         ["restart"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, restart, [], RpcTimeout)]);
+            io:format("~p\n", [rpc:call(TargetNode, erlang, apply,
+                                        [fun() ->
+                                                 catch error_logger:info_msg("Administrative restart\n"),
+                                                 init:restart()
+                                         end, []], RpcTimeout)]);
         ["reboot"] ->
-            io:format("~p\n", [rpc:call(TargetNode, init, reboot, [], RpcTimeout)]);
+            io:format("~p\n", [rpc:call(TargetNode, erlang, apply,
+                                        [fun() ->
+                                                 catch error_logger:info_msg("Administrative reboot\n"),
+                                                 init:reboot()
+                                         end, []], RpcTimeout)]);
         ["rpc", Module, Function | RpcArgs] ->
             case rpc:call(TargetNode, list_to_atom(Module), list_to_atom(Function),
                           [RpcArgs], RpcTimeout) of
