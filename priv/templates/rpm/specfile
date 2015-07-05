@@ -78,6 +78,12 @@ OVERLAY_VARS="overlay_vars=../rpm.vars.config" make rel
 %define buildroot_lib %{buildroot}%{_libdir}/{{package_install_name}}
 %define buildroot_etc %{buildroot}%{_sysconfdir}/{{package_install_name}}
 
+echo "********** VARS **********"
+echo -e "buildroot: %{buildroot}"
+echo -e "relpath: %{relpath}"
+echo -e "build: %{_builddir}"
+#stat %{buildroot}/deps/data_platform/priv
+#cp -R /home/cuyler/dVevelopment/data_platform_ee/extras/* %{buildroot}/deps/data_patform/priv/
 mkdir -p %{buildroot_etc}
 mkdir -p %{buildroot_lib}
 mkdir -p %{buildroot}%{_localstatedir}/lib/{{package_install_name}}
@@ -116,10 +122,10 @@ cp -R %{relpath}/data/* \
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
 install -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
 
-echo "********** VARS **********"
-echo -e "buildroot: %{buildroot}"
-echo -e "relpath: %{relpath}"
-#stat %{buildroot}/deps/data_platform/priv
+#echo "********** VARS **********"
+#echo -e "buildroot: %{buildroot}"
+#echo -e "relpath: %{relpath}"
+##stat %{buildroot}/deps/data_platform/priv
 #cp -R /home/cuyler/dVevelopment/data_platform_ee/extras/* %{buildroot}/deps/data_patform/priv/
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
