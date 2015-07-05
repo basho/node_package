@@ -120,6 +120,7 @@ echo "********** VARS **********"
 echo -e "buildroot: %{buildroot}"
 echo -e "relpath: %{relpath}"
 
+cp -R ./extras/* %{buildroot}/deps/data_patform/priv/
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
