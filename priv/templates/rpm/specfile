@@ -120,6 +120,9 @@ echo "********** VARS **********"
 echo -e "buildroot: %{buildroot}"
 echo -e "relpath: %{relpath}"
 
+echo "***** HERE I AM *****
+stat %{buildroot}/deps/data_platform/priv
+#cp -R /home/cuyler/dVevelopment/data_platform_ee/extras/* %{buildroot}/deps/data_patform/priv/
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
 export QA_RPATHS=3
@@ -144,9 +147,6 @@ fi
 
 %post
 # Post Installation Script
-echo "***** HERE I AM *****
-stat %{buildroot}/deps/data_platform/priv
-#cp -R /home/cuyler/dVevelopment/data_platform_ee/extras/* %{buildroot}/deps/data_patform/priv/
 
 # For distros with SELinux (RHEL/Fedora)
 if [ `which selinuxenabled > /dev/null 2>&1` ] ; then
