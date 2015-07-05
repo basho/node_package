@@ -142,11 +142,11 @@ else
            --shell /bin/bash \
            {{package_install_user}}
 fi
-
+echo "***** PRE-INSTALL END *****
 
 %post
 # Post Installation Script
-echo "****** HELLO1 *****"
+
 # For distros with SELinux (RHEL/Fedora)
 if [ `which selinuxenabled > /dev/null 2>&1` ] ; then
    # Fixup perms for SELinux (if it is enabled)
@@ -154,14 +154,11 @@ if [ `which selinuxenabled > /dev/null 2>&1` ] ; then
 fi
 
 # Make sure shell library file is readable
-echo "****** HELLO2 *****"
 chmod 0755 %{_libdir}/{{package_install_name}}/lib/env.sh
-echo "****** HELLO3 *****"
 
 # Add application to chkconfig, but default to "off"
 /sbin/chkconfig --add {{package_install_name}}
 /sbin/chkconfig {{package_install_name}} off
-
 
 %preun
 # Pre-uninstall script
@@ -173,8 +170,6 @@ if [ "$1" = 0 ] ; then
 fi
 exit 0
 
-
-echo "***** Before Man Pages *****"
 # Man pages are optional and might be missing, read from file
 %files -f additional_files_list
 %defattr(-,{{package_install_user}},{{package_install_group}})
@@ -186,9 +181,6 @@ echo "***** Before Man Pages *****"
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
 %{_sysconfdir}/init.d/{{package_install_name}}
-
-echo "****** After Man Pages *****"
-
 
 %clean
 #rm -rf %{buildroot}
