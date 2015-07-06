@@ -18,6 +18,7 @@ PKG_VERSION_NO_H	?= $(shell echo $(PKG_VERSION) | tr - .)
 default: init.script
 	mkdir -p BUILD
 	mkdir -p packages
+	echo "** RAWR **"
 	rpmbuild --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}$(DISTRO)%%{ARCH}.rpm" \
 		--define '_topdir $(PWD)' \
 		--define '_sourcedir $(PWD)' \
