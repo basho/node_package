@@ -154,8 +154,13 @@ process_args([Arg | Rest], Acc, Opts) ->
 
 
 start_epmd() ->
-    [] = os:cmd(epmd_path() ++ " -daemon"),
-    ok.
+    case os:getenv("NO_EPMD") of
+      false ->
+        [] = os:cmd(epmd_path() ++ " -daemon"),
+        ok;
+      _ ->
+        ok
+    end.
 
 epmd_path() ->
     ErtsBinDir = filename:dirname(escript:script_name()),
