@@ -251,17 +251,20 @@ case "$1" in
         # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
         do_start
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         ;;
 
     stop)
         # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         do_stop
         ;;
 
     restart)
         # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         do_stop
         do_start
         ;;
@@ -275,6 +278,7 @@ case "$1" in
         if [ "$ES" -ne 0 ]; then
             exit $ES
         fi
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         ;;
 
     attach-direct)
@@ -288,7 +292,7 @@ case "$1" in
           # Make sure a node is running
           node_up_check
         fi
-
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         echo "Direct Shell: Use \"Ctrl-D\" to quit. \"Ctrl-C\" will terminate the $SCRIPT node."
         shift
         exec $ERTS_PATH/to_erl $PIPE_DIR
@@ -300,7 +304,7 @@ case "$1" in
 
         # Make sure a node is running
         node_up_check
-
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
         shift
         NODE_NAME=${NAME_ARG#* }
@@ -349,6 +353,7 @@ case "$1" in
 
         # Log the startup
         logger -t "$SCRIPT[$$]" "Starting up"
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
 
         # Start the VM
         exec $CMD
@@ -357,6 +362,7 @@ case "$1" in
     top)
         # Make sure the local node IS running
         node_up_check
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
 
         shift
         MYPID=$$
@@ -371,10 +377,12 @@ case "$1" in
 
     ertspath)
         echo $ERTS_PATH
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         ;;
 
     chkconfig)
         bootstrapd $@
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
 
         check_config
         ;;
@@ -386,6 +394,7 @@ case "$1" in
             echo "$RUNNER_SCRIPT config is not available."
             exit 1
         else
+            $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT config "$1" 
             # Let's validate the output
 
             case "$1" in
@@ -413,6 +422,7 @@ case "$1" in
         ;;
 
     escript)
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         shift
         $ERTS_PATH/escript "$@"
         ES=$?
@@ -422,10 +432,12 @@ case "$1" in
         ;;
 
     version)
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         echo $APP_VERSION
         ;;
 
     getpid)
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         # Get the PID from nodetool
         get_pid
         ES=$?
@@ -436,6 +448,7 @@ case "$1" in
         ;;
 
     help)
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         help
         ;;
     *)
