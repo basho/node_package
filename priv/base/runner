@@ -421,9 +421,9 @@ case "$1" in
         fi
         ;;
 
-    escript)
-        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
+    escript) 
         shift
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT escript "$*"
         $ERTS_PATH/escript "$@"
         ES=$?
         if [ "$ES" -ne 0 ]; then
