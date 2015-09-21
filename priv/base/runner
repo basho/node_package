@@ -207,6 +207,7 @@ do_start() {
             if [ "$PROCESS" != "undefined" ]; then
                 # Attempt to create a .pid file for the process
                 create_pid_file
+                $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT start
                 exit 0
             fi
         done
@@ -251,7 +252,6 @@ case "$1" in
         # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
         do_start
-        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
         ;;
 
     stop)
@@ -362,9 +362,9 @@ case "$1" in
     top)
         # Make sure the local node IS running
         node_up_check
-        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT "$1" 
 
         shift
+        $NODETOOL rpc riak_core_console log_operations_command $USER $SCRIPT top "$*"
         MYPID=$$
         NODE_NAME=${NAME_ARG#* }
         $ERTS_PATH/erl -noshell -noinput \
