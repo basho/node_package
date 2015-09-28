@@ -44,7 +44,7 @@ fi
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
 
-WHOAMI=`whoami`
+WHOAMI=`id -un`
 
 # erlexec requires HOME to be set. The username needs to be a
 # unquoted literal because of the tilde expansion, hence the
