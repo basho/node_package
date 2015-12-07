@@ -92,7 +92,7 @@ your application's =vars.config=.
 **** Optional Variables
  - =runner_ulimit_warn= - The runner script will warn if `ulimit -n` is less than
    this value.  This defaults to 4096 in all packages.
- - =platform_patch_dir= - Directory to include in erlang's load path to allow for
+ - =package_patch_dir= - Directory to include in erlang's load path to allow for
    patches to be hotloaded.  By default this will be in the =platform_lib_dir=
    (ex: "basho-patches")
  - =runner_user= - The username to run the application as
@@ -124,3 +124,15 @@ So, if you want to have a variable persist all the way through to the
 final reltool step, the variable needs to be set in pkg.vars.config
 (or defaulted in <osname>.template) AND be present in the vars.config,
 so it can be applied to the reltool templates.
+
+*** Example App
+
+The easiest app that uses =node_package= is [[https://github.com/basho/stanchion][stanchion]] a small application that Basho uses along side Riak CS.
+
+In particular, see:
+
+ -  [[https://github.com/basho/stanchion/blob/develop/pkg.vars.config][pkg.vars.config]]
+ -  [[https://github.com/basho/stanchion/blob/develop/Makefile#L73][makefile]]
+ -  [[https://github.com/basho/stanchion/blob/develop/rel/reltool.config#L46][reltool.config]]  
+
+It also has custom settings in its [[https://github.com/basho/stanchion/blob/develop/rel/vars.config#L31][vars.config]] for adjusting settings in the =bin/stanchion= that comes from node_package's =runner= script.

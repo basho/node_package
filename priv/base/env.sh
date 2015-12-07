@@ -44,7 +44,14 @@ fi
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
 
-WHOAMI=`whoami`
+WHOAMI=`id -un`
+
+# erlexec requires HOME to be set. The username needs to be a
+# unquoted literal because of the tilde expansion, hence the
+# usage of eval.
+if [ -z "$HOME" ]; then
+    export HOME=`eval echo "~$WHOAMI"`
+fi
 
 # Echo to stderr on errors
 echoerr() { echo "$@" 1>&2; }
@@ -231,8 +238,8 @@ check_user() {
         #     riak-admin bucket-type create mytype {props: {n_val: 4}}
         #  after the arguments were passed into the new shell during exec su
         #
-        # So this regex finds any '"', '{', or '}' and prepends with a '\'
-        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([{}"]\)/\\\\\1/g'`
+        # So this regex finds any '(', ')', "'" , '"', '{', or '}' and prepends with a '\'
+        ESCAPED_ARGS=$(echo "$@" | sed -e "s/\([\\\(\\\){}\"']\)/\\\\\1/g")
 
         # This will drop priviledges into the runner user
         # It exec's in a new shell and the current shell will exit
