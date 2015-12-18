@@ -92,4 +92,4 @@ setversion: varcheck
 ## Check required settings before continuing
 varcheck:
 	$(if $(PKG_VERSION),,$(error "Variable PKG_VERSION must be set and exported, see basho/node_package readme"))
-	$(if $(PKG_ID),,$(error "Variable PKK_ID must be set and exported, see basho/node_package readme"))
+	$(if $(PKG_ID),,$(error "Variable PKG_ID must be set and exported, see basho/node_package readme"))
