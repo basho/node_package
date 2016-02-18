@@ -114,7 +114,7 @@ cp -R %{relpath}/data/* \
       %{buildroot}%{_localstatedir}/lib/{{package_install_name}}
 
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
-install -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
+install -u root -g root -m755 %{_topdir}/init.script  %{buildroot}%{_sysconfdir}/init.d/{{package_install_name}}
 
 # Needed to work around check-rpaths which seems to be hardcoded into recent
 # RPM releases
