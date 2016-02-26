@@ -90,7 +90,7 @@ This is the primary script for controlling the $SCRIPT node.
         Attaches to the console of a $SCRIPT node running in the background
         using an Erlang remote shell, giving access to the Erlang shell and
         runtime messages. Prints "Node is not running!" when the node cannot
-        be reached. Exit \`$SCRIPT attach\` by pressing Ctrl-C twice.
+        be reached. Exit \`$SCRIPT attach\` by pressing \"Ctrl-G q\".
 
     attach-direct
         Attaches to the console of a $SCRIPT node running in the background
@@ -301,7 +301,8 @@ case "$1" in
         # Make sure a node is running
         node_up_check
 
-        echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
+        echo "Remote Shell: Use \"Ctrl-G q\" to quit."
+        echo "q() or init:stop() will terminate the $SCRIPT node."
         shift
         NODE_NAME=${NAME_ARG#* }
         exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
