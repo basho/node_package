@@ -172,12 +172,12 @@ exit 0
 %{_libdir}/*
 %dir %{_sysconfdir}/{{package_install_name}}
 %config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
-%{_{{bin_or_sbin}}dir}/*
 %{_localstatedir}/lib/{{package_install_name}}
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
 %defattr(-,root,root)
 %{_sysconfdir}/init.d/{{package_install_name}}
+%{_{{bin_or_sbin}}dir}/*
 
 %clean
 rm -rf %{buildroot}
