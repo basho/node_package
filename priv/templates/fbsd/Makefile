@@ -88,21 +88,18 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	@echo "Packaging /usr/local files"
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@cwd /usr/local" >> +CONTENTS && \
-	   echo "@owner {{package_install_user}}" >> +CONTENTS && \
-	   echo "@group {{package_install_group}}" >> +CONTENTS && \
-	   echo "@mode 0755" >> +CONTENTS
+	   echo "@owner root" >> +CONTENTS && \
+	   echo "@group wheel" >> +CONTENTS && \
+	   echo "@mode 0755" >> +CONTENT
 	cd $(BUILD_STAGE_DIR) && \
 	   find lib -type f >> +CONTENTS && \
 	   find lib -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
+	   echo "@exec chown -R root:wheel {{platform_base_dir}}" >> +CONTENTS && \
+	   find {{bin_or_sbin}} -type f >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
-	   echo "@owner root" >> +CONTENTS && \
-	   echo "@group wheel" >> +CONTENTS && \
 	   echo "@mode 0644" >> +CONTENTS && \
 	   find etc -type f >> +CONTENTS && \
-	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@mode 0755" >> +CONTENTS && \
-	   find {{bin_or_sbin}} -type f >> +CONTENTS
+	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS
 	@echo "Packaging /var files"
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@cwd /var" >> +CONTENTS
