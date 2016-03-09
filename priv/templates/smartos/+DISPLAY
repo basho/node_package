@@ -1,6 +1,6 @@
 Thank you for installing {{package_name}}.
 
-{{package_name}} has been installed in {{platform_base_dir}} owned by user:group {{package_install_user}}:{{package_install_group}}
+{{package_name}} has been installed in {{platform_base_dir}} owned by user:group root:root
 
 The primary directories are:
 

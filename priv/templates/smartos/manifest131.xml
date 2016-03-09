@@ -16,7 +16,7 @@
     <method_context working_directory="/tmp" project="{{package_install_name}}">
       <method_credential user="{{package_install_user}}" group="{{package_install_group}}" />
       <method_environment>
-        <envvar name="HOME" value="{{platform_base_dir}}" />
+        <envvar name="HOME" value="{{platform_data_dir}}" />
         <envvar name="LOGNAME" value="{{package_install_user}}" />
         <envvar name="PATH" value="/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin" />
         <envvar name="LD_PRELOAD_32" value="/lib/libumem.so.1" />

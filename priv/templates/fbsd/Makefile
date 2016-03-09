@@ -73,9 +73,9 @@ packing_list_files: $(BUILD_STAGE_DIR)
 		{{/package_commands}} echo -n; fi
 
 	@echo "Scanning data and log directories for empty directories to add"
-	$(eval DIRS_INSTALL = {{platform_log_dir}})
-	$(eval DIRS_INSTALL += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
-	for i in $(DIRS_INSTALL); \
+	$(eval PACKAGE_USER_WRITABLE_DIRS = {{platform_log_dir}})
+	$(eval PACKAGE_USER_WRITABLE_DIRS += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
+	for i in $(PACKAGE_USER_WRITABLE_DIRS); \
 	    do                          \
 		echo "@exec mkdir -p $$i" >> plist; \
                 echo "@exec chown -R {{package_install_user}}:{{package_install_group}} $$i" >> plist; \
