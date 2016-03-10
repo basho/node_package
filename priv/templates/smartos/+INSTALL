@@ -68,7 +68,7 @@ if [ "$2" = "POST-INSTALL" ]; then
     # This shouldn't have to happen in the post-install, but
     # there is some non-deterministic stuff happening during
     # install on SmartOS that causes wrong ownership.
-    chown -R root:root {{platform_etc_dir}}
+    chown -R root:{{package_install_group}} {{platform_etc_dir}}
 
     for i in $CONFIG_FILES; do
         if [ -f {{platform_etc_dir}}/$i ]; then

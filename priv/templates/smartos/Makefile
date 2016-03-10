@@ -133,7 +133,7 @@ packing_list_files: $(BUILD_STAGE_DIR) templates
 	   echo "@comment Packing /opt/local/etc files" >> +CONTENTS && \
 	   echo "@cwd /opt/local" >> +CONTENTS && \
 	   echo "@owner root" >> +CONTENTS && \
-	   echo "@group root" >> +CONTENTS && \
+	   echo "@group riak" >> +CONTENTS && \
 	   find etc -type f >> +CONTENTS
 
 	cd $(BUILD_STAGE_DIR) && \
