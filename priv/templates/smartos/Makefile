@@ -42,6 +42,12 @@ OPENSSL_DEP = openssl-1.0.1*
 GCC_DEP     = gcc47-libs>=4.7.0
 SMF_MANIFEST = manifest131.xml
 endif
+ifeq ($(PKGSRC_VERSION),2015Q4)  # SmartOS 15.4.0
+NCURSES_DEP = ncurses-6*
+OPENSSL_DEP = openssl-1.0.2*
+GCC_DEP     = gcc49-libs>=4.9.3
+SMF_MANIFEST = manifest154.xml
+endif
 
 
 # Where we install things (based on vars.config)
