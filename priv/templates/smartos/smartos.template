@@ -30,5 +30,6 @@
 {template, "manifest16.xml", "manifest16.xml"}.
 {template, "manifest18.xml", "manifest18.xml"}.
 {template, "manifest131.xml", "manifest131.xml"}.
+{template, "manifest154.xml", "manifest154.xml"}.
 {template, "epmd", "epmd"}.
 {template, "runner.patch", "runner.patch"}.
