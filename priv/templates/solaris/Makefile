@@ -50,7 +50,9 @@ prototype:
 	echo "i r.preserve" >> prototype
 	echo '' >> prototype
 	pkgproto rel/{{package_install_name}}={{package_install_name}} >> prototype
-	sed -e "s/ $(LOGNAME) .*$$/ {{package_install_user}} {{package_install_group}}/" \
+	sed -e "s/ $(LOGNAME) .*$$/ root bin/" \
+		-e "s/d none {{package_install_name}}\/data \(.*\) $(LOGNAME) \(.*\)/d none {{package_install_name}}\/data \1 {{package_install_user}} {{package_install_group}}/" \
+		-e "s/d none {{package_install_name}}\/log \(.*\) $(LOGNAME) \(.*\)/d none {{package_install_name}}\/log \1 {{package_install_user}} {{package_install_group}}/" \
 	    -e 's/f none {{package_install_name}}\/etc/e preserve {{package_install_name}}\/etc/' prototype > prototype.tmp && mv prototype.tmp prototype
 
 $(PKGERDIR)/pkgclean:
