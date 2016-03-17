@@ -86,8 +86,12 @@ if [ "$2" = "POST-INSTALL" ]; then
         -c "{{package_install_name}} default project" {{package_install_name}}
     fi
 
+    # Ensure proper permissions of SMF files
+    chown -R root:root /opt/local/share/smf/{{package_install_name}}
+    chown -R root:root /opt/local/share/smf/{{package_install_name}}-epmd
+    chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
+
     # Import SMF definitions
     svccfg import /opt/local/share/smf/{{package_install_name}}-epmd/manifest.xml
-    chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
     svccfg import /opt/local/share/smf/{{package_install_name}}/manifest.xml
 fi
