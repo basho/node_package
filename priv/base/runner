@@ -89,14 +89,16 @@ This is the primary script for controlling the $SCRIPT node.
     attach
         Attaches to the console of a $SCRIPT node running in the background
         using an Erlang remote shell, giving access to the Erlang shell and
-        runtime messages. Prints "Node is not running!" when the node cannot
-        be reached. Exit \`$SCRIPT attach\` by pressing Ctrl-C twice.
+        runtime messages. Prints "Node did not respond to ping!" when the
+        node cannot be reached.
+        Exit \`$SCRIPT attach\` by pressing \"Ctrl-G q\".
 
     attach-direct
         Attaches to the console of a $SCRIPT node running in the background
         using a directly connected FIFO, giving access to the Erlang shell
-        and runtime messages. Prints "Node is not running!" when the node
-        cannot be reached. Exit \`$SCRIPT attach-direct\` by pressing Ctrl-D.
+        and runtime messages. Prints "Node did not respond to ping!" when the
+        node cannot be reached.
+        Exit \`$SCRIPT attach-direct\` by pressing \"Ctrl-D\".
 
     chkconfig
         Confirms whether the $SCRIPT.conf and advanced.config is
@@ -301,7 +303,8 @@ case "$1" in
         # Make sure a node is running
         node_up_check
 
-        echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
+        echo "Remote Shell: Use \"Ctrl-G q\" to quit."
+        echo "q() or init:stop() will terminate the $SCRIPT node."
         shift
         NODE_NAME=${NAME_ARG#* }
         exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
