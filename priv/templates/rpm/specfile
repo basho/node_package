@@ -169,14 +169,15 @@ exit 0
 # Man pages are optional and might be missing, read from file
 %files -f additional_files_list
 %defattr(-,{{package_install_user}},{{package_install_group}})
-%{_libdir}/*
-%dir %{_sysconfdir}/{{package_install_name}}
-%config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
-%{_{{bin_or_sbin}}dir}/*
 %{_localstatedir}/lib/{{package_install_name}}
 %{_localstatedir}/log/{{package_install_name}}
 %{_localstatedir}/run/{{package_install_name}}
+%defattr(-,root,root)
 %{_sysconfdir}/init.d/{{package_install_name}}
+%{_{{bin_or_sbin}}dir}/*
+%{_libdir}/*
+%dir %{_sysconfdir}/{{package_install_name}}
+%config(noreplace) %{_sysconfdir}/{{package_install_name}}/*
 
 %clean
 rm -rf %{buildroot}

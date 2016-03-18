@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Variable that will get replaced by the Makefile dirs_create target
-CREATE_DIRS="%DIRS_CREATE%"
+PACKAGE_USER_WRITABLE_DIRS="%PACKAGE_USER_WRITABLE_DIRS%"
 
 # Config files that could possibly be installed
 CONFIG_FILES="vm.args app.config advanced.config {{cuttlefish_conf}}"
@@ -12,12 +12,12 @@ if [ "$2" = "PRE-INSTALL" ]; then
     fi
 
     if ! getent passwd "{{package_install_user}}" 2>/dev/null 1>&2; then
-        useradd -g {{package_install_group}} -d {{platform_base_dir}} -s /bin/sh {{package_install_user}}
+        useradd -g {{package_install_group}} -d {{platform_data_dir}} -s /bin/sh {{package_install_user}}
     fi
 
     # Create var directories outside of +CONTENTS
-    # Read directories from the CREATE_DIRS variable
-    for i in $CREATE_DIRS; do
+    # Read directories from the PACKAGE_USER_WRITABLE_DIRS variable
+    for i in $PACKAGE_USER_WRITABLE_DIRS; do
         if [ -d $i ]; then
             echo "Skipping directory creation of $i, directory already exists"
         else
@@ -42,12 +42,12 @@ if [ "$2" = "POST-INSTALL" ]; then
 
     # Ensure proper permissions on {{package_name}} scripts
     for i in {{#package_commands}}{{name}} {{/package_commands}}; do
-        chown {{package_install_user}}:{{package_install_group}} {{platform_bin_dir}}/$i
+        chown root:root {{platform_bin_dir}}/$i
         chmod 755 {{platform_bin_dir}}/$i
     done
 
     # Ensure proper ownership of lib directory
-    chown -R {{package_install_user}}:{{package_install_group}} {{platform_lib_dir}}
+    chown -R root:root {{platform_lib_dir}}
     chmod -R g+r {{platform_lib_dir}}
 
     # Treat new configuration files as new if old ones already exist
@@ -86,8 +86,12 @@ if [ "$2" = "POST-INSTALL" ]; then
         -c "{{package_install_name}} default project" {{package_install_name}}
     fi
 
+    # Ensure proper permissions of SMF files
+    chown -R root:root /opt/local/share/smf/{{package_install_name}}
+    chown -R root:root /opt/local/share/smf/{{package_install_name}}-epmd
+    chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
+
     # Import SMF definitions
     svccfg import /opt/local/share/smf/{{package_install_name}}-epmd/manifest.xml
-    chmod 755 /opt/local/share/smf/{{package_install_name}}-epmd/{{package_install_name}}-epmd
     svccfg import /opt/local/share/smf/{{package_install_name}}/manifest.xml
 fi

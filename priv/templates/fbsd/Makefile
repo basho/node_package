@@ -57,7 +57,7 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	echo "@name {{package_name}}-$(PKG_VERSION)" >> plist
 	echo "@conflicts {{package_name}}-*" >> plist
 	echo "@exec if ! pw groupshow {{package_install_group}} 2>/dev/null; then pw groupadd {{package_install_group}}; fi" >> plist
-	echo "@exec if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_base_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi" >> plist
+	echo "@exec if ! pw usershow {{package_install_user}} 2>/dev/null; then pw useradd {{package_install_user}} -g {{package_install_group}} -h - -d {{platform_data_dir}} -s /bin/sh -c \"{{package_install_user_desc}}\"; fi" >> plist
 	echo "@comment ORIGIN:{{freebsd_package_category}}/{{package_install_name}}" >> plist
 
 	@echo "Copying Man pages to staging directory"
@@ -73,9 +73,9 @@ packing_list_files: $(BUILD_STAGE_DIR)
 		{{/package_commands}} echo -n; fi
 
 	@echo "Scanning data and log directories for empty directories to add"
-	$(eval DIRS_INSTALL = {{platform_log_dir}})
-	$(eval DIRS_INSTALL += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
-	for i in $(DIRS_INSTALL); \
+	$(eval PACKAGE_USER_WRITABLE_DIRS = {{platform_log_dir}})
+	$(eval PACKAGE_USER_WRITABLE_DIRS += $(shell cd $(BUILD_STAGE_DIR) && find $(PDATA_ROOT_DIR) -type d -exec printf "/%s " {} \;))
+	for i in $(PACKAGE_USER_WRITABLE_DIRS); \
 	    do                          \
 		echo "@exec mkdir -p $$i" >> plist; \
                 echo "@exec chown -R {{package_install_user}}:{{package_install_group}} $$i" >> plist; \
@@ -88,22 +88,18 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	@echo "Packaging /usr/local files"
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@cwd /usr/local" >> +CONTENTS && \
-	   echo "@owner {{package_install_user}}" >> +CONTENTS && \
-	   echo "@group {{package_install_group}}" >> +CONTENTS && \
-	   echo "@mode 0755" >> +CONTENTS
-	cd $(BUILD_STAGE_DIR) && \
-	   find {{bin_or_sbin}} -type f >> +CONTENTS
+	   echo "@owner root" >> +CONTENTS && \
+	   echo "@group wheel" >> +CONTENTS && \
+	   echo "@mode 0755" >> +CONTENT
 	cd $(BUILD_STAGE_DIR) && \
 	   find lib -type f >> +CONTENTS && \
 	   find lib -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS && \
-	   echo "@exec chown -R {{package_install_user}}:{{package_install_group}} {{platform_base_dir}}" >> +CONTENTS
+	   echo "@exec chown -R root:wheel {{platform_base_dir}}" >> +CONTENTS && \
+	   find {{bin_or_sbin}} -type f >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
-	   echo "@owner root" >> +CONTENTS && \
-	   echo "@group wheel" >> +CONTENTS && \
 	   echo "@mode 0644" >> +CONTENTS && \
 	   find etc -type f >> +CONTENTS && \
 	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS
-
 	@echo "Packaging /var files"
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@cwd /var" >> +CONTENTS
