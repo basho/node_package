@@ -272,7 +272,7 @@ node_down_check() {
 node_up_check() {
     MUTE=`ping_node 2> /dev/null`
     if [ "$?" -ne 0 ]; then
-        echoerr "Node is not running!"
+        echoerr "Node did not respond to ping!"
         exit 1
     fi
 }
