@@ -1,4 +1,8 @@
 * node_package
+** Release 3.0.0 - Release notes
+
+Please see [[RELEASE-NOTES.md][RELEASE-NOTES.md]] for important changes in the 3.0.0 release of `node_package`
+
 ** Overview
 
 `node_package` is a set of RPM/Debian/Solaris templates and scripts, suitable for
