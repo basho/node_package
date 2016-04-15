@@ -32,7 +32,7 @@ chmod -R +X /etc/{{package_install_name}}
 chmod 0755 /usr/lib/{{package_install_name}}/lib/env.sh
 chmod 0755 /usr/lib/{{package_install_name}}/lib/app_epath.sh
 chmod 0755 /usr/lib/{{package_install_name}}/erts-*/bin/nodetool
-chmod -R go+r /usr/lib/{{package_install_name}}/lib/
+chmod -R go+rX /usr/lib/{{package_install_name}}/lib/
 
 case "$1" in
     configure)
