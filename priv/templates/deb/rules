@@ -32,21 +32,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-
-	cp -R rel/{{package_install_name}}/lib \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-	cp -R rel/{{package_install_name}}/erts* \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-	cp -R rel/{{package_install_name}}/releases \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-## executables
-	if [ -d rel/{{package_install_name}}/bin ]; then \
-	    mkdir -p debian/{{package_name}}/usr/{{bin_or_sbin}} && \
-	    {{#package_commands}}install -p -D -m 0755 rel/{{package_install_name}}/bin/{{name}} debian/{{package_name}}/usr/{{bin_or_sbin}}/ && \
-	    {{/package_commands}}echo -n; fi
+	dh_install
 
 ## install man pages if they exist
 	if [ -d doc/man/man1 ]; then \
@@ -56,14 +42,6 @@ install: build
                                              debian/{{package_name}}/usr/share/man/man1/ \
                                  ; fi && \
 	    {{/package_commands}}echo -n; fi
-
-	mkdir -p debian/{{package_name}}/etc/{{package_install_name}}
-	cp -R rel/{{package_install_name}}/etc/* \
-              debian/{{package_name}}/etc/{{package_install_name}}
-
-	mkdir -p debian/{{package_name}}/var/lib
-	cp -R rel/{{package_install_name}}/data/* \
-              debian/{{package_name}}/var/lib/{{package_install_name}}
 
 	install -m755 debian/init.script \
               debian/{{package_name}}/etc/init.d/{{package_install_name}}

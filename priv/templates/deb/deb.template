@@ -31,6 +31,7 @@
 {template, "control", "control"}.
 {template, "copyright", "copyright"}.
 {template, "dirs", "dirs"}.
+{template, "install", "install"}.
 {template, "postinst", "postinst"}.
 {template, "postrm", "postrm"}.
 {template, "rules", "rules"}.
