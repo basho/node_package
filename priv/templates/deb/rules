@@ -34,10 +34,7 @@ install: build
 	dh_installdirs
 	dh_install
 	dh_installman
-
-	install -m755 debian/init.script \
-              debian/{{package_name}}/etc/init.d/{{package_install_name}}
-
+	dh_installinit --name={{package_install_name}} --no-start
 	dh_shlibdeps
 
 # We have nothing to do by default.

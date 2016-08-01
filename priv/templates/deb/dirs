@@ -1,4 +1,3 @@
-etc/init.d
 etc/logrotate.d
 var/run/{{package_install_name}}
 var/log/{{package_install_name}}
