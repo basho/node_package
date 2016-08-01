@@ -1,5 +1,4 @@
 etc/init.d
 etc/logrotate.d
-usr/share/man/man1
 var/run/{{package_install_name}}
 var/log/{{package_install_name}}

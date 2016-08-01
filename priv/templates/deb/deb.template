@@ -37,3 +37,4 @@
 {template, "rules", "rules"}.
 {template, "vars.config", "vars.config"}.
 {template, "init.script", "init.script"}.
+{template, "package.manpages", "{{package_name}}.manpages"}.
