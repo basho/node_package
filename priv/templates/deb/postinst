@@ -23,13 +23,6 @@ for i in lib log; do
     chown -R {{package_install_user}}:{{package_install_group}} /var/$i/{{package_install_name}}
 done
 
-chmod 0755 /etc/{{package_install_name}}
-chmod -R a+rX /etc/{{package_install_name}}
-chmod 0755 /usr/lib/{{package_install_name}}/lib/env.sh
-chmod 0755 /usr/lib/{{package_install_name}}/lib/app_epath.sh
-chmod 0755 /usr/lib/{{package_install_name}}/erts-*/bin/nodetool
-chmod -R go+rX /usr/lib/{{package_install_name}}/lib/
-
 case "$1" in
     configure)
     ;;

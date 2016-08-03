@@ -11,6 +11,7 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
+ROOTDIR := debian/{{package_name}}
 
 ## Clear variables that may confound our build of sub-projects; also
 ## note that it is necessary to use overlay_vars relative to .. as
@@ -27,6 +28,7 @@ clean:
 
 ## dh_shlibdeps was added to figure out the dependencies on shared libraries
 ##   and will populate the ${shlibs:Depends} callout in the control file
+install: LIBDIR := $(ROOTDIR)/usr/lib/{{package_install_name}}
 install: build
 	dh_testdir
 	dh_testroot
@@ -35,6 +37,15 @@ install: build
 	dh_install
 	dh_installman
 	dh_installinit --name={{package_install_name}} --no-start
+	dh_fixperms
+	chmod 0755 $(ROOTDIR)/etc/{{package_install_name}}
+	chmod -R a+rX $(ROOTDIR)/etc/{{package_install_name}}
+	for file in lib/env.sh lib/app_epath.sh erts-*/bin/nodetool; do \
+		if [ -f $(LIBDIR)/$$file ]; then \
+			chmod 0755 $(LIBDIR)/$$file; \
+		fi; \
+	done
+	chmod -R go+rX debian/{{package_name}}/usr/lib/{{package_install_name}}/lib/
 	dh_shlibdeps
 
 # We have nothing to do by default.
