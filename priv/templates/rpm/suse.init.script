@@ -31,13 +31,6 @@ pidfile=/var/run/$NAME/$NAME.pid
 # Read configuration variable file if it is present and readable
 [ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
 
-# `service` strips all environmental VARS so
-# if no HOME was set in /etc/sysconfig/$NAME then set one here
-# to the data directory for erlexec's sake
-if [ -z "$HOME" ]; then
-    export HOME={{platform_data_dir}}
-fi
-
 # Checks the status of a node
 do_status() {
     $DAEMON ping >/dev/null 2>&1 && return 0 || return 3
