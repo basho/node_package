@@ -239,7 +239,7 @@ check_user() {
         #  after the arguments were passed into the new shell during exec su
         #
         # So this regex finds any '(', ')', "'" , '"', '{', or '}' and prepends with a '\'
-        ESCAPED_ARGS=$(echo "$@" | sed -e "s/\([\\\(\\\){}\"']\)/\\\\\1/g")
+        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([\\\(\\\){}"\x27]\)/\\\\\1/g'`
 
         # This will drop priviledges into the runner user
         # It exec's in a new shell and the current shell will exit
