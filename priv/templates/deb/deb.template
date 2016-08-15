@@ -31,8 +31,11 @@
 {template, "control", "control"}.
 {template, "copyright", "copyright"}.
 {template, "dirs", "dirs"}.
+{template, "install", "install"}.
 {template, "postinst", "postinst"}.
 {template, "postrm", "postrm"}.
 {template, "rules", "rules"}.
 {template, "vars.config", "vars.config"}.
-{template, "init.script", "init.script"}.
+{template, "init.script", "{{package_name}}.{{package_install_name}}.init"}.
+{template, "package.service", "{{package_name}}.{{package_install_name}}.service"}.
+{template, "package.manpages", "{{package_name}}.manpages"}.

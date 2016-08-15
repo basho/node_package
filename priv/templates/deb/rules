@@ -11,6 +11,7 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
+ROOTDIR := debian/{{package_name}}
 
 ## Clear variables that may confound our build of sub-projects; also
 ## note that it is necessary to use overlay_vars relative to .. as
@@ -27,47 +28,24 @@ clean:
 
 ## dh_shlibdeps was added to figure out the dependencies on shared libraries
 ##   and will populate the ${shlibs:Depends} callout in the control file
+install: LIBDIR := $(ROOTDIR)/usr/lib/{{package_install_name}}
 install: build
 	dh_testdir
 	dh_testroot
 	dh_prep
 	dh_installdirs
-
-	cp -R rel/{{package_install_name}}/lib \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-	cp -R rel/{{package_install_name}}/erts* \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-	cp -R rel/{{package_install_name}}/releases \
-              debian/{{package_name}}/usr/lib/{{package_install_name}}
-
-## executables
-	if [ -d rel/{{package_install_name}}/bin ]; then \
-	    mkdir -p debian/{{package_name}}/usr/{{bin_or_sbin}} && \
-	    {{#package_commands}}install -p -D -m 0755 rel/{{package_install_name}}/bin/{{name}} debian/{{package_name}}/usr/{{bin_or_sbin}}/ && \
-	    {{/package_commands}}echo -n; fi
-
-## install man pages if they exist
-	if [ -d doc/man/man1 ]; then \
-	    mkdir -p debian/usr/share/man/man1 && \
-	    {{#package_commands}}if [ -f doc/man/man1/{{name}}.1.gz ]; then \
-                                     install -p -D -m 0544 doc/man/man1/{{name}}.1.gz \
-                                             debian/{{package_name}}/usr/share/man/man1/ \
-                                 ; fi && \
-	    {{/package_commands}}echo -n; fi
-
-	mkdir -p debian/{{package_name}}/etc/{{package_install_name}}
-	cp -R rel/{{package_install_name}}/etc/* \
-              debian/{{package_name}}/etc/{{package_install_name}}
-
-	mkdir -p debian/{{package_name}}/var/lib
-	cp -R rel/{{package_install_name}}/data/* \
-              debian/{{package_name}}/var/lib/{{package_install_name}}
-
-	install -m755 debian/init.script \
-              debian/{{package_name}}/etc/init.d/{{package_install_name}}
-
+	dh_install
+	dh_installman
+	dh_installinit --name={{package_install_name}} --no-start
+	dh_fixperms
+	chmod 0755 $(ROOTDIR)/etc/{{package_install_name}}
+	chmod -R a+rX $(ROOTDIR)/etc/{{package_install_name}}
+	for file in lib/env.sh lib/app_epath.sh erts-*/bin/nodetool; do \
+		if [ -f $(LIBDIR)/$$file ]; then \
+			chmod 0755 $(LIBDIR)/$$file; \
+		fi; \
+	done
+	chmod -R go+rX debian/{{package_name}}/usr/lib/{{package_install_name}}/lib/
 	dh_shlibdeps
 
 # We have nothing to do by default.
