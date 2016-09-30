@@ -8,8 +8,8 @@
 if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
     POSIX_SHELL="true"
     export POSIX_SHELL
-    # To support 'whoami' add /usr/ucb to path
-    PATH=/usr/ucb:$PATH
+    # To support POSIX.2 compliant 'id' add /usr/xpg4/bin to path
+    PATH=/usr/xpg4/bin:$PATH
     export PATH
     exec /usr/bin/ksh $0 "$@"
 fi
@@ -239,7 +239,7 @@ check_user() {
         #  after the arguments were passed into the new shell during exec su
         #
         # So this regex finds any '(', ')', "'" , '"', '{', or '}' and prepends with a '\'
-        ESCAPED_ARGS=$(echo "$@" | sed -e "s/\([\\\(\\\){}\"']\)/\\\\\1/g")
+        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([\\\(\\\){}"\x27]\)/\\\\\1/g'`
 
         # This will drop priviledges into the runner user
         # It exec's in a new shell and the current shell will exit
