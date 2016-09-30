@@ -4,17 +4,6 @@
 
 # installed by node_package (github.com/basho/node_package)
 
-# /bin/sh on Solaris is not a POSIX compatible shell, but /usr/bin/ksh is.
-if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
-    POSIX_SHELL="true"
-    export POSIX_SHELL
-    # To support 'whoami' add /usr/ucb to path
-    PATH=/usr/ucb:$PATH
-    export PATH
-    exec /usr/bin/ksh $0 "$@"
-fi
-unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as well
-
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 RUNNER_SCRIPT=${0##*/}
 

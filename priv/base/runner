@@ -4,6 +4,17 @@
 
 # installed by node_package (github.com/basho/node_package)
 
+# /bin/sh on Solaris is not a POSIX compatible shell, but /usr/xpg4/bin/sh is.
+if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
+    POSIX_SHELL="true"
+    export POSIX_SHELL
+    # Add posix compatible binaries to the PATH
+    PATH=`getconf PATH`:$PATH
+    export PATH
+    exec /usr/xpg4/bin/sh $0 "$@"
+fi
+unset POSIX_SHELL # clear it so if we invoke other scripts, they run as /usr/xpg4/bin/sh as well
+
 # Pull environment for this install
 . "{{runner_base_dir}}/lib/env.sh"
 
