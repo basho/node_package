@@ -27,6 +27,13 @@ buildrel:
 	@# Ye Olde Bourne Shell on Solaris means we have to do it old school
 	echo "Using `which erl` to build"; \
 	OVERLAY_VARS="overlay_vars=../solaris/vars.config" $(MAKE) rel
+	chmod -R go+rX rel/{{package_install_name}}
+	chmod 0755 rel/{{package_install_name}}/etc
+	chmod -R a+rX rel/{{package_install_name}}/etc
+	chmod 0755 rel/{{package_install_name}}/lib/env.sh
+	chmod 0755 rel/{{package_install_name}}/lib/app_epath.sh
+	chmod 0755 rel/{{package_install_name}}/erts-*/bin/nodetool
+	chmod -R go+rX rel/{{package_install_name}}/lib/
 	chmod 0755 rel/{{package_install_name}}/bin/* \
 		rel/{{package_install_name}}/erts-*/bin/*
 	if [ "{{bin_or_sbin}}" != "bin" ]; then \
