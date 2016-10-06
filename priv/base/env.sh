@@ -15,7 +15,7 @@ if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
 fi
 unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as well
 
-RUNNER_GROUP={{runner_user}}
+RUNNER_USER={{runner_user}}
 APP_VERSION={{app_version}}
 
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
@@ -24,14 +24,13 @@ RUNNER_SCRIPT=${0##*/}
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
 RUNNER_PATCH_DIR={{runner_patch_dir}}
-RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
 
 # directories /files where data is written
 RUNNER_LOG_DIR={{runner_log_dir}}
 RUNNER_LIB_DIR={{runner_lib_dir}}
 PIPE_DIR={{pipe_dir}}
-PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
-PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
+PID_DIR="{{platform_data_dir}}/$RUNNER_SCRIPT"
+PID_FILE="$PID_DIR/$RUNNER_SCRIPT.pid"
 
 # Threshold where users will be warned of low ulimit file settings
 # default it if it is not set
@@ -142,8 +141,8 @@ ping_node() {
 check_dir() {
     DIR="$1"
 
-    if [ -z "$RUNNER_GROUP" ]; then
-        # If RUNNER_GROUP is not set this is probably a test setup (devrel) and does
+    if [ -z "$RUNNER_USER" ]; then
+        # If RUNNER_USER is not set this is probably a test setup (devrel) and does
         # not need to be checked. Just make sure it's there.
         mkdir -p "$DIR"
         return 0
@@ -155,8 +154,8 @@ check_dir() {
         echoerr "Unable to access $DIR, nonexistent or permission denied"
         echoerr "Please run the following commands as root:"
         echoerr "mkdir -p $DIR"
-        echoerr "chown root:$RUNNER_GROUP $DIR"
-        echoerr "chmod 2770 $DIR"
+        echoerr "chown $RUNNER_USER:$RUNNER_USER $DIR"
+        echoerr "chmod 0750 $DIR"
         return 1
     fi
 }
