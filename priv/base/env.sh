@@ -15,22 +15,21 @@ if [ `uname -s` = 'SunOS' -a "${POSIX_SHELL}" != "true" ]; then
 fi
 unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as well
 
+RUNNER_GROUP={{runner_user}}
+APP_VERSION={{app_version}}
+
 RUNNER_SCRIPT_DIR={{runner_script_dir}}
 RUNNER_SCRIPT=${0##*/}
 
 RUNNER_BASE_DIR={{runner_base_dir}}
 RUNNER_ETC_DIR={{runner_etc_dir}}
+RUNNER_PATCH_DIR={{runner_patch_dir}}
+RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
+
+# directories /files where data is written
 RUNNER_LOG_DIR={{runner_log_dir}}
 RUNNER_LIB_DIR={{runner_lib_dir}}
-RUNNER_PATCH_DIR={{runner_patch_dir}}
 PIPE_DIR={{pipe_dir}}
-RUNNER_GROUP={{runner_user}}
-APP_VERSION={{app_version}}
-
-# Variables needed to support creation of .pid files
-# PID directory and pid file name of this app
-# ex: /var/run/riak & /var/run/riak/riak.pid
-RUN_DIR="/var/run" # for now hard coded unless we find a platform that differs
 PID_DIR=$RUN_DIR/$RUNNER_SCRIPT
 PID_FILE=$PID_DIR/$RUNNER_SCRIPT.pid
 
@@ -157,7 +156,7 @@ check_dir() {
         echoerr "Please run the following commands as root:"
         echoerr "mkdir -p $DIR"
         echoerr "chown root:$RUNNER_GROUP $DIR"
-        echoerr "chmod 2775 $DIR"
+        echoerr "chmod 2770 $DIR"
         return 1
     fi
 }
