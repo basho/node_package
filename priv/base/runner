@@ -158,9 +158,8 @@ do_start() {
     # Warn the user if ulimit is too low
     check_ulimit
 
-    HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
-    export HEART_COMMAND
-    mkdir -p $PIPE_DIR
+    export HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
+
     $ERTS_PATH/run_erl -daemon $PIPE_DIR/ $RUNNER_LOG_DIR \
         "exec $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT console" 2>&1
 
