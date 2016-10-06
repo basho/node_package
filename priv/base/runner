@@ -143,29 +143,11 @@ SCRIPTING COMMANDS
         $SCRIPT.
 
 EOF
-
 }
 
-
-# Call bootstrapd for daemon commands like start/stop/console
 bootstrapd() {
-    # Fail fast if they have no rights to mess around with pids
-    check_user_internal
-
-    # Create PID directory if it does not exist before dropping permissiongs
-    # to the runner user
-    create_pid_dir
-    ES=$?
-    if [ "$ES" -ne 0 ]; then
-        echoerr "Unable to access $PID_DIR, permission denied, run script as root"
+    if ! check_dirs; then
         exit 1
-    fi
-
-    # Make sure the user running this script is the owner and/or su to that user
-    check_user $@
-    ES=$?
-    if [ "$ES" -ne 0 ]; then
-        exit $ES
     fi
 }
 
@@ -176,16 +158,13 @@ do_start() {
     # Warn the user if ulimit is too low
     check_ulimit
 
-    # Make sure log directory exists
-    mkdir -p $RUNNER_LOG_DIR
-
     HEART_COMMAND="$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT start"
     export HEART_COMMAND
     mkdir -p $PIPE_DIR
     $ERTS_PATH/run_erl -daemon $PIPE_DIR/ $RUNNER_LOG_DIR \
         "exec $RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT console" 2>&1
 
-    if [ ! -z "$WAIT_FOR_PROCESS" ]; then
+    if [ -n "$WAIT_FOR_PROCESS" ]; then
         # Wait for the node to come up. We can't just ping it because
         # distributed erlang comes up for a second before the node crashes
         # (eg. in the case of an unwriteable disk). Once the node comes
@@ -236,8 +215,7 @@ do_stop() {
     fi
 
     # Now wait for the app to *really* stop
-    while `kill -s 0 $PID 2>/dev/null`;
-    do
+    while `kill -s 0 $PID 2>/dev/null`; do
         sleep 1
     done
 
@@ -248,28 +226,23 @@ do_stop() {
 # Check the first argument for instructions
 case "$1" in
     start)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
         do_start
         ;;
 
     stop)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
         do_stop
         ;;
 
     restart)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
         do_stop
         do_start
         ;;
 
     ping)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
-        ## See if the VM is alive
         ping_node
         ES=$?
         if [ "$ES" -ne 0 ]; then
@@ -278,7 +251,6 @@ case "$1" in
         ;;
 
     attach-direct)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
 
         # Allow attaching to a node without pinging it
@@ -295,10 +267,8 @@ case "$1" in
         ;;
 
     attach)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
 
-        # Make sure a node is running
         node_up_check
 
         echo "Remote Shell: Use \"Ctrl-C a\" to quit. q() or init:stop() will terminate the $SCRIPT node."
@@ -308,7 +278,6 @@ case "$1" in
         ;;
 
     console)
-        # Bootstrap daemon command (check perms & drop to $RUNNER_USER)
         bootstrapd $@
 
         RES=`ping_node 2> /dev/null`
@@ -317,7 +286,6 @@ case "$1" in
             exit 1
         fi
 
-        # Sanity check the app.config file
         check_config
         ES=$?
         if [ "$ES" -ne 0 ]; then
@@ -375,7 +343,6 @@ case "$1" in
 
     chkconfig)
         bootstrapd $@
-
         check_config
         ;;
 
@@ -386,10 +353,8 @@ case "$1" in
             echo "$RUNNER_SCRIPT config is not available."
             exit 1
         else
-            # Let's validate the output
-
             case "$1" in
-                effective) ## Great, pass through!
+                effective)
                     ;;
                 describe)
                     if [ $# -lt 2 ] || [ "$2" = "-l" ]; then
@@ -398,7 +363,7 @@ case "$1" in
                         exit 1
                     fi
                     ;;
-                generate) ## Great, pass through!
+                generate)
                     ;;
                 *)
                     echo "Valid commands for $RUNNER_SCRIPT config are:"
@@ -408,6 +373,7 @@ case "$1" in
                     ;;
             esac
 
+            # TODO is this really portable?
             printf '%s \n' "`$CUTTLEFISH_COMMAND_PREFIX $@`"
         fi
         ;;
@@ -426,7 +392,6 @@ case "$1" in
         ;;
 
     getpid)
-        # Get the PID from nodetool
         get_pid
         ES=$?
         if [ "$ES" -ne 0 ] || [ -z $PID ]; then

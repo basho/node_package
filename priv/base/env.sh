@@ -24,7 +24,7 @@ RUNNER_LOG_DIR={{runner_log_dir}}
 RUNNER_LIB_DIR={{runner_lib_dir}}
 RUNNER_PATCH_DIR={{runner_patch_dir}}
 PIPE_DIR={{pipe_dir}}
-RUNNER_USER={{runner_user}}
+RUNNER_GROUP={{runner_user}}
 APP_VERSION={{app_version}}
 
 # Variables needed to support creation of .pid files
@@ -40,6 +40,11 @@ ULIMIT_WARN={{runner_ulimit_warn}}
 if [ -z "$ULIMIT_WARN" ]; then
     ULIMIT_WARN=4096
 fi
+
+# Common config file on Debian-like systems
+[ -r /etc/default/$RUNNER_SCRIPT ] && . /etc/default/$RUNNER_SCRIPT
+# Common config file on RPM-like systems
+[ -r /etc/sysconfig/$RUNNER_SCRIPT ] && . /etc/sysconfig/$RUNNER_SCRIPT
 
 # Registered process to wait for to consider start a success
 WAIT_FOR_PROCESS={{runner_wait_process}}
@@ -96,8 +101,7 @@ fi
 
 # Optionally specify a NUMA policy
 NUMACTL_ARG="{{numactl_arg}}"
-if [ -z "$NUMACTL_ARG" ]
-then
+if [ -z "$NUMACTL_ARG" ]; then
     NUMACTL=""
 # Confirms `numactl` is in the path and validates $NUMACTL_ARG
 elif which numactl > /dev/null 2>&1 && numactl $NUMACTL_ARG ls /dev/null > /dev/null 2>&1
@@ -136,36 +140,40 @@ ping_node() {
     $NODETOOL ping < /dev/null
 }
 
-# Attempts to create a pid directory like /var/run/APPNAME and then
-# changes the permissions on that directory so the $RUNNER_USER can
-# read/write/delete .pid files during startup/shutdown
-create_pid_dir() {
-    # Validate RUNNER_USER is set and they have permissions to write to /var/run
-    # Don't continue if we've already su'd to RUNNER_USER
-    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        if [ -w $RUN_DIR ]; then
-            mkdir -p $PID_DIR
-            ES=$?
-            if [ "$ES" -ne 0 ]; then
-                return 1
-            else
-                # Change permissions on $PID_DIR
-                chown $RUNNER_USER $PID_DIR
-                ES=$?
-                if [ "$ES" -ne 0 ]; then
-                    return 1
-                else
-                    return 0
-                fi
-            fi
-        else
-            # If we don't have permissions, fail
-            return 1
-        fi
+check_dir() {
+    if [ -z "$RUNNER_GROUP" ]; then
+        # If RUNNER_GROUP is not set this is probably a test setup (devrel) and does
+        # not need to be checked
+        return 0
     fi
 
-    # If RUNNER_USER is not set this is probably a test setup (devrel) and does
-    # not need a .pid file, so do not return error
+    DIR="$1"
+
+    if [ -d $DIR ] && [ -w $DIR]; then
+        return 0
+    else
+        echoerr "Unable to access $DIR, permission denied"
+        echoerr "Please run the following commands as root:"
+        echoerr "mkdir -p $DIR"
+        echoerr "chown root:$RUNNER_GROUP $DIR"
+        echoerr "chmod 2775 $DIR"
+        return 1
+    fi
+}
+
+check_dirs() {
+    if [ -z "$RUNNER_GROUP" ]; then
+        # If RUNNER_GROUP is not set this is probably a test setup (devrel) and does
+        # not need to be checked
+        return 0
+    fi
+
+    for DIR in "$PID_DIR" "$RUNNER_LIB_DIR" "$RUNNER_LOG_DIR"; do
+        if ! check_dir "$DIR"; then
+            return 1
+        fi
+    done
+
     return 0
 }
 
@@ -194,61 +202,6 @@ create_pid_file() {
         fi
     else
         return 1
-    fi
-}
-
-
-# Simple way to check the correct user and fail early
-check_user_internal() {
-    # Validate that the user running the script is the owner of the
-    # RUN_DIR.
-    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        if [ "x$WHOAMI" != "xroot" ]; then
-            echo "You need to be root or use sudo to run this command"
-            exit 1
-        fi
-    fi
-}
-
-# Function to su into correct user that is poorly named for historical
-# reasons (excuses)
-# This also serves as an entry point to most functions
-check_user() {
-    check_user_internal
-
-    # This call must be before the su call, when the user is dropped
-    # optional config will be brought in if available
-    load_default_os_config
-
-    # do not su again if we are already the runner user
-    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" != "x$RUNNER_USER" ]); then
-        # Escape any double quotes that might be in the command line
-        # args. Without this, passing something like JSON on the command
-        # line will get stripped.
-        #  Ex:
-        #     riak-admin bucket-type create mytype '{"props": {"n_val": 4}}'
-        #  would become
-        #     riak-admin bucket-type create mytype {props: {n_val: 4}}
-        #  after the arguments were passed into the new shell during exec su
-        #
-        # So this regex finds any '"', '{', or '}' and prepends with a '\'
-        ESCAPED_ARGS=`echo "$@" | sed -e 's/\([{}"]\)/\\\\\1/g'`
-
-        # This will drop priviledges into the runner user
-        # It exec's in a new shell and the current shell will exit
-        exec su - $RUNNER_USER -c "$RUNNER_SCRIPT_DIR/$RUNNER_SCRIPT $ESCAPED_ARGS"
-    fi
-}
-
-# Function to load default config files based on OS
-load_default_os_config() {
-    # Only run this if we already dropped to the runner user
-    if ([ "$RUNNER_USER" ] && [ "x$WHOAMI" = "x$RUNNER_USER" ]); then
-        # Common config file on Debian-like systems
-        [ -r /etc/default/$RUNNER_SCRIPT ] && . /etc/default/$RUNNER_SCRIPT
-
-        # Common config file on RPM-like systems
-        [ -r /etc/sysconfig/$RUNNER_SCRIPT ] && . /etc/sysconfig/$RUNNER_SCRIPT
     fi
 }
 
@@ -299,9 +252,7 @@ check_config() {
 
 # Function to check if ulimit is properly set
 check_ulimit() {
-
-    # don't fail if this is unset
-    if [ ! -z "$ULIMIT_WARN" ]; then
+    if [ -n "$ULIMIT_WARN" ]; then
         ULIMIT_F=`ulimit -n`
         if [ "$ULIMIT_F" -lt $ULIMIT_WARN ]; then
             echo "!!!!"

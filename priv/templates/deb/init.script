@@ -41,6 +41,7 @@ do_start()
     start-stop-daemon --start \
         --name {{package_install_name}} \
         --user {{package_install_user}} \
+        --chuid {{package_install_user}}:{{package_install_user}} \
         --exec $DAEMON -- start \
         || return 2
 }
@@ -66,6 +67,7 @@ do_stop()
                       --quiet \
                       --retry=TERM/30/KILL/5 \
                       --user {{package_install_user}} \
+                      --chuid {{package_install_user}}:{{package_install_user}} \
                       --exec $ERTS_PATH/run_erl
     return $?
 }
