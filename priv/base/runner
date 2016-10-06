@@ -295,9 +295,6 @@ case "$1" in
         # Warn the user if ulimit -n is less than the defined threshold
         check_ulimit
 
-        # Make sure log directory exists
-        mkdir -p $RUNNER_LOG_DIR
-
         # Setup beam-required vars
         ROOTDIR=$RUNNER_BASE_DIR
         BINDIR=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin

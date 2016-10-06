@@ -141,18 +141,19 @@ ping_node() {
 }
 
 check_dir() {
+    DIR="$1"
+
     if [ -z "$RUNNER_GROUP" ]; then
         # If RUNNER_GROUP is not set this is probably a test setup (devrel) and does
-        # not need to be checked
+        # not need to be checked. Just make sure it's there.
+        mkdir -p "$DIR"
         return 0
     fi
-
-    DIR="$1"
 
     if [ -d $DIR ] && [ -w $DIR]; then
         return 0
     else
-        echoerr "Unable to access $DIR, permission denied"
+        echoerr "Unable to access $DIR, nonexistent or permission denied"
         echoerr "Please run the following commands as root:"
         echoerr "mkdir -p $DIR"
         echoerr "chown root:$RUNNER_GROUP $DIR"
@@ -162,18 +163,11 @@ check_dir() {
 }
 
 check_dirs() {
-    if [ -z "$RUNNER_GROUP" ]; then
-        # If RUNNER_GROUP is not set this is probably a test setup (devrel) and does
-        # not need to be checked
-        return 0
-    fi
-
     for DIR in "$PID_DIR" "$RUNNER_LIB_DIR" "$RUNNER_LOG_DIR"; do
         if ! check_dir "$DIR"; then
             return 1
         fi
     done
-
     return 0
 }
 
