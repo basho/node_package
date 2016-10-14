@@ -98,6 +98,8 @@ packing_list_files: $(BUILD_STAGE_DIR)
 	   find {{bin_or_sbin}} -type f >> +CONTENTS
 	cd $(BUILD_STAGE_DIR) && \
 	   echo "@mode 0644" >> +CONTENTS && \
+	   echo "@exec mkdir -p {{platform_etc_dir}}/generated" && \
+	   echo "@exec chown {{package_install_user}}:{{package_install_group}} {{platform_etc_dir}}/generated" && \
 	   find etc -type f >> +CONTENTS && \
 	   find etc -d -type d -mindepth 1 -exec echo "@dirrm {}" \; >> +CONTENTS
 	@echo "Packaging /var files"
