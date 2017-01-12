@@ -306,8 +306,9 @@ case "$1" in
         echo "Remote Shell: Use \"Ctrl-G q\" to quit."
         echo "q() or init:stop() will terminate the $SCRIPT node."
         shift
+        RAND=$(($(($RANDOM % 1000)) + 1))
         NODE_NAME=${NAME_ARG#* }
-        exec $ERTS_PATH/erl -name c_$$_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
+        exec $ERTS_PATH/erl -name c_$RAND_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
         ;;
 
     console)
@@ -362,11 +363,11 @@ case "$1" in
         node_up_check
 
         shift
-        MYPID=$$
+        RAND=$(($(($RANDOM % 1000)) + 1))
         NODE_NAME=${NAME_ARG#* }
         $ERTS_PATH/erl -noshell -noinput \
             -pa $RUNNER_PATCH_DIR \
-            -hidden $NAME_PARAM np_etop$MYPID$NAME_HOST $COOKIE_ARG $NET_TICKTIME_ARG \
+            -hidden $NAME_PARAM np_etop$RAND$NAME_HOST $COOKIE_ARG $NET_TICKTIME_ARG \
             -s etop -s erlang halt -output text \
             -node $NODE_NAME \
             $* -tracing off
