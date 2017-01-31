@@ -142,6 +142,9 @@ process_args(["-sname", TargetName | Rest], Acc, _) ->
     ThisNode = append_node_suffix(TargetName, "_maint_"),
     {ok, _} = net_kernel:start([ThisNode, shortnames]),
     process_args(Rest, Acc, nodename(TargetName));
+process_args(["-kernel","net_ticktime", TicktimeStr | Rest], Acc, TargetNode) ->
+    net_kernel:set_net_ticktime(list_to_integer(TicktimeStr)),
+    process_args(Rest, Acc, TargetNode);
 process_args(["-rpctimeout", TimeoutStr | Rest], Acc, TargetNode) ->
     Timeout = case TimeoutStr of
                   "infinity" -> infinity;
