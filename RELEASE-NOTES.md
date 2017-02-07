@@ -1,3 +1,9 @@
+# node_package 4.0.0
+
+### Breaking ALIAS change
+In the 4.0 branch, the `$NODETOOL` variable has been replaced by the `NODETOOL` alias.
+This change was made to support distributed Erlang built-in TLS. Please see [this issue](https://github.com/basho/riak/issues/509) for more details.
+
 # node_package 3.0.0
 ## Security Improvements
 ### Introduction
