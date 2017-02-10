@@ -125,7 +125,7 @@ ERTS_PATH=$RUNNER_BASE_DIR/erts-$ERTS_VSN/bin
 
 # Setup command to control the node
 if [ -f $RUNNER_ETC_DIR/vm.args ]; then
-    SSL_ARGS=$(grep -e '^\-ssl_dist_opt' -e '^\-proto_dist' $RUNNER_ETC_DIR/vm.args | tr '\n' ' ')
+    SSL_ARGS=`grep -e '^\-ssl_dist_opt' -e '^\-proto_dist' $RUNNER_ETC_DIR/vm.args | tr '\n' ' '`
     ERL_FLAGS="$ERL_FLAGS $SSL_ARGS"
 fi
 alias NODETOOL="ERL_FLAGS=\"$ERL_FLAGS\" $ERTS_PATH/escript $ERTS_PATH/nodetool $NET_TICKTIME_ARG $NAME_ARG $COOKIE_ARG"
@@ -144,7 +144,10 @@ fi
 
 # Ping node without stealing stdin
 ping_node() {
-    NODETOOL ping < /dev/null
+    output=`NODETOOL ping < /dev/null`
+    status=$?
+    echo $output
+    return $status
 }
 
 # Attempts to create a pid directory like /var/run/APPNAME and then
