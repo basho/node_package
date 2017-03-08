@@ -44,7 +44,7 @@ do_status() {
 }
 
 check_pid_status() {
-    pid=$(ps ax | grep beam.smp | grep "\-progname $NAME" | awk '{print $1}')
+    pid=$(ps ax | grep beam.smp | grep "\-progname $NAME " | awk '{print $1}')
     if [ "$pid" = "" ]; then
         # prog not running?
         return 1
