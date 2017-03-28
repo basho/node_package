@@ -308,7 +308,7 @@ case "$1" in
         shift
         RAND=$(($(($$ % 1000)) + 1))
         NODE_NAME=${NAME_ARG#* }
-        exec $ERTS_PATH/erl -name c_$RAND_$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
+        exec $ERTS_PATH/erl -name c$RAND$NODE_NAME -hidden -remsh $NODE_NAME $COOKIE_ARG $NET_TICKTIME_ARG
         ;;
 
     console)
