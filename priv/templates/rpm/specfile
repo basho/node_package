@@ -31,6 +31,8 @@ BuildRoot: %{_tmppath}/%{name}-%{_revision}-%{release}-root
 Summary: {{package_shortdesc}}
 Obsoletes: {{package_name}}
 
+Requires: {{rpm_depends}}
+
 %description
 {{package_desc}}
 
