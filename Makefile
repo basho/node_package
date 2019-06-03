@@ -13,9 +13,15 @@ DEPS_DIR     ?= deps
 ifeq ($(OS),Linux)
 ARCH          = $(shell uname -m)
 ISRPM         = $(shell cat /etc/redhat-release 2> /dev/null)
+ISARPM        = $(shell cat /etc/system-release 2> /dev/null)
 ISDEB         = $(shell cat /etc/debian_version 2> /dev/null)
 ISSLES        = $(shell cat /etc/SuSE-release 2> /dev/null)
 ifneq ($(ISRPM),)
+OSNAME        = RedHat
+PKGERDIR      = rpm
+BUILDDIR      = rpmbuild
+else
+ifneq ($(ISARPM),)
 OSNAME        = RedHat
 PKGERDIR      = rpm
 BUILDDIR      = rpmbuild
@@ -31,6 +37,7 @@ PKGERDIR      = rpm
 BUILDDIR      = rpmbuild
 endif  # SLES
 endif  # deb
+endif  # amazon
 endif  # rpm
 endif  # linux
 
